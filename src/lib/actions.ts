@@ -259,7 +259,7 @@ async function searchResultLegacy(
             const [code, grade] = item.split(':').map((s: string) => s.trim());
             return {
                 code,
-                subject: subjectDetails[code] || 'Unknown Subject',
+                subject: subjectDetails[code] || code,
                 grade
             };
         });
