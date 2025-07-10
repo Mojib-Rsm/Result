@@ -109,7 +109,7 @@ const prompt = ai.definePrompt({
 Exam Name: {{{examName}}}
 Exam Year: {{{examYear}}}
 Board Name: {{{boardName}}}
-Grades: {{{jsonStringify grades}}}
+Grades: {{grades}}
 
 First, use the getScholarshipInfo tool to find relevant scholarships.
 
