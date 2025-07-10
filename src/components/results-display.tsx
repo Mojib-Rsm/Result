@@ -6,18 +6,13 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Download, RotateCcw } from 'lucide-react';
 import type { ExamResult } from '@/types';
-import type { GenerateRecommendationsOutput } from '@/ai/flows/generate-recommendations';
-import AiRecommendations from './ai-recommendations';
-import { Separator } from './ui/separator';
 
 interface ResultsDisplayProps {
   result: ExamResult;
-  recommendations: GenerateRecommendationsOutput | null;
-  isLoadingRecommendations: boolean;
   onReset: () => void;
 }
 
-export default function ResultsDisplay({ result, recommendations, isLoadingRecommendations, onReset }: ResultsDisplayProps) {
+export default function ResultsDisplay({ result, onReset }: ResultsDisplayProps) {
   
   useEffect(() => {
     const originalBodyClassName = document.body.className;
@@ -103,14 +98,6 @@ export default function ResultsDisplay({ result, recommendations, isLoadingRecom
             </Button>
         </CardFooter>
       </Card>
-      
-      {isPass && (
-        <div className="no-print">
-            <Separator />
-            <AiRecommendations recommendations={recommendations} isLoading={isLoadingRecommendations} />
-        </div>
-      )}
-
     </div>
   );
 }

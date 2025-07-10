@@ -1,7 +1,5 @@
 'use server';
 
-import { generateRecommendations } from '@/ai/flows/generate-recommendations';
-import type { GenerateRecommendationsInput } from '@/ai/flows/generate-recommendations';
 import type { ExamResult, GradeInfo } from '@/types';
 import { z } from 'zod';
 import { formSchema } from '@/components/exam-form';
@@ -152,11 +150,4 @@ export async function searchResultAction(
      }
      throw new Error('An unknown error occurred while fetching the result.');
   }
-}
-
-
-export async function getRecommendationsAction(input: GenerateRecommendationsInput) {
-  // Simulate network delay for AI call
-  await new Promise(resolve => setTimeout(resolve, 1500));
-  return generateRecommendations(input);
 }

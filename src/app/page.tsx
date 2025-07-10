@@ -5,15 +5,13 @@ import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
-import { searchResultAction, getRecommendationsAction, getCaptchaAction } from '@/lib/actions';
+import { searchResultAction, getCaptchaAction } from '@/lib/actions';
 import type { CaptchaChallenge } from '@/lib/actions';
 import { ExamForm, formSchema } from '@/components/exam-form';
 import ResultsDisplay from '@/components/results-display';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { ExamResult } from '@/types';
-import type { GenerateRecommendationsOutput } from '@/ai/flows/generate-recommendations';
 import { useHistory } from '@/hooks/use-history';
 
 export default function Home() {
@@ -22,14 +20,12 @@ export default function Home() {
     isFetchingCaptcha: boolean;
     error: string | null;
     result: ExamResult | null;
-    recommendations: GenerateRecommendationsOutput | null;
     captchaChallenge: CaptchaChallenge | null;
   }>({
     isLoading: false,
     isFetchingCaptcha: true,
     error: null,
     result: null,
-    recommendations: null,
     captchaChallenge: null,
   });
 
@@ -73,33 +69,15 @@ export default function Home() {
       return;
     }
 
-    setState({ ...state, isLoading: true, error: null, result: null, recommendations: null });
+    setState({ ...state, isLoading: true, error: null, result: null });
     
     try {
       const examResult = await searchResultAction({ 
         ...values, 
         cookies: state.captchaChallenge.cookies 
       });
-      setState(prevState => ({ ...prevState, result: examResult }));
-
-      if (examResult.status === 'Pass') {
-        const grades = examResult.grades.reduce((acc, g) => {
-          acc[g.subject] = g.grade;
-          return acc;
-        }, {} as Record<string, string>);
-
-        const recommendations = await getRecommendationsAction({
-          examName: values.exam.toUpperCase(),
-          grades,
-          examYear: values.year,
-          boardName: values.board,
-        });
-        setState(prevState => ({ ...prevState, isLoading: false, recommendations }));
-        addHistoryItem({ ...values, result: examResult, recommendations });
-      } else {
-        setState(prevState => ({ ...prevState, isLoading: false }));
-        addHistoryItem({ ...values, result: examResult, recommendations: null });
-      }
+      setState(prevState => ({ ...prevState, result: examResult, isLoading: false }));
+      addHistoryItem({ ...values, result: examResult });
 
     } catch (error) {
       console.error(error);
@@ -108,8 +86,8 @@ export default function Home() {
         isLoading: false,
         error: error instanceof Error ? error.message : 'An unexpected error occurred.',
         result: null,
-        recommendations: null,
       }));
+      fetchCaptcha();
     }
   };
 
@@ -127,7 +105,6 @@ export default function Home() {
       isFetchingCaptcha: false,
       error: null,
       result: null,
-      recommendations: null,
       captchaChallenge: null,
     });
     fetchCaptcha();
@@ -142,7 +119,7 @@ export default function Home() {
           Check Your Results
         </h1>
         <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
-          Enter your exam details to instantly view your results and receive AI-powered recommendations for your future.
+          Enter your exam details to instantly view your results.
         </p>
       </div>
 
@@ -189,8 +166,6 @@ export default function Home() {
         <>
           <ResultsDisplay 
             result={state.result} 
-            recommendations={state.recommendations} 
-            isLoadingRecommendations={state.isLoading && state.result.status === 'Pass'}
             onReset={resetSearch}
           />
         </>

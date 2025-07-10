@@ -1,5 +1,3 @@
-import type { GenerateRecommendationsOutput } from "@/ai/flows/generate-recommendations";
-
 export interface GradeInfo {
   code: string;
   subject: string;
@@ -34,5 +32,4 @@ export interface HistoryItem {
     year: string;
     exam: string;
     result: ExamResult;
-    recommendations: GenerateRecommendationsOutput | null;
 }
