@@ -128,6 +128,9 @@ export async function searchResultAction(
                 motherName: apiResult.mname,
                 group: apiResult.stud_group,
                 dob: apiResult.dob,
+                institute: apiResult.institute_name,
+                type: apiResult.st_type,
+                session: apiResult.session,
             },
             grades: grades,
         };
@@ -139,6 +142,9 @@ export async function searchResultAction(
         }
         if (data.msg && data.msg.toLowerCase().includes('not found')) {
              throw new Error("Result not found. Please check your roll, registration, board, and year and try again.");
+        }
+        if (data.msg && data.msg.toLowerCase().includes('incorrect registration')) {
+            throw new Error('Incorrect registration number. Please check and try again.');
         }
         throw new Error(data.msg || 'An unknown error occurred while fetching the result.');
     }

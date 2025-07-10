@@ -53,14 +53,20 @@
   * {
     @apply border-border;
   }
+  body {
+    @apply bg-background text-foreground;
+  }
 }
 
-body.printing {
-  padding: 2rem;
-}
-.no-print {
-  display: revert;
-}
-body.printing .no-print {
-  display: none !important;
+@media print {
+  body {
+    background-color: white;
+  }
+  .no-print {
+    display: none !important;
+  }
+  #printable-area {
+    box-shadow: none;
+    border: none;
+  }
 }

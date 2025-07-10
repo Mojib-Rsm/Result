@@ -10,6 +10,9 @@ export interface StudentInfo {
   motherName: string;
   group: string;
   dob: string;
+  institute: string;
+  type: string;
+  session: string;
 }
 
 export interface ExamResult {
