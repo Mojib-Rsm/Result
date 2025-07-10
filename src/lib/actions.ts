@@ -47,17 +47,19 @@ export async function getCaptchaAction(): Promise<CaptchaChallenge> {
     const captchaImageUrl = `data:${mimeType};base64,${base64Image}`;
     
     let captchaText = '';
-    try {
-        const result = await readCaptcha({ photoDataUri: captchaImageUrl });
-        captchaText = result.text;
-    } catch(aiError) {
-        console.warn("AI captcha read failed, user will have to enter manually.", aiError);
-    }
+    // Temporarily disable AI captcha reading to avoid server errors on Vercel if API key is not set.
+    // The app can function without it, requiring manual entry.
+    // try {
+    //     const result = await readCaptcha({ photoDataUri: captchaImageUrl });
+    //     captchaText = result.text;
+    // } catch(aiError) {
+    //     console.warn("AI captcha read failed, user will have to enter manually.", aiError);
+    // }
     
     return {
         image: captchaImageUrl,
         cookies: cookies,
-        text: captchaText,
+        text: captchaText, // Will be an empty string
     };
 
   } catch (error) {
