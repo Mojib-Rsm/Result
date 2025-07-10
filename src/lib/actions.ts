@@ -1,3 +1,4 @@
+
 'use server';
 
 import type { ExamResult, GradeInfo } from '@/types';
@@ -106,8 +107,19 @@ async function searchResult2025Ctg(values: z.infer<typeof formSchema>): Promise<
         }
         
         const infoRows = infoTable.querySelectorAll('tr');
+        const infoData: Record<string, string> = {};
 
-        const gpaText = infoRows[5]?.querySelectorAll('td')[1]?.innerText.trim().split('=')[1] || '0';
+        infoRows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            if (cells.length === 4) {
+                infoData[cells[0].innerText.trim()] = cells[1].innerText.trim();
+                infoData[cells[2].innerText.trim()] = cells[3].innerText.trim();
+            } else if (cells.length === 2) {
+                infoData[cells[0].innerText.trim()] = cells[1].innerText.trim();
+            }
+        });
+        
+        const gpaText = infoData['Result']?.split('=')[1] || '0';
         const gpa = parseFloat(gpaText);
 
         const gradesTable = root.querySelector('.tftable2');
@@ -118,7 +130,7 @@ async function searchResult2025Ctg(values: z.infer<typeof formSchema>): Promise<
             const cells = gradeRows[i].querySelectorAll('td');
             if (cells.length === 3) {
                  const subject = cells[1].innerText.trim();
-                 if (subject.toLowerCase().includes('result of ca')) continue; // Skip CA result header
+                 if (subject.toLowerCase().includes('result of ca')) continue;
 
                  const gradeText = cells[2].innerText.trim();
                  const gradeMatch = gradeText.match(/\((.*?)\)/);
@@ -133,33 +145,22 @@ async function searchResult2025Ctg(values: z.infer<typeof formSchema>): Promise<
         }
         
         const result: ExamResult = {
-            roll: infoRows[0].querySelectorAll('td')[1].innerText.trim(),
-            name: infoRows[0].querySelectorAll('td')[3].innerText.trim(),
-            board: infoRows[1].querySelectorAll('td')[1].innerText.trim(),
-            fatherName: infoRows[1].querySelectorAll('td')[3].innerText.trim(),
-            group: infoRows[2].querySelectorAll('td')[1].innerText.trim(),
-            motherName: infoRows[2].querySelectorAll('td')[3].innerText.trim(),
-            session: infoRows[3].querySelectorAll('td')[1].innerText.trim(),
-            reg: infoRows[3].querySelectorAll('td')[3].innerText.trim(),
-            institute: infoRows[4].querySelectorAll('td')[3].innerText.trim(),
-            dob: infoRows[5].querySelectorAll('td')[3].innerText.trim(),
-
-            // Data from form
+            roll: infoData['Roll No'] || '',
+            reg: infoData['Reg. NO'] || '',
+            board: infoData['Board'] || '',
             year: values.year,
             exam: values.exam.toUpperCase(),
-            
-            // Parsed result data
             gpa: gpa,
             status: gpa > 0 ? 'Pass' : 'Fail',
             
             studentInfo: {
-                name: infoRows[0].querySelectorAll('td')[3].innerText.trim(),
-                fatherName: infoRows[1].querySelectorAll('td')[3].innerText.trim(),
-                motherName: infoRows[2].querySelectorAll('td')[3].innerText.trim(),
-                group: infoRows[2].querySelectorAll('td')[1].innerText.trim(),
-                dob: infoRows[5].querySelectorAll('td')[3].innerText.trim(),
-                institute: infoRows[4].querySelectorAll('td')[3].innerText.trim(),
-                session: infoRows[3].querySelectorAll('td')[1].innerText.trim(),
+                name: infoData['Name'] || '',
+                fatherName: infoData["Father's Name"] || '',
+                motherName: infoData["Mother's Name"] || '',
+                group: infoData['Group'] || '',
+                dob: infoData['DATE OF BIRTH'] || '',
+                institute: infoData['Institute'] || '',
+                session: infoData['Session'] || '',
             },
             grades: grades.filter(g => g.subject && g.code),
         };
