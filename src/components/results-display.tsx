@@ -61,17 +61,7 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
       <Card className="shadow-lg" id="printable-area">
         <CardHeader>
           <div className="flex justify-between items-start">
-            <div className='flex items-center gap-4'>
-                <div className="no-print relative h-32 w-32 bg-gray-200 rounded-md border-2 border-dashed flex items-center justify-center">
-                    <Image 
-                        src="https://placehold.co/128x128.png" 
-                        alt="Student Photo"
-                        width={128}
-                        height={128}
-                        className='rounded-md'
-                        data-ai-hint="student portrait"
-                    />
-                </div>
+             <div className="flex-grow flex justify-center items-center">
                 <div className="flex flex-col items-center text-center">
                     <Image 
                         src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Government_Seal_of_Bangladesh.svg/800px-Government_Seal_of_Bangladesh.svg.png" 
@@ -85,7 +75,7 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
                     </Link>
                 </div>
             </div>
-            <div className={`text-right font-bold text-xl`}>
+            <div className={`text-right font-bold text-xl min-w-[120px]`}>
                 <p className={isPass ? 'text-green-600' : 'text-destructive'}>Status: {result.status}</p>
                 {isPass && <p>GPA: {gpa}</p>}
                 {isPass && <p>Grade: {gpaGrade}</p>}
