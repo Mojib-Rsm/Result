@@ -19,8 +19,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.variable}>
-        <div className={cn('font-sans antialiased', 'bg-background text-foreground')}>
+      <body>
+        <div className={cn('font-sans antialiased', inter.variable, 'bg-background text-foreground')}>
           <div className="relative flex min-h-screen flex-col">
             <Header />
             <main className="flex-1">{children}</main>
