@@ -75,7 +75,7 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
         
         pdf.addImage(imgData, 'PNG', x, y, newImgWidth, newImgHeight);
         
-        const fileName = `${result.studentInfo.name.replace(/\s+/g, '_')}-${result.roll}.pdf`;
+        const fileName = `${result.studentInfo.name.replace(/\s+/g, '_')}-${result.roll}-Mojib_Rsm.pdf`;
         pdf.save(fileName);
     } catch(error) {
         console.error("Error generating PDF:", error);
