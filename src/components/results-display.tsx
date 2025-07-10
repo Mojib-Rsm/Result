@@ -166,7 +166,7 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
             <Separator className="my-6" />
             
             <div className="px-6 pb-6 text-center text-xs text-muted-foreground">
-                <p>Thanks for using our service. Contact: mojibrsm@gmail.com</p>
+                <p>Thanks to Mojib Rsm</p>
                 <Link href="https://www.bartanow.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
                     www.bartanow.com
                 </Link>
