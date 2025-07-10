@@ -38,17 +38,17 @@ const FooterContent = () => (
                 <p className="text-sm text-muted-foreground">For any query: mojibrsm@gmail.com</p>
             </div>
             <div className="flex flex-col items-center gap-2 mt-2">
-                <Link href="https://www.oftern.com" target="_blank" rel="noopener noreferrer">
+                <Link href="https://www.bartanow.com" target="_blank" rel="noopener noreferrer">
                     <Image 
                         src="https://www.oftern.com/uploads/logo/favicon_67c1bdb47ee422-18965133.png"
-                        alt="Oftern Logo"
+                        alt="Bartanow Logo"
                         width={40}
                         height={40}
                         className="h-10 w-10 rounded-full"
                     />
                 </Link>
-                <Link href="https://www.oftern.com" target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">
-                    www.oftern.com
+                <Link href="https://www.bartanow.com" target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">
+                    www.bartanow.com
                 </Link>
             </div>
         </div>

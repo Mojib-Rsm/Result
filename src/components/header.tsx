@@ -23,7 +23,7 @@ export default function Header({ className }: HeaderProps) {
   return (
     <header className={cn("sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60", className)}>
       <div className="container flex h-14 max-w-screen-2xl items-center">
-        <Link href="https://www.oftern.com" target="_blank" rel="noopener noreferrer" className="mr-6 flex items-center space-x-2">
+        <Link href="https://www.bartanow.com" target="_blank" rel="noopener noreferrer" className="mr-6 flex items-center space-x-2">
            <Image
             src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Government_Seal_of_Bangladesh.svg/800px-Government_Seal_of_Bangladesh.svg.png"
             alt="Government Seal of Bangladesh"
