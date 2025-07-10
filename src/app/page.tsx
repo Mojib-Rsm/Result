@@ -7,7 +7,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
 import { searchResultAction, getCaptchaAction } from '@/lib/actions';
-import type { CaptchaChallenge } from '@/lib/actions';
 import { ExamForm, formSchema, formSchemaWithoutReg, formSchema2025 } from '@/components/exam-form';
 import ResultsDisplay from '@/components/results-display';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,16 +17,12 @@ import { useHistory } from '@/hooks/use-history';
 export default function Home() {
   const [state, setState] = useState<{
     isLoading: boolean;
-    isFetchingCaptcha: boolean;
     error: string | null;
     result: ExamResult | null;
-    captchaChallenge: CaptchaChallenge | null;
   }>({
     isLoading: false,
-    isFetchingCaptcha: true,
     error: null,
     result: null,
-    captchaChallenge: null,
   });
   
   const { addHistoryItem } = useHistory();
@@ -74,45 +69,24 @@ export default function Home() {
 
   }, [selectedYear, selectedBoard, form]);
 
-  const fetchCaptcha = async () => {
-    setState(prevState => ({ ...prevState, isFetchingCaptcha: true, error: null }));
-    try {
-      const challenge = await getCaptchaAction();
-      setState(prevState => ({ ...prevState, captchaChallenge: challenge, isFetchingCaptcha: false }));
-    } catch (error) {
-      console.error(error);
-      setState(prevState => ({ 
-        ...prevState, 
-        isFetchingCaptcha: false, 
-        error: error instanceof Error ? error.message : 'Could not load security key.' 
-      }));
-    }
-  };
-
-  useEffect(() => {
-    if (isCaptchaRequired) {
-        fetchCaptcha();
-    } else {
-        setState(prevState => ({ ...prevState, captchaChallenge: null, isFetchingCaptcha: false }));
-    }
-     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isCaptchaRequired]);
 
   const handleSearch = async (values: z.infer<typeof formSchema>) => {
-    if (state.isFetchingCaptcha) return; // Prevent submission while captcha is being fetched
-    
-    if (isCaptchaRequired && !state.captchaChallenge?.solvedCaptcha) {
-      setState(prevState => ({ ...prevState, error: 'ক্যাপচা স্বয়ংক্রিয়ভাবে সমাধান করা যায়নি। অনুগ্রহ করে পৃষ্ঠাটি রিফ্রেশ করুন।' }));
-      return;
-    }
-
     setState({ ...state, isLoading: true, error: null, result: null });
     
     try {
+      let captcha = '';
+      let cookies = '';
+
+      if (isCaptchaRequired) {
+        const captchaChallenge = await getCaptchaAction();
+        captcha = captchaChallenge.solvedCaptcha;
+        cookies = captchaChallenge.cookies;
+      }
+      
       const examResult = await searchResultAction({ 
         ...values,
-        captcha: state.captchaChallenge?.solvedCaptcha ?? '',
-        cookies: state.captchaChallenge?.cookies ?? ''
+        captcha,
+        cookies,
       });
       
       const historyEntry: Omit<HistoryItem, 'timestamp'> = { ...values, result: examResult };
@@ -128,10 +102,6 @@ export default function Home() {
         error: error instanceof Error ? error.message : 'একটি অপ্রত্যাশিত ত্রুটি ঘটেছে।',
         result: null,
       }));
-      // Re-fetch captcha only on captcha error
-      if (isCaptchaRequired && error instanceof Error && (error.message.toLowerCase().includes('captcha') || error.message.toLowerCase().includes('security key'))) {
-        fetchCaptcha();
-      }
     }
   };
 
@@ -145,18 +115,11 @@ export default function Home() {
     });
     setState({
       isLoading: false,
-      isFetchingCaptcha: false,
       error: null,
       result: null,
-      captchaChallenge: null,
     });
-    if (isCaptchaRequired) {
-        fetchCaptcha();
-    }
   };
   
-  const isSubmitting = state.isLoading || (isCaptchaRequired && state.isFetchingCaptcha);
-
   return (
     <div className="container mx-auto max-w-4xl px-4 py-8 md:py-12" id="main-content">
       <div className="flex flex-col items-center text-center mb-12 no-print">
@@ -183,7 +146,7 @@ export default function Home() {
             <ExamForm 
               form={form} 
               onSubmit={handleSearch} 
-              isSubmitting={isSubmitting}
+              isSubmitting={state.isLoading}
               isRegRequired={isRegRequired}
             />
           </CardContent>
