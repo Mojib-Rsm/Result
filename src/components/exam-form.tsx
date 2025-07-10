@@ -19,6 +19,8 @@ export const formSchema = z.object({
   captcha: z.string().min(1, 'Please enter the security key.'),
 });
 
+export const formSchemaWithoutReg = formSchema.omit({ reg: true });
+
 const boards = [
     { value: 'barisal', label: 'Barisal' },
     { value: 'chittagong', label: 'Chittagong' },
@@ -35,7 +37,7 @@ const boards = [
 ];
 
 const currentYear = new Date().getFullYear();
-const years = Array.from({ length: 30 }, (_, i) => currentYear - i).map(String);
+const years = Array.from({ length: 30 }, (_, i) => currentYear + 5 - i).map(String);
 const exams = [
     { value: 'ssc', label: 'SSC/Dakhil' },
     { value: 'hsc', label: 'HSC/Alim/Equivalent' },
@@ -54,9 +56,10 @@ interface ExamFormProps {
   captchaImage?: string;
   isFetchingCaptcha: boolean;
   onReloadCaptcha: () => void;
+  isRegRequired: boolean;
 }
 
-export function ExamForm({ form, onSubmit, isSubmitting, captchaImage, isFetchingCaptcha, onReloadCaptcha }: ExamFormProps) {
+export function ExamForm({ form, onSubmit, isSubmitting, captchaImage, isFetchingCaptcha, onReloadCaptcha, isRegRequired }: ExamFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -126,22 +129,25 @@ export function ExamForm({ form, onSubmit, isSubmitting, captchaImage, isFetchin
               </FormItem>
             )}
           />
-           <FormField
-            control={form.control}
-            name="reg"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Registration No.</FormLabel>
-                <FormControl><Input placeholder="e.g., 1234567890" {...field} /></FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+
+          {isRegRequired && (
+            <FormField
+              control={form.control}
+              name="reg"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Registration No.</FormLabel>
+                  <FormControl><Input placeholder="e.g., 1234567890" {...field} /></FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
         
             <div className="flex flex-col gap-2">
                  <FormLabel>Security Key</FormLabel>
                 <div className="flex items-center gap-4">
-                    <div className='relative h-12 w-40 bg-gray-200 rounded-md'>
+                    <div className='relative h-12 w-48 bg-gray-200 rounded-md'>
                     {isFetchingCaptcha ? (
                         <Skeleton className="h-full w-full" />
                     ) : (

@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 
 import { searchResultAction, getCaptchaAction } from '@/lib/actions';
 import type { CaptchaChallenge } from '@/lib/actions';
-import { ExamForm, formSchema } from '@/components/exam-form';
+import { ExamForm, formSchema, formSchemaWithoutReg } from '@/components/exam-form';
 import ResultsDisplay from '@/components/results-display';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -28,11 +28,15 @@ export default function Home() {
     result: null,
     captchaChallenge: null,
   });
-
+  
   const { addHistoryItem } = useHistory();
+  const [isRegRequired, setIsRegRequired] = useState(true);
 
   const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+    resolver: (data, context, options) => {
+        const schema = isRegRequired ? formSchema : formSchemaWithoutReg;
+        return zodResolver(schema)(data, context, options);
+    },
     defaultValues: {
       roll: '',
       reg: '',
@@ -42,6 +46,14 @@ export default function Home() {
       captcha: '',
     },
   });
+
+  const selectedYear = form.watch('year');
+
+  useEffect(() => {
+    // For years 2025 and beyond, registration is not required.
+    const yearNumber = parseInt(selectedYear, 10);
+    setIsRegRequired(yearNumber < 2025);
+  }, [selectedYear]);
 
   const fetchCaptcha = async () => {
     setState(prevState => ({ ...prevState, isFetchingCaptcha: true, error: null }));
@@ -145,6 +157,7 @@ export default function Home() {
               captchaImage={state.captchaChallenge?.captchaImage}
               isFetchingCaptcha={state.isFetchingCaptcha}
               onReloadCaptcha={fetchCaptcha}
+              isRegRequired={isRegRequired}
             />
           </CardContent>
         </Card>

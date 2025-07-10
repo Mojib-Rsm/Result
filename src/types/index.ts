@@ -11,7 +11,6 @@ export interface StudentInfo {
   group: string;
   dob: string;
   institute: string;
-  type: string;
   session: string;
 }
 
@@ -30,7 +29,7 @@ export interface ExamResult {
 
 export interface HistoryItem {
     roll: string;
-    reg: string;
+    reg?: string;
     board: string;
     year: string;
     exam: string;

@@ -65,21 +65,30 @@ export async function searchResultAction(
   values: z.infer<typeof formSchema> & { cookies: string }
 ): Promise<ExamResult> {
   
+  const yearNumber = parseInt(values.year, 10);
+  const isNewApi = yearNumber >= 2025;
+  
+  const apiUrl = isNewApi 
+    ? "https://results.e-board.com/v3/getres" // New API for 2025+
+    : "https://app.eboardresults.com/v2/getres"; // Old API
+
   const params = new URLSearchParams();
   params.append('exam', values.exam);
   params.append('year', values.year);
   params.append('board', values.board);
   params.append('roll', values.roll);
-  params.append('reg', values.reg);
   params.append('captcha', values.captcha);
-  params.append('result_type', '1');
-  params.append('eiin', '');
-  params.append('dcode', '');
-  params.append('ccode', '');
-
+  
+  if (!isNewApi) {
+    params.append('reg', values.reg);
+    params.append('result_type', '1');
+    params.append('eiin', '');
+    params.append('dcode', '');
+    params.append('ccode', '');
+  }
 
   try {
-    const res = await fetch("https://app.eboardresults.com/v2/getres", {
+    const res = await fetch(apiUrl, {
       method: 'POST',
       headers: {
         "Accept": "application/json, text/javascript, */*; q=0.01",
@@ -116,7 +125,7 @@ export async function searchResultAction(
 
         const result: ExamResult = {
             roll: apiResult.roll_no,
-            reg: values.reg,
+            reg: values.reg || apiResult.reg_no || 'N/A', // Use registration from input, fallback to API or N/A
             board: apiResult.board_name,
             year: apiResult.pass_year,
             exam: apiResult.exam_name,
@@ -129,7 +138,6 @@ export async function searchResultAction(
                 group: apiResult.stud_group,
                 dob: apiResult.dob,
                 institute: apiResult.inst_name,
-                type: apiResult.st_type,
                 session: apiResult.session,
             },
             grades: grades,
