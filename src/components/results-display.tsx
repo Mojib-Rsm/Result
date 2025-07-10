@@ -2,6 +2,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -58,15 +59,25 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
     <div className="space-y-8">
       <Card className="shadow-lg" id="printable-area">
         <CardHeader>
-          <div className="flex flex-col md:flex-row justify-between items-start">
-            <div className='mb-4 md:mb-0'>
+          <div className="flex flex-col items-center text-center mb-4">
+              <Image 
+                src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Government_Seal_of_Bangladesh.svg/800px-Government_Seal_of_Bangladesh.svg.png" 
+                alt="Government Seal of Bangladesh"
+                width={60}
+                height={60}
+                className="h-16 w-16 mb-2"
+              />
               <CardTitle className="text-2xl text-primary">Result Marksheet</CardTitle>
               <CardDescription>{result.exam.toUpperCase()} Examination - {result.year}</CardDescription>
+          </div>
+          <div className="flex flex-col md:flex-row justify-between items-start">
+            <div className='mb-4 md:mb-0'>
+               
             </div>
             <div className={`text-right font-bold text-xl`}>
                 <p className={isPass ? 'text-green-600' : 'text-destructive'}>Status: {result.status}</p>
-                {isPass && <p className="text-green-600">GPA: {gpa}</p>}
-                {isPass && <p className="text-green-600">Grade: {gpaGrade}</p>}
+                {isPass && <p>GPA: {gpa}</p>}
+                {isPass && <p>Grade: {gpaGrade}</p>}
             </div>
           </div>
         </CardHeader>

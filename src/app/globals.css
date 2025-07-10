@@ -4,25 +4,34 @@
 
 @layer base {
   :root {
-    --background: 225 100% 96%;
+    --background: 220 20% 96%;
     --foreground: 222 84% 5%;
+
     --card: 0 0% 100%;
     --card-foreground: 222 84% 5%;
+
     --popover: 0 0% 100%;
     --popover-foreground: 222 84% 5%;
-    --primary: 229 58% 46%;
-    --primary-foreground: 210 40% 98%;
-    --secondary: 225 50% 90%;
-    --secondary-foreground: 229 58% 46%;
-    --muted: 225 50% 90%;
+
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 14% 91%;
+    --secondary-foreground: 222 84% 5%;
+
+    --muted: 220 14% 91%;
     --muted-foreground: 225 10% 45%;
-    --accent: 256 85% 65%;
-    --accent-foreground: 210 40% 98%;
+
+    --accent: 24 94% 50%;
+    --accent-foreground: 0 0% 100%;
+
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 225 50% 88%;
-    --input: 225 50% 88%;
-    --ring: 229 58% 46%;
+
+    --border: 220 13% 89%;
+    --input: 220 13% 89%;
+    --ring: 217 91% 60%;
+    
     --radius: 0.5rem;
   }
 
@@ -33,19 +42,19 @@
     --card-foreground: 210 40% 98%;
     --popover: 222 84% 5%;
     --popover-foreground: 210 40% 98%;
-    --primary: 210 40% 98%;
-    --primary-foreground: 222 84% 5%;
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 100%;
     --secondary: 217 33% 18%;
     --secondary-foreground: 210 40% 98%;
     --muted: 217 33% 18%;
     --muted-foreground: 215 20% 65%;
-    --accent: 256 85% 65%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 24 94% 50%;
+    --accent-foreground: 0 0% 100%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 0 0% 98%;
     --border: 217 33% 18%;
     --input: 217 33% 18%;
-    --ring: 256 85% 75%;
+    --ring: 217 91% 70%;
   }
 }
 
@@ -60,13 +69,13 @@
 
 @media print {
   body {
-    background-color: white;
+    background-color: white !important;
   }
   .no-print {
     display: none !important;
   }
   #printable-area {
-    box-shadow: none;
-    border: none;
+    box-shadow: none !important;
+    border: none !important;
   }
 }
