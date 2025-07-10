@@ -1,3 +1,4 @@
+
 'use client';
 
 import Image from 'next/image';
@@ -16,7 +17,7 @@ export const formSchema = z.object({
   board: z.string(),
   year: z.string(),
   exam: z.string(),
-  captcha: z.string().min(1, 'অনুগ্রহ করে নিরাপত্তা কী লিখুন।'),
+  captcha: z.string().min(1, 'অনুগ্রহ করে সিক্রেট কোড লিখুন।'),
 });
 
 export const formSchemaWithoutReg = formSchema.omit({ reg: true });
@@ -153,7 +154,7 @@ export function ExamForm({ form, onSubmit, isSubmitting, captchaImage, isFetchin
           {isCaptchaRequired && (
             <>
               <div className="flex flex-col gap-2">
-                  <FormLabel>নিরাপত্তা কী</FormLabel>
+                  <FormLabel>সিক্রেট কোড</FormLabel>
                   <div className="flex items-center gap-4">
                       <div className='relative h-12 w-48 bg-gray-200 rounded-md'>
                       {isFetchingCaptcha ? (
@@ -173,7 +174,7 @@ export function ExamForm({ form, onSubmit, isSubmitting, captchaImage, isFetchin
                   render={({ field }) => (
                   <FormItem>
                       <FormLabel>ছবিতে দেখানো সংখ্যাগুলো লিখুন</FormLabel>
-                      <FormControl><Input placeholder="নিরাপত্তা কী এখানে লিখুন" {...field} /></FormControl>
+                      <FormControl><Input placeholder="সিক্রেট কোড এখানে লিখুন" {...field} /></FormControl>
                       <FormMessage />
                   </FormItem>
                   )}
