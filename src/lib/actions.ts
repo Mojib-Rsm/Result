@@ -16,26 +16,26 @@ export async function searchResultAction(
   });
   const sessionCookie = mainPageRes.headers.get('set-cookie')?.split(';')[0] || '';
   
-  if (!sessionCookie) {
-    throw new Error('Could not establish session with the results server.');
-  }
+  // The cookie might not always be sent, so we don't fail here. We'll pass it if we have it.
 
   const mainPageHtml = await mainPageRes.text();
   const mainRoot = parse(mainPageHtml);
 
   // 2. Extract captcha values from the form.
-  const captchaRow = mainRoot.querySelector('tr:nth-child(8)');
+  const captchaRow = mainRoot.querySelector('form table tr:nth-child(7)'); // The captcha is usually in the 7th row.
   if (!captchaRow) {
-    throw new Error('Could not find the captcha on the page.');
+    throw new Error('Could not find the captcha on the page. The website layout may have changed.');
   }
 
   const captchaText = captchaRow.querySelector('td:nth-child(2)')?.innerText.trim();
   if (!captchaText) {
       throw new Error('Could not read the captcha text.');
   }
-  const numbers = captchaText.match(/\d+/g);
+
+  // The text is usually like "2 + 8 ="
+  const numbers = captchaText.match(/\d/g);
   if (!numbers || numbers.length < 2) {
-      throw new Error('Could not parse captcha numbers.');
+      throw new Error('Could not parse captcha numbers from text: ' + captchaText);
   }
 
   const value_a = parseInt(numbers[0], 10);
@@ -55,13 +55,18 @@ export async function searchResultAction(
   formData.append('value_b', String(value_b));
   formData.append('value_s', String(value_s));
 
+  const headers: HeadersInit = {
+    "Referer": "http://www.educationboardresults.gov.bd/",
+    "User-Agent": "Mozilla/5.0"
+  };
+
+  if (sessionCookie) {
+    headers["Cookie"] = sessionCookie;
+  }
+
   const res = await fetch("http://www.educationboardresults.gov.bd/result.php", {
     method: 'POST',
-    headers: {
-      "Cookie": sessionCookie,
-      "Referer": "http://www.educationboardresults.gov.bd/",
-      "User-Agent": "Mozilla/5.0"
-    },
+    headers,
     body: formData,
   });
 
@@ -72,15 +77,22 @@ export async function searchResultAction(
   const resultHtml = await res.text();
   const resultRoot = parse(resultHtml);
 
+  // Check for result not found message
+  if (resultHtml.includes("Result Not Found")) {
+      throw new Error("Result not found. Please check your roll, registration, board, and year and try again.");
+  }
+  
   const resultDiv = resultRoot.querySelector('.result_display');
   if (!resultDiv) {
-    // Check for specific error messages
     const bodyText = resultRoot.querySelector('body')?.innerText.trim();
     if (bodyText && bodyText.includes('Roll No. does not exist')) {
         throw new Error('The provided Roll Number does not exist for the selected board and year.');
     }
     if (bodyText && bodyText.includes('Registration No. mismatched')) {
         throw new Error('Registration number mismatched.');
+    }
+    if (bodyText && bodyText.includes('are not numeric')) {
+        throw new Error('Security answer is not correct. Please try again.');
     }
     throw new Error('Could not parse the result page. The result format might have changed.');
   }
@@ -96,8 +108,9 @@ export async function searchResultAction(
       return row?.querySelectorAll('td')[1]?.innerText.trim() || '';
   };
 
-  const gpa = parseFloat(getTableValue('GPA'));
-  const status = isNaN(gpa) || gpa === 0 ? 'Fail' : 'Pass';
+  const gpaStr = getTableValue('GPA');
+  const gpa = gpaStr.toLowerCase() !== 'failed' ? parseFloat(gpaStr) : 0;
+  const status = gpa > 0 ? 'Pass' : 'Fail';
 
   const grades: GradeInfo[] = [];
   const gradesTable = resultDiv.querySelectorAll('table')[1];
@@ -118,10 +131,10 @@ export async function searchResultAction(
 
   const result: ExamResult = {
     roll: getTableValue('Roll No'),
-    reg: values.reg, // This API doesn't return the reg no in the result page
+    reg: values.reg, 
     board: getTableValue('Board'),
-    year: values.year, // Nor the year
-    exam: values.exam.toUpperCase(), // Nor the exam name
+    year: values.year,
+    exam: values.exam.toUpperCase(),
     gpa: isNaN(gpa) ? 0 : gpa,
     status,
     studentInfo: {
@@ -140,6 +153,6 @@ export async function searchResultAction(
 
 export async function getRecommendationsAction(input: GenerateRecommendationsInput) {
   // Simulate network delay for AI call
-  await new Promise(resolve => setTimeout(resolve, 2000));
+  await new Promise(resolve => setTimeout(resolve, 1500));
   return generateRecommendations(input);
 }
