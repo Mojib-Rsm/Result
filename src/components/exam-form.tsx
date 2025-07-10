@@ -154,7 +154,6 @@ export function ExamForm({ form, onSubmit, isSubmitting, captchaImage, isFetchin
           {isCaptchaRequired && (
             <>
               <div className="flex flex-col gap-2">
-                  <FormLabel>সিক্রেট কোড</FormLabel>
                   <div className="flex items-center gap-4">
                       <div className='relative h-12 w-48 bg-gray-200 rounded-md flex items-center justify-center'>
                       {isFetchingCaptcha ? (
