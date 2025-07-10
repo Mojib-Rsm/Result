@@ -97,14 +97,19 @@ const getCareerOptions = ai.defineTool(
 const prompt = ai.definePrompt({
   name: 'generateRecommendationsPrompt',
   tools: [getScholarshipInfo, getCareerOptions],
-  input: {schema: GenerateRecommendationsInputSchema},
+  input: {schema: z.object({
+    examName: z.string(),
+    examYear: z.string(),
+    boardName: z.string(),
+    grades: z.record(z.string(), z.string())
+  })},
   output: {schema: GenerateRecommendationsOutputSchema},
   prompt: `You are an AI career counselor. Based on the student's exam results, provide personalized recommendations for scholarships, subject suggestions, and career options.
 
 Exam Name: {{{examName}}}
 Exam Year: {{{examYear}}}
 Board Name: {{{boardName}}}
-Grades: {{grades}}
+Grades: {{{jsonStringify grades}}}
 
 First, use the getScholarshipInfo tool to find relevant scholarships.
 

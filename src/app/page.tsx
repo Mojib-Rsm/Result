@@ -48,7 +48,8 @@ export default function Home() {
   });
 
   const fetchCaptcha = async () => {
-    setState(prevState => ({ ...prevState, isFetchingCaptcha: true, error: null }));
+    // Only clear the error if we are not already showing one.
+    setState(prevState => ({ ...prevState, isFetchingCaptcha: true, error: prevState.error ? prevState.error : null }));
     try {
       const challenge = await getCaptchaAction();
       setState(prevState => ({ ...prevState, captchaChallenge: challenge, isFetchingCaptcha: false }));
@@ -102,7 +103,7 @@ export default function Home() {
 
     } catch (error) {
       console.error(error);
-      fetchCaptcha();
+      // Don't fetch captcha here, let the user decide.
       setState(prevState => ({
         ...prevState,
         isLoading: false,
