@@ -19,14 +19,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body>
-        <div className={cn('font-sans antialiased', inter.variable)}>
-          <div className="relative flex min-h-screen flex-col bg-background">
-            <Header />
-            <main className="flex-1">{children}</main>
-          </div>
-          <Toaster />
+      <body className={cn('font-sans antialiased', inter.variable)}>
+        <div className="relative flex min-h-screen flex-col bg-background">
+          <Header />
+          <main className="flex-1">{children}</main>
         </div>
+        <Toaster />
       </body>
     </html>
   );
