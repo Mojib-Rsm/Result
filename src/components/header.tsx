@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { GraduationCap, History } from 'lucide-react';
+import { GraduationCap, History, FileText } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -14,6 +14,7 @@ export default function Header({ className }: { className?: string }) {
   const navLinks = [
     { href: '/', label: 'হোম', icon: GraduationCap },
     { href: '/history', label: 'ইতিহাস', icon: History },
+    { href: '/image-to-text', label: 'ছবি থেকে লেখা', icon: FileText },
   ];
 
   return (
@@ -47,7 +48,10 @@ export default function Header({ className }: { className?: string }) {
                 pathname === link.href ? 'text-foreground' : 'text-foreground/60'
               )}
             >
-              <Link href={link.href}>{link.label}</Link>
+              <Link href={link.href} className="flex items-center gap-2">
+                <link.icon className="h-4 w-4" />
+                {link.label}
+              </Link>
             </Button>
           ))}
         </nav>
