@@ -84,6 +84,7 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-2 mb-4 text-sm">
             <div><strong>Roll No:</strong> {result.roll}</div>
+            <div><strong>Reg No:</strong> {result.reg}</div>
             <div><strong>Name:</strong> {result.studentInfo.name}</div>
             <div><strong>Father's Name:</strong> {result.studentInfo.fatherName}</div>
             <div><strong>Board:</strong> <span className="capitalize">{result.board}</span></div>
@@ -91,7 +92,6 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
             <div><strong>Mother's Name:</strong> {result.studentInfo.motherName}</div>
             <div><strong>Date of Birth:</strong> {result.studentInfo.dob}</div>
             <div className="md:col-span-2"><strong>Institute:</strong> {result.studentInfo.institute}</div>
-            <div><strong>Type:</strong> {result.studentInfo.type}</div>
             <div className="md:col-span-2"><strong>Session:</strong> {result.studentInfo.session}</div>
           </div>
 
@@ -117,6 +117,15 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
             </TableBody>
           </Table>
         </CardContent>
+
+         <Separator className="my-6" />
+        
+        <div className="px-6 pb-6 text-center text-xs text-muted-foreground">
+             <p>For any queries, contact: developer.mojibrsm@gmail.com</p>
+             <p>Developed by: <span className="font-semibold text-foreground">Mojib Rsm</span></p>
+        </div>
+
+
         <CardFooter className="flex justify-end gap-2 no-print mt-6">
             {!isDialog && onReset && (
                 <Button variant="outline" onClick={onReset}>
