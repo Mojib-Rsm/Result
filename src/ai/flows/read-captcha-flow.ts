@@ -35,7 +35,7 @@ const prompt = ai.definePrompt({
   output: {schema: ReadCaptchaOutputSchema},
   prompt: `You are an expert OCR (Optical Character Recognition) tool specializing in reading distorted captcha images. Your primary task is to extract the numerical digits from the provided image, ignoring all background noise, distortions, and other non-numeric elements.
 
-The image is a heavily distorted captcha. Focus exclusively on identifying the core sequence of numbers, which are typically between 4 and 6 digits long. Do your absolute best to decipher the correct numbers.
+The image is a heavily distorted captcha, often at an angle. Focus exclusively on identifying the core sequence of numbers, which are typically between 4 and 6 digits long. Do your absolute best to decipher the correct numbers, even if they are skewed, blurry, or partially obscured.
 
 Image: {{media url=photoDataUri}}`,
 });
