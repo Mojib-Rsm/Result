@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 
 import { searchResultAction, getCaptchaAction } from '@/lib/actions';
 import type { CaptchaChallenge } from '@/lib/actions';
-import { ExamForm, formSchema, formSchemaWithoutReg } from '@/components/exam-form';
+import { ExamForm, formSchema, formSchemaWithoutReg, formSchema2025 } from '@/components/exam-form';
 import ResultsDisplay from '@/components/results-display';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -31,10 +31,20 @@ export default function Home() {
   
   const { addHistoryItem } = useHistory();
   const [isRegRequired, setIsRegRequired] = useState(true);
+  const [isCaptchaRequired, setIsCaptchaRequired] = useState(true);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: (data, context, options) => {
-        const schema = isRegRequired ? formSchema : formSchemaWithoutReg;
+        let schema;
+        const is2025Ctg = data.year === '2025' && data.board === 'chittagong';
+
+        if (is2025Ctg) {
+          schema = formSchema2025;
+        } else if (isRegRequired) {
+          schema = formSchema;
+        } else {
+          schema = formSchemaWithoutReg;
+        }
         return zodResolver(schema)(data, context, options);
     },
     defaultValues: {
@@ -48,12 +58,21 @@ export default function Home() {
   });
 
   const selectedYear = form.watch('year');
+  const selectedBoard = form.watch('board');
 
   useEffect(() => {
-    // For years 2025 and beyond, registration is not required.
     const yearNumber = parseInt(selectedYear, 10);
-    setIsRegRequired(yearNumber < 2025);
-  }, [selectedYear]);
+    const is2025Ctg = yearNumber === 2025 && selectedBoard === 'chittagong';
+
+    setIsRegRequired(!is2025Ctg);
+    setIsCaptchaRequired(!is2025Ctg);
+
+    if (is2025Ctg) {
+      form.setValue('reg', '');
+      form.setValue('captcha', '');
+    }
+
+  }, [selectedYear, selectedBoard, form]);
 
   const fetchCaptcha = async () => {
     setState(prevState => ({ ...prevState, isFetchingCaptcha: true, error: null }));
@@ -71,12 +90,16 @@ export default function Home() {
   };
 
   useEffect(() => {
-    fetchCaptcha();
+    if (isCaptchaRequired) {
+        fetchCaptcha();
+    } else {
+        setState(prevState => ({ ...prevState, captchaChallenge: null, isFetchingCaptcha: false }));
+    }
      // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isCaptchaRequired]);
 
   const handleSearch = async (values: z.infer<typeof formSchema>) => {
-    if (!state.captchaChallenge) {
+    if (isCaptchaRequired && !state.captchaChallenge) {
       setState(prevState => ({ ...prevState, error: 'Captcha not loaded. Please refresh.' }));
       return;
     }
@@ -86,7 +109,7 @@ export default function Home() {
     try {
       const examResult = await searchResultAction({ 
         ...values, 
-        cookies: state.captchaChallenge.cookies 
+        cookies: state.captchaChallenge?.cookies ?? ''
       });
       addHistoryItem({ ...values, result: examResult });
       setState(prevState => ({ ...prevState, result: examResult, isLoading: false }));
@@ -100,7 +123,7 @@ export default function Home() {
         result: null,
       }));
       // Re-fetch captcha only on captcha error
-      if (error instanceof Error && error.message.toLowerCase().includes('captcha')) {
+      if (isCaptchaRequired && error instanceof Error && error.message.toLowerCase().includes('captcha')) {
         fetchCaptcha();
       }
     }
@@ -122,10 +145,12 @@ export default function Home() {
       result: null,
       captchaChallenge: null,
     });
-    fetchCaptcha();
+    if (isCaptchaRequired) {
+        fetchCaptcha();
+    }
   };
   
-  const isSubmitting = state.isLoading || state.isFetchingCaptcha;
+  const isSubmitting = state.isLoading || (isCaptchaRequired && state.isFetchingCaptcha);
 
   return (
     <div className="container mx-auto max-w-4xl px-4 py-8 md:py-12" id="main-content">
@@ -158,6 +183,7 @@ export default function Home() {
               isFetchingCaptcha={state.isFetchingCaptcha}
               onReloadCaptcha={fetchCaptcha}
               isRegRequired={isRegRequired}
+              isCaptchaRequired={isCaptchaRequired}
             />
           </CardContent>
         </Card>

@@ -22,6 +22,9 @@ export const formSchema = z.object({
 
 export const formSchemaWithoutReg = formSchema.omit({ reg: true });
 
+export const formSchema2025 = formSchema.omit({ reg: true, captcha: true });
+
+
 const boards = [
     { value: 'barisal', label: 'Barisal' },
     { value: 'chittagong', label: 'Chittagong' },
@@ -38,7 +41,8 @@ const boards = [
 ];
 
 const maxYear = 2025;
-const years = Array.from({ length: 30 }, (_, i) => maxYear - i).map(String);
+const years = Array.from({ length: maxYear - 1996 + 1 }, (_, i) => maxYear - i).map(String);
+
 
 const exams = [
     { value: 'ssc', label: 'SSC/Dakhil' },
@@ -59,9 +63,10 @@ interface ExamFormProps {
   isFetchingCaptcha: boolean;
   onReloadCaptcha: () => void;
   isRegRequired: boolean;
+  isCaptchaRequired: boolean;
 }
 
-export function ExamForm({ form, onSubmit, isSubmitting, captchaImage, isFetchingCaptcha, onReloadCaptcha, isRegRequired }: ExamFormProps) {
+export function ExamForm({ form, onSubmit, isSubmitting, captchaImage, isFetchingCaptcha, onReloadCaptcha, isRegRequired, isCaptchaRequired }: ExamFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -146,32 +151,36 @@ export function ExamForm({ form, onSubmit, isSubmitting, captchaImage, isFetchin
             />
           )}
         
-            <div className="flex flex-col gap-2">
-                 <FormLabel>Security Key</FormLabel>
-                <div className="flex items-center gap-4">
-                    <div className='relative h-12 w-48 bg-gray-200 rounded-md'>
-                    {isFetchingCaptcha ? (
-                        <Skeleton className="h-full w-full" />
-                    ) : (
-                        captchaImage && <Image src={captchaImage} alt="Captcha" layout="fill" objectFit="contain" />
-                    )}
-                    </div>
-                     <Button type="button" variant="secondary" size="icon" onClick={onReloadCaptcha} disabled={isFetchingCaptcha}>
-                        <RefreshCw className={`h-4 w-4 ${isFetchingCaptcha ? 'animate-spin' : ''}`} />
-                    </Button>
-                </div>
-            </div>
-             <FormField
-                control={form.control}
-                name="captcha"
-                render={({ field }) => (
-                <FormItem>
-                    <FormLabel>Type the digits visible on the image</FormLabel>
-                    <FormControl><Input placeholder="Type the security key here" {...field} /></FormControl>
-                    <FormMessage />
-                </FormItem>
-                )}
-            />
+          {isCaptchaRequired && (
+            <>
+              <div className="flex flex-col gap-2">
+                  <FormLabel>Security Key</FormLabel>
+                  <div className="flex items-center gap-4">
+                      <div className='relative h-12 w-48 bg-gray-200 rounded-md'>
+                      {isFetchingCaptcha ? (
+                          <Skeleton className="h-full w-full" />
+                      ) : (
+                          captchaImage && <Image src={captchaImage} alt="Captcha" layout="fill" objectFit="contain" />
+                      )}
+                      </div>
+                      <Button type="button" variant="secondary" size="icon" onClick={onReloadCaptcha} disabled={isFetchingCaptcha}>
+                          <RefreshCw className={`h-4 w-4 ${isFetchingCaptcha ? 'animate-spin' : ''}`} />
+                      </Button>
+                  </div>
+              </div>
+              <FormField
+                  control={form.control}
+                  name="captcha"
+                  render={({ field }) => (
+                  <FormItem>
+                      <FormLabel>Type the digits visible on the image</FormLabel>
+                      <FormControl><Input placeholder="Type the security key here" {...field} /></FormControl>
+                      <FormMessage />
+                  </FormItem>
+                  )}
+              />
+            </>
+          )}
 
         </div>
         <div className="flex justify-end pt-4">

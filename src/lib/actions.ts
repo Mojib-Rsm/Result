@@ -3,6 +3,7 @@
 import type { ExamResult, GradeInfo } from '@/types';
 import { z } from 'zod';
 import { formSchema } from '@/components/exam-form';
+import { parse } from 'node-html-parser';
 
 export type CaptchaChallenge = {
   captchaImage: string; // Base64 Data URI
@@ -59,33 +60,117 @@ export async function getCaptchaAction(): Promise<CaptchaChallenge> {
   }
 }
 
-
 // Action 2: Submit the form with the captcha to get the result
 export async function searchResultAction(
   values: z.infer<typeof formSchema> & { cookies: string }
 ): Promise<ExamResult> {
   
   const yearNumber = parseInt(values.year, 10);
-  const isNewApi = yearNumber >= 2025;
-  
-  const apiUrl = isNewApi 
-    ? "https://results.e-board.com/v3/getres" // New API for 2025+
-    : "https://app.eboardresults.com/v2/getres"; // Old API
+  const is2025Ctg = yearNumber === 2025 && values.board === 'chittagong';
+
+  if (is2025Ctg) {
+      return searchResult2025Ctg(values);
+  }
+
+  return searchResultLegacy(values);
+}
+
+// Handler for 2025 Chittagong Board API
+async function searchResult2025Ctg(values: z.infer<typeof formSchema>): Promise<ExamResult> {
+    try {
+        const res = await fetch("https://sresult.bise-ctg.gov.bd/rxto2025/individual/result.php", {
+            "headers": {
+                "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+                "content-type": "application/x-www-form-urlencoded",
+                "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
+            },
+            "body": `roll=${values.roll}&button2=`,
+            "method": "POST"
+        });
+
+        if (!res.ok) {
+            throw new Error(`Result server responded with status: ${res.status}`);
+        }
+
+        const html = await res.text();
+        const root = parse(html);
+
+        const resultTable = root.querySelector('.tftable');
+        if (!resultTable) {
+            throw new Error("Result not found. Please check your roll number.");
+        }
+        const resultCells = resultTable.querySelectorAll('td');
+
+        const gpaText = resultCells[11]?.innerText.trim().split('=')[1] || '0';
+
+        const gradesTable = root.querySelector('.tftable2');
+        const gradeRows = gradesTable?.querySelectorAll('tr') || [];
+        const grades: GradeInfo[] = [];
+
+        for (let i = 1; i < gradeRows.length; i++) { // Skip header row
+            const cells = gradeRows[i].querySelectorAll('td');
+            if (cells.length === 3) {
+                 const gradeText = cells[2].innerText.trim();
+                 const gradeMatch = gradeText.match(/\((\w[+-]?)\s*\)/);
+                 const grade = gradeMatch ? gradeMatch[1] : gradeText;
+
+                grades.push({
+                    code: cells[0].innerText.trim(),
+                    subject: cells[1].innerText.trim(),
+                    grade: grade,
+                });
+            }
+        }
+        
+        const result: ExamResult = {
+            roll: resultCells[1].innerText.trim(),
+            reg: resultCells[7].innerText.trim(),
+            board: resultCells[3].innerText.trim(),
+            year: values.year,
+            exam: values.exam.toUpperCase(),
+            gpa: parseFloat(gpaText),
+            status: parseFloat(gpaText) > 0 ? 'Pass' : 'Fail',
+            studentInfo: {
+                name: resultCells[5].innerText.trim(),
+                fatherName: resultCells[4].innerText.trim(),
+                motherName: resultCells[6].innerText.trim(),
+                group: resultCells[2].innerText.trim(),
+                dob: resultCells[12].innerText.trim(),
+                institute: resultCells[10].innerText.trim(),
+                session: resultCells[8].innerText.trim(),
+            },
+            grades: grades.filter(g => !g.subject.includes('Result of CA')), // Filter out non-subject rows
+        };
+
+        return result;
+
+    } catch (error) {
+        console.error("2025 Result fetch failed:", error);
+        if (error instanceof Error) {
+            throw new Error(error.message);
+        }
+        throw new Error('An unknown error occurred while fetching the 2025 result.');
+    }
+}
+
+
+// Handler for Legacy E-Board Result API
+async function searchResultLegacy(
+  values: z.infer<typeof formSchema> & { cookies: string }
+): Promise<ExamResult> {
+  const apiUrl = "https://app.eboardresults.com/v2/getres";
 
   const params = new URLSearchParams();
   params.append('exam', values.exam);
   params.append('year', values.year);
   params.append('board', values.board);
   params.append('roll', values.roll);
+  params.append('reg', values.reg);
   params.append('captcha', values.captcha);
-  
-  if (!isNewApi) {
-    params.append('reg', values.reg);
-    params.append('result_type', '1');
-    params.append('eiin', '');
-    params.append('dcode', '');
-    params.append('ccode', '');
-  }
+  params.append('result_type', '1');
+  params.append('eiin', '');
+  params.append('dcode', '');
+  params.append('ccode', '');
 
   try {
     const res = await fetch(apiUrl, {
