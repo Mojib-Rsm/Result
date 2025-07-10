@@ -10,10 +10,17 @@ import { parse } from 'node-html-parser';
 export async function searchResultAction(
   values: z.infer<typeof formSchema>
 ): Promise<ExamResult> {
-  // 1. Fetch the homepage to get a session cookie and the captcha values.
-  const mainPageRes = await fetch("http://www.educationboardresults.gov.bd/", {
-    headers: { 'User-Agent': 'Mozilla/5.0' }
-  });
+  let mainPageRes;
+  try {
+    // 1. Fetch the homepage to get a session cookie and the captcha values.
+    mainPageRes = await fetch("http://www.educationboardresults.gov.bd/", {
+      headers: { 'User-Agent': 'Mozilla/5.0' }
+    });
+  } catch (error) {
+    console.error("Fetch failed:", error);
+    throw new Error("Could not connect to the education board's result server. It may be offline or blocking requests. Please try again later.");
+  }
+  
   const sessionCookie = mainPageRes.headers.get('set-cookie')?.split(';')[0] || '';
   
   // The cookie might not always be sent, so we don't fail here. We'll pass it if we have it.
