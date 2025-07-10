@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { History as HistoryIcon, Search, Trash2, Eye } from 'lucide-react';
+import { History as HistoryIcon, Search, Trash2, Eye, School } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import ResultsDisplay from '@/components/results-display';
 import type { HistoryItem } from '@/types';
@@ -76,10 +76,16 @@ export default function HistoryPage() {
                         </Badge>
                     </div>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="space-y-2">
                     <p><strong>Exam:</strong> <span className="uppercase">{item.exam}</span>, {item.year}</p>
                     <p><strong>Board:</strong> <span className="capitalize">{item.board}</span></p>
                     {item.result.status === 'Pass' && <p><strong>GPA:</strong> {item.result.gpa.toFixed(2)}</p>}
+                     <div className="flex items-start pt-1">
+                        <School className="h-4 w-4 mr-2 mt-1 text-muted-foreground flex-shrink-0" />
+                        <p className="text-sm text-muted-foreground flex-1">
+                            {item.result.studentInfo.institute}
+                        </p>
+                    </div>
                 </CardContent>
                 <CardFooter>
                     <DialogTrigger asChild>

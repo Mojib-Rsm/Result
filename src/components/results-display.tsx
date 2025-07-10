@@ -55,13 +55,20 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
   const gpa = result.gpa.toFixed(2);
   const isPass = result.status === 'Pass';
   const gpaGrade = getGpaGrade(result.gpa);
+  
+  const InfoItem = ({ label, value }: { label: string, value: string | undefined}) => (
+    <div className="flex flex-col p-2 bg-muted/30 rounded-md">
+        <span className="text-xs text-muted-foreground">{label}</span>
+        <span className="font-semibold text-sm capitalize">{value || 'N/A'}</span>
+    </div>
+  );
 
   return (
     <div className="space-y-8">
       <Card className="shadow-lg" id="printable-area">
         <CardHeader>
           <div className="relative">
-            <div className="text-center">
+             <div className="text-center">
                 <div className="inline-block">
                     <Image 
                         src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Government_Seal_of_Bangladesh.svg/800px-Government_Seal_of_Bangladesh.svg.png" 
@@ -70,7 +77,7 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
                         height={60}
                         className="h-16 w-16 mb-2 mx-auto"
                     />
-                    <Link href="https://www.oftern.com" target="_blank" rel="noopener noreferrer" className="text-xs text-muted-foreground hover:underline">
+                     <Link href="https://www.oftern.com" target="_blank" rel="noopener noreferrer" className="text-xs text-muted-foreground hover:underline">
                         www.oftern.com
                     </Link>
                 </div>
@@ -87,22 +94,24 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
           </div>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-2 mb-4 text-sm">
-            <div><strong>Roll No:</strong> {result.roll}</div>
-            <div><strong>Name:</strong> {result.studentInfo.name}</div>
-            <div><strong>Father's Name:</strong> {result.studentInfo.fatherName}</div>
-            <div><strong>Reg No:</strong> {result.reg}</div>
-            <div><strong>Board:</strong> <span className="capitalize">{result.board}</span></div>
-            <div><strong>Group:</strong> {result.studentInfo.group}</div>
-            <div><strong>Mother's Name:</strong> {result.studentInfo.motherName}</div>
-            <div><strong>Date of Birth:</strong> {result.studentInfo.dob}</div>
-            <div><strong>Session:</strong> {result.studentInfo.session}</div>
-            <div className="md:col-span-3"><strong>Institute:</strong> {result.studentInfo.institute}</div>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
+            <InfoItem label="Roll No" value={result.roll} />
+            <InfoItem label="Reg No" value={result.reg} />
+            <InfoItem label="Board" value={result.board} />
+            <InfoItem label="Name" value={result.studentInfo.name} />
+            <InfoItem label="Father's Name" value={result.studentInfo.fatherName} />
+            <InfoItem label="Mother's Name" value={result.studentInfo.motherName} />
+            <InfoItem label="Group" value={result.studentInfo.group} />
+            <InfoItem label="Date of Birth" value={result.studentInfo.dob} />
+            <InfoItem label="Session" value={result.studentInfo.session} />
+            <div className="col-span-2 md:col-span-3">
+              <InfoItem label="Institute" value={result.studentInfo.institute} />
+            </div>
           </div>
 
           <Separator className="my-6" />
 
-          <h3 className="font-semibold text-lg mb-2">Subject-wise Grade</h3>
+          <h3 className="font-semibold text-lg mb-2 text-center">Subject-wise Grade</h3>
           <Table>
             <TableHeader>
               <TableRow>
@@ -127,7 +136,6 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
         
         <div className="px-6 pb-6 text-center text-xs text-muted-foreground">
              <p>For any queries, contact: mojibrsm@gmail.com</p>
-             <p>Developed by: <span className="font-semibold text-foreground">Mojib Rsm</span></p>
         </div>
 
 
