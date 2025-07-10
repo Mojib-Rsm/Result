@@ -1,4 +1,3 @@
-
 'use client';
 
 import Image from 'next/image';
@@ -12,12 +11,12 @@ import { Loader2, RefreshCw } from 'lucide-react';
 import { Skeleton } from './ui/skeleton';
 
 export const formSchema = z.object({
-  roll: z.string().min(6, 'Roll number must be at least 6 digits.').regex(/^\d+$/, 'Roll must be a number.'),
-  reg: z.string().min(1, 'Registration number is required.').regex(/^\d+$/, 'Registration must be a number.'),
+  roll: z.string().min(6, 'রোল নম্বর কমপক্ষে ৬ সংখ্যার হতে হবে।').regex(/^\d+$/, 'রোল নম্বর অবশ্যই একটি সংখ্যা হতে হবে।'),
+  reg: z.string().min(1, 'রেজিস্ট্রেশন নম্বর আবশ্যক।').regex(/^\d+$/, 'রেজিস্ট্রেশন নম্বর অবশ্যই একটি সংখ্যা হতে হবে।'),
   board: z.string(),
   year: z.string(),
   exam: z.string(),
-  captcha: z.string().min(1, 'Please enter the security key.'),
+  captcha: z.string().min(1, 'অনুগ্রহ করে নিরাপত্তা কী লিখুন।'),
 });
 
 export const formSchemaWithoutReg = formSchema.omit({ reg: true });
@@ -26,18 +25,18 @@ export const formSchema2025 = formSchema.omit({ reg: true, captcha: true });
 
 
 const boards = [
-    { value: 'barisal', label: 'Barisal' },
-    { value: 'chittagong', label: 'Chittagong' },
-    { value: 'comilla', label: 'Comilla' },
-    { value: 'dhaka', label: 'Dhaka' },
-    { value: 'dinajpur', label: 'Dinajpur' },
-    { value: 'jessore', label: 'Jessore' },
-    { value: 'mymensingh', label: 'Mymensingh' },
-    { value: 'rajshahi', label: 'Rajshahi' },
-    { value: 'sylhet', label: 'Sylhet' },
-    { value: 'madrasah', label: 'Madrasah' },
-    { value: 'tec', label: 'Technical' },
-    { value: 'dibs', label: 'DIBS(Dhaka)' },
+    { value: 'barisal', label: 'বরিশাল' },
+    { value: 'chittagong', label: 'চট্টগ্রাম' },
+    { value: 'comilla', label: 'কুমিল্লা' },
+    { value: 'dhaka', label: 'ঢাকা' },
+    { value: 'dinajpur', label: 'দিনাজপুর' },
+    { value: 'jessore', label: 'যশোর' },
+    { value: 'mymensingh', label: 'ময়মনসিংহ' },
+    { value: 'rajshahi', label: 'রাজশাহী' },
+    { value: 'sylhet', label: 'সিলেট' },
+    { value: 'madrasah', label: 'মাদ্রাসা' },
+    { value: 'tec', label: 'কারিগরি' },
+    { value: 'dibs', label: 'ডিপ্লোমা ইন বিজনেস স্টাডিজ (DIBS)' },
 ];
 
 const maxYear = 2025;
@@ -45,14 +44,14 @@ const years = Array.from({ length: maxYear - 1996 + 1 }, (_, i) => maxYear - i).
 
 
 const exams = [
-    { value: 'ssc', label: 'SSC/Dakhil' },
-    { value: 'hsc', label: 'HSC/Alim/Equivalent' },
-    { value: 'jsc', label: 'JSC/JDC' },
-    { value: 'ssc_voc', label: 'SSC(Vocational)'},
-    { value: 'hsc_voc', label: 'HSC(Vocational)'},
-    { value: 'hsc_hbm', label: 'HSC(BM)'},
-    { value: 'hsc_dic', label: 'Diploma in Commerce'},
-    { value: 'hsc_dba', label: 'Diploma in Business Studies'},
+    { value: 'ssc', label: 'এসএসসি/দাখিল' },
+    { value: 'hsc', label: 'এইচএসসি/আলিম/সমমান' },
+    { value: 'jsc', label: 'জেএসসি/জেডিসি' },
+    { value: 'ssc_voc', label: 'এসএসসি (ভোকেশনাল)'},
+    { value: 'hsc_voc', label: 'এইচএসসি (ভোকেশনাল)'},
+    { value: 'hsc_hbm', label: 'এইচএসসি (বিএম)'},
+    { value: 'hsc_dic', label: 'ডিপ্লোমা ইন কমার্স'},
+    { value: 'hsc_dba', label: 'ডিপ্লোমা ইন বিজনেস স্টাডিজ'},
 ];
 
 interface ExamFormProps {
@@ -76,10 +75,10 @@ export function ExamForm({ form, onSubmit, isSubmitting, captchaImage, isFetchin
             name="exam"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Examination</FormLabel>
+                <FormLabel>পরীক্ষা</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
-                    <SelectTrigger><SelectValue placeholder="Select Exam" /></SelectTrigger>
+                    <SelectTrigger><SelectValue placeholder="পরীক্ষা নির্বাচন করুন" /></SelectTrigger>
                   </FormControl>
                   <SelectContent>
                     {exams.map(e => <SelectItem key={e.value} value={e.value}>{e.label}</SelectItem>)}
@@ -94,10 +93,10 @@ export function ExamForm({ form, onSubmit, isSubmitting, captchaImage, isFetchin
             name="year"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Year</FormLabel>
+                <FormLabel>বছর</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
-                    <SelectTrigger><SelectValue placeholder="Select Year" /></SelectTrigger>
+                    <SelectTrigger><SelectValue placeholder="বছর নির্বাচন করুন" /></SelectTrigger>
                   </FormControl>
                   <SelectContent>
                     {years.map(y => <SelectItem key={y} value={y}>{y}</SelectItem>)}
@@ -112,10 +111,10 @@ export function ExamForm({ form, onSubmit, isSubmitting, captchaImage, isFetchin
             name="board"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Board</FormLabel>
+                <FormLabel>বোর্ড</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
-                    <SelectTrigger><SelectValue placeholder="Select Board" /></SelectTrigger>
+                    <SelectTrigger><SelectValue placeholder="বোর্ড নির্বাচন করুন" /></SelectTrigger>
                   </FormControl>
                   <SelectContent>
                     {boards.map(b => <SelectItem key={b.value} value={b.value}>{b.label}</SelectItem>)}
@@ -130,8 +129,8 @@ export function ExamForm({ form, onSubmit, isSubmitting, captchaImage, isFetchin
             name="roll"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Roll Number</FormLabel>
-                <FormControl><Input placeholder="e.g., 123456" {...field} /></FormControl>
+                <FormLabel>রোল নম্বর</FormLabel>
+                <FormControl><Input placeholder="যেমন: 123456" {...field} /></FormControl>
                 <FormMessage />
               </FormItem>
             )}
@@ -143,8 +142,8 @@ export function ExamForm({ form, onSubmit, isSubmitting, captchaImage, isFetchin
               name="reg"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Registration No.</FormLabel>
-                  <FormControl><Input placeholder="e.g., 1234567890" {...field} /></FormControl>
+                  <FormLabel>রেজিস্ট্রেশন নম্বর</FormLabel>
+                  <FormControl><Input placeholder="যেমন: 1234567890" {...field} /></FormControl>
                   <FormMessage />
                 </FormItem>
               )}
@@ -154,7 +153,7 @@ export function ExamForm({ form, onSubmit, isSubmitting, captchaImage, isFetchin
           {isCaptchaRequired && (
             <>
               <div className="flex flex-col gap-2">
-                  <FormLabel>Security Key</FormLabel>
+                  <FormLabel>নিরাপত্তা কী</FormLabel>
                   <div className="flex items-center gap-4">
                       <div className='relative h-12 w-48 bg-gray-200 rounded-md'>
                       {isFetchingCaptcha ? (
@@ -173,8 +172,8 @@ export function ExamForm({ form, onSubmit, isSubmitting, captchaImage, isFetchin
                   name="captcha"
                   render={({ field }) => (
                   <FormItem>
-                      <FormLabel>Type the digits visible on the image</FormLabel>
-                      <FormControl><Input placeholder="Type the security key here" {...field} /></FormControl>
+                      <FormLabel>ছবিতে দেখানো সংখ্যাগুলো লিখুন</FormLabel>
+                      <FormControl><Input placeholder="নিরাপত্তা কী এখানে লিখুন" {...field} /></FormControl>
                       <FormMessage />
                   </FormItem>
                   )}
@@ -186,7 +185,7 @@ export function ExamForm({ form, onSubmit, isSubmitting, captchaImage, isFetchin
         <div className="flex justify-end pt-4">
           <Button type="submit" disabled={isSubmitting} className="w-full md:w-auto">
             {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Get Result
+            ফলাফল দেখুন
           </Button>
         </div>
       </form>

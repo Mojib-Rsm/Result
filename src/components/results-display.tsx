@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -6,14 +5,13 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Download, Loader2, RotateCcw } from 'lucide-react';
+import { Download, Loader2, Search } from 'lucide-react';
 import type { ExamResult } from '@/types';
 import { Separator } from './ui/separator';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
-
 
 interface ResultsDisplayProps {
   result: ExamResult;
@@ -30,6 +28,32 @@ const getGpaGrade = (gpa: number): string => {
     if (gpa >= 1) return 'D';
     return 'F';
 };
+
+const FooterContent = () => (
+    <div className="text-center">
+        <div className="flex flex-col items-center justify-center gap-4">
+            <div className="text-center">
+                <p className="text-md font-medium text-foreground">Developed & Maintained by: Mojib Rsm</p>
+                <p className="text-sm text-muted-foreground">For any query: mojibrsm@gmail.com</p>
+            </div>
+            <div className="flex flex-col items-center gap-2 mt-2">
+                <Link href="https://www.bartanow.com" target="_blank" rel="noopener noreferrer">
+                    <Image 
+                        src="https://placehold.co/40x40.png"
+                        data-ai-hint="logo monogram"
+                        alt="Bartanow Logo"
+                        width={40}
+                        height={40}
+                        className="h-10 w-10 rounded-full"
+                    />
+                </Link>
+                <Link href="https://www.bartanow.com" target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">
+                    www.bartanow.com
+                </Link>
+            </div>
+        </div>
+    </div>
+);
 
 
 export default function ResultsDisplay({ result, onReset, isDialog = false }: ResultsDisplayProps) {
@@ -75,7 +99,7 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
         
         pdf.addImage(imgData, 'PNG', x, y, newImgWidth, newImgHeight);
         
-        const fileName = `${result.studentInfo.name.replace(/\s+/g, '_')}-${result.roll}-Mojib_Rsm.pdf`;
+        const fileName = `${result.studentInfo.name.replace(/\s+/g, '_')}-${result.roll}-oftern.com.pdf`;
         pdf.save(fileName);
     } catch(error) {
         console.error("Error generating PDF:", error);
@@ -98,31 +122,45 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
 
   return (
     <div className="space-y-8">
+       <div className="flex justify-end gap-2 no-print">
+          {!isDialog && onReset && (
+              <Button variant="outline" onClick={onReset} disabled={isDownloading} size="icon">
+                  <Search className="h-4 w-4" />
+                  <span className="sr-only">আবার খুঁজুন</span>
+              </Button>
+          )}
+          <Button onClick={handleDownloadPdf} disabled={isDownloading}>
+              {isDownloading ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <Download className="mr-2 h-4 w-4" />
+              )}
+              ডাউনলোড পিডিএফ
+          </Button>
+      </div>
+
       <div id="pdf-container">
         <Card className="shadow-lg" id="printable-area">
-            <CardHeader>
+            <CardHeader className="text-center">
                 <div className="relative">
-                    <div className="text-center">
-                        <div className="inline-block">
-                            <Image 
-                                src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Government_Seal_of_Bangladesh.svg/800px-Government_Seal_of_Bangladesh.svg.png" 
-                                alt="Government Seal of Bangladesh"
-                                width={60}
-                                height={60}
-                                className="h-16 w-16 mb-2 mx-auto"
-                            />
-                        </div>
+                     <div className="flex flex-col items-center justify-center">
+                        <Image 
+                            src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Government_Seal_of_Bangladesh.svg/800px-Government_Seal_of_Bangladesh.svg.png" 
+                            alt="Government Seal of Bangladesh"
+                            width={60}
+                            height={60}
+                            className="h-16 w-16 mb-2"
+                        />
+                         <CardTitle className="text-2xl text-primary">Result Marksheet</CardTitle>
                     </div>
+
                     <div className="absolute top-0 right-0 text-right font-bold text-xl min-w-[120px]">
                         <p className={isPass ? 'text-green-600' : 'text-destructive'}>Status: {result.status}</p>
                         {isPass && <p>GPA: {gpa}</p>}
                         {isPass && <p>Grade: {gpaGrade}</p>}
                     </div>
                 </div>
-                <div className="text-center mt-4">
-                    <CardTitle className="text-2xl text-primary">Result Marksheet</CardTitle>
-                    <CardDescription>{result.exam.toUpperCase()} Examination - {result.year}</CardDescription>
-                </div>
+                 <CardDescription>{result.exam.toUpperCase()} Examination - {result.year}</CardDescription>
             </CardHeader>
             <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
@@ -165,20 +203,17 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
 
             <Separator className="my-6" />
             
-            <div className="px-6 pb-6 text-center text-xs text-muted-foreground">
-                <p>Thanks to Mojib Rsm</p>
-                <Link href="https://www.bartanow.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                    www.bartanow.com
-                </Link>
+            <div className="px-6 pb-6">
+                 <FooterContent />
             </div>
         </Card>
       </div>
 
-      <CardFooter className="flex justify-end gap-2 no-print">
+       <CardFooter className="flex justify-end gap-2 no-print">
           {!isDialog && onReset && (
               <Button variant="outline" onClick={onReset} disabled={isDownloading}>
-                  <RotateCcw className="mr-2 h-4 w-4" />
-                  Check Another
+                  <Search className="mr-2 h-4 w-4" />
+                  অন্য ফলাফল খুঁজুন
               </Button>
           )}
           <Button onClick={handleDownloadPdf} disabled={isDownloading}>
@@ -187,7 +222,7 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
               ) : (
                 <Download className="mr-2 h-4 w-4" />
               )}
-              Download PDF
+              ডাউনলোড পিডিএফ
           </Button>
       </CardFooter>
     </div>

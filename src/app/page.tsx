@@ -100,7 +100,7 @@ export default function Home() {
 
   const handleSearch = async (values: z.infer<typeof formSchema>) => {
     if (isCaptchaRequired && !state.captchaChallenge) {
-      setState(prevState => ({ ...prevState, error: 'Captcha not loaded. Please refresh.' }));
+      setState(prevState => ({ ...prevState, error: 'ক্যাপচা লোড করা যায়নি। অনুগ্রহ করে রিফ্রেশ করুন।' }));
       return;
     }
 
@@ -119,7 +119,7 @@ export default function Home() {
       setState(prevState => ({
         ...prevState,
         isLoading: false,
-        error: error instanceof Error ? error.message : 'An unexpected error occurred.',
+        error: error instanceof Error ? error.message : 'একটি অপ্রত্যাশিত ত্রুটি ঘটেছে।',
         result: null,
       }));
       // Re-fetch captcha only on captcha error
@@ -156,18 +156,18 @@ export default function Home() {
     <div className="container mx-auto max-w-4xl px-4 py-8 md:py-12" id="main-content">
       <div className="flex flex-col items-center text-center mb-12 no-print">
         <h1 className="text-4xl md:text-5xl font-bold tracking-tight bg-gradient-to-br from-primary to-accent bg-clip-text text-transparent">
-          Check Your Results
+          আপনার ফলাফল দেখুন
         </h1>
         <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
-          Enter your exam details to instantly view your results.
+          আপনার পরীক্ষার বিবরণ লিখুন এবং মুহূর্তেই ফলাফল দেখুন।
         </p>
       </div>
 
       {!state.result && !state.isLoading && (
         <Card className="shadow-lg no-print">
           <CardHeader>
-            <CardTitle>Enter Exam Information</CardTitle>
-            <CardDescription>Fill in your details as they appear on your admit card.</CardDescription>
+            <CardTitle>পরীক্ষার তথ্য লিখুন</CardTitle>
+            <CardDescription>আপনার প্রবেশপত্র অনুযায়ী তথ্য পূরণ করুন।</CardDescription>
           </CardHeader>
           <CardContent>
              {state.error && (
@@ -197,8 +197,8 @@ export default function Home() {
           </CardHeader>
           <CardContent className="space-y-6 pt-6">
             <div className="space-y-2 text-center">
-              <p className="text-lg font-semibold animate-pulse">Fetching your result...</p>
-              <p className="text-muted-foreground">This may take a moment.</p>
+              <p className="text-lg font-semibold animate-pulse">আপনার ফলাফল আনা হচ্ছে...</p>
+              <p className="text-muted-foreground">কিছুক্ষণ অপেক্ষা করুন।</p>
             </div>
           </CardContent>
         </Card>

@@ -26,14 +26,14 @@ export default function HistoryPage() {
     <div className="container mx-auto max-w-5xl px-4 py-8 md:py-12">
       <div className="flex flex-col items-start mb-8 md:flex-row md:items-center md:justify-between">
         <div className="mb-4 md:mb-0">
-          <h1 className="text-4xl font-bold tracking-tight">Search History</h1>
-          <p className="mt-2 text-lg text-muted-foreground">Review your past result searches.</p>
+          <h1 className="text-4xl font-bold tracking-tight">অনুসন্ধানের ইতিহাস</h1>
+          <p className="mt-2 text-lg text-muted-foreground">আপনার পূর্ববর্তী ফলাফল অনুসন্ধানের ইতিহাস দেখুন।</p>
         </div>
         <div className="relative w-full md:w-auto">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <Input
             type="text"
-            placeholder="Filter by name or roll..."
+            placeholder="নাম বা রোল দিয়ে ফিল্টার করুন..."
             className="pl-10 w-full md:w-64"
             value={filter}
             onChange={e => setFilter(e.target.value)}
@@ -45,7 +45,7 @@ export default function HistoryPage() {
           <div className="flex justify-end mb-4">
             <Button variant="destructive" size="sm" onClick={clearHistory}>
               <Trash2 className="mr-2 h-4 w-4" />
-              Clear History
+              ইতিহাস মুছুন
             </Button>
           </div>
         )}
@@ -54,10 +54,10 @@ export default function HistoryPage() {
         <div className="text-center py-16 border-2 border-dashed rounded-lg">
           <HistoryIcon className="mx-auto h-12 w-12 text-muted-foreground" />
           <h3 className="mt-4 text-lg font-medium">
-            {history.length === 0 ? 'No History Yet' : 'No Matching Results'}
+            {history.length === 0 ? 'কোনো ইতিহাস নেই' : 'কোনো ফলাফল পাওয়া যায়নি'}
           </h3>
           <p className="mt-1 text-sm text-muted-foreground">
-             {history.length === 0 ? 'Your previous searches will appear here.' : 'Try a different filter.'}
+             {history.length === 0 ? 'আপনার অনুসন্ধানের ইতিহাস এখানে দেখা যাবে।' : 'অন্য কিছু দিয়ে ফিল্টার করুন।'}
           </p>
         </div>
       ) : (
@@ -69,7 +69,7 @@ export default function HistoryPage() {
                     <div className="flex justify-between items-start">
                         <div>
                             <CardTitle>{item.result.studentInfo.name}</CardTitle>
-                            <CardDescription>Roll: {item.roll} | Reg: {item.reg}</CardDescription>
+                            <CardDescription>রোল: {item.roll} | রেজি: {item.reg}</CardDescription>
                         </div>
                         <Badge variant={item.result.status === 'Pass' ? 'default' : 'destructive'} className={item.result.status === 'Pass' ? 'bg-green-600' : ''}>
                             {item.result.status}
@@ -77,8 +77,8 @@ export default function HistoryPage() {
                     </div>
                 </CardHeader>
                 <CardContent className="space-y-2">
-                    <p><strong>Exam:</strong> <span className="uppercase">{item.exam}</span>, {item.year}</p>
-                    <p><strong>Board:</strong> <span className="capitalize">{item.board}</span></p>
+                    <p><strong>পরীক্ষা:</strong> <span className="uppercase">{item.exam}</span>, {item.year}</p>
+                    <p><strong>বোর্ড:</strong> <span className="capitalize">{item.board}</span></p>
                     {item.result.status === 'Pass' && <p><strong>GPA:</strong> {item.result.gpa.toFixed(2)}</p>}
                      <div className="flex items-start pt-1">
                         <School className="h-4 w-4 mr-2 mt-1 text-muted-foreground flex-shrink-0" />
@@ -91,7 +91,7 @@ export default function HistoryPage() {
                     <DialogTrigger asChild>
                         <Button variant="link" className="p-0 h-auto" onClick={() => setSelectedResult(item)}>
                             <Eye className="mr-2 h-4 w-4" />
-                            View Details
+                            বিস্তারিত দেখুন
                         </Button>
                     </DialogTrigger>
                 </CardFooter>
@@ -101,7 +101,7 @@ export default function HistoryPage() {
             {selectedResult && (
                 <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
                     <DialogHeader className="no-print">
-                        <DialogTitle>Result Details</DialogTitle>
+                        <DialogTitle>ফলাফলের বিবরণ</DialogTitle>
                     </DialogHeader>
                     <ResultsDisplay result={selectedResult.result} isDialog={true} />
                 </DialogContent>
