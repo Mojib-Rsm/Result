@@ -8,9 +8,21 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { History as HistoryIcon, Search, Trash2, Eye, School, User, BarChart2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog"
 import ResultsDisplay from '@/components/results-display';
 import type { HistoryItem } from '@/types';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useHistory } from '@/hooks/use-history';
 
 export default function HistoryPage() {
   const [isLoading, setIsLoading] = useState(true);
@@ -19,8 +31,10 @@ export default function HistoryPage() {
   const [filter, setFilter] = useState('');
   const [selectedResult, setSelectedResult] = useState<HistoryItem | null>(null);
 
-  useEffect(() => {
-    try {
+  const { removeHistoryItem, clearHistory: clearAllHistoryAndStats } = useHistory();
+
+  const loadData = () => {
+     try {
       const localStatsRaw = localStorage.getItem('bd-results-stats');
       if (localStatsRaw) {
         setStats(JSON.parse(localStatsRaw));
@@ -35,20 +49,23 @@ export default function HistoryPage() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  useEffect(() => {
+    loadData();
   }, []);
 
-  const clearLocalHistory = () => {
-    if (window.confirm("আপনি কি আপনার সমস্ত অনুসন্ধানের ইতিহাস এবং পরিসংখ্যান মুছে ফেলতে চান?")) {
-      setHistory([]);
-      setStats({ visits: 0, searches: 0 });
-      try {
-          localStorage.removeItem('bd-results-history-local');
-          localStorage.removeItem('bd-results-stats');
-      } catch(e) {
-          console.error("Could not clear local data", e)
-      }
-    }
+  const handleClearAll = () => {
+    clearAllHistoryAndStats();
+    loadData();
   }
+
+  const handleRemoveItem = (timestamp: number) => {
+    removeHistoryItem(timestamp);
+    // Optimistically update UI
+    setHistory(prevHistory => prevHistory.filter(item => item.timestamp !== timestamp));
+  };
+
 
   const filteredHistory = history.filter(
     item =>
@@ -109,15 +126,34 @@ export default function HistoryPage() {
           />
         </div>
       </div>
+      
+       <AlertDialog>
+          {history.length > 0 && (
+              <div className="flex justify-end mb-4">
+                  <AlertDialogTrigger asChild>
+                      <Button variant="destructive" size="sm">
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          সব ইতিহাস মুছুন
+                      </Button>
+                  </AlertDialogTrigger>
+              </div>
+          )}
+          <AlertDialogContent>
+              <AlertDialogHeader>
+                  <AlertDialogTitle>আপনি কি নিশ্চিত?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                      এই কাজটি ফিরিয়ে আনা যাবে না। এটি আপনার সমস্ত অনুসন্ধানের ইতিহাস এবং পরিসংখ্যান স্থায়ীভাবে মুছে ফেলবে।
+                  </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                  <AlertDialogCancel>বাতিল</AlertDialogCancel>
+                  <AlertDialogAction onClick={handleClearAll}>
+                    মুছে ফেলুন
+                  </AlertDialogAction>
+              </AlertDialogFooter>
+          </AlertDialogContent>
+      </AlertDialog>
 
-      {history.length > 0 && (
-          <div className="flex justify-end mb-4">
-            <Button variant="destructive" size="sm" onClick={clearLocalHistory}>
-              <Trash2 className="mr-2 h-4 w-4" />
-              ইতিহাস ও পরিসংখ্যান মুছুন
-            </Button>
-          </div>
-        )}
 
       {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -139,7 +175,7 @@ export default function HistoryPage() {
          <Dialog>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredHistory.map(item => (
-                <Card key={`${item.roll}-${item.exam}-${item.timestamp}`} className="hover:shadow-lg transition-shadow">
+                <Card key={item.timestamp} className="hover:shadow-lg transition-shadow relative group">
                 <CardHeader>
                     <div className="flex justify-between items-start">
                         <div>
@@ -170,6 +206,30 @@ export default function HistoryPage() {
                         </Button>
                     </DialogTrigger>
                 </CardFooter>
+
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="ghost" size="icon" className="absolute top-2 right-2 h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Trash2 className="h-4 w-4 text-destructive" />
+                      <span className="sr-only">মুছুন</span>
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>আপনি কি নিশ্চিত?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        এই ফলাফলটি আপনার ইতিহাস থেকে স্থায়ীভাবে মুছে ফেলা হবে।
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>বাতিল</AlertDialogCancel>
+                      <AlertDialogAction onClick={() => handleRemoveItem(item.timestamp)}>
+                        মুছে ফেলুন
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+
                 </Card>
             ))}
             </div>

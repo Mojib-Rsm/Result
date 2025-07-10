@@ -62,5 +62,27 @@ export function useHistory() {
     }
   }, []);
 
-  return { addHistoryItem, isInitialized };
+  const removeHistoryItem = useCallback((timestamp: number) => {
+    if (typeof window === 'undefined') return;
+    try {
+        const existingHistoryRaw = localStorage.getItem(LOCAL_HISTORY_KEY);
+        let existingHistory: HistoryItem[] = existingHistoryRaw ? JSON.parse(existingHistoryRaw) : [];
+        existingHistory = existingHistory.filter(item => item.timestamp !== timestamp);
+        localStorage.setItem(LOCAL_HISTORY_KEY, JSON.stringify(existingHistory));
+    } catch(e) {
+        console.error("Could not remove item from local history", e)
+    }
+  }, []);
+
+  const clearHistory = useCallback(() => {
+     if (typeof window === 'undefined') return;
+      try {
+          localStorage.removeItem(LOCAL_HISTORY_KEY);
+          localStorage.removeItem(STATS_KEY);
+      } catch(e) {
+          console.error("Could not clear local data", e)
+      }
+  }, []);
+
+  return { addHistoryItem, removeHistoryItem, clearHistory, isInitialized };
 }
