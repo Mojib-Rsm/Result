@@ -1,8 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
-import { useHistory } from '@/hooks/use-history';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -14,37 +13,42 @@ import type { HistoryItem } from '@/types';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function HistoryPage() {
-  const { isInitialized } = useHistory();
+  const [isLoading, setIsLoading] = useState(true);
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [filter, setFilter] = useState('');
   const [selectedResult, setSelectedResult] = useState<HistoryItem | null>(null);
 
-  // This is a workaround to show local history since we moved to Firebase for admin
   useEffect(() => {
-      try {
-        const localHistory = localStorage.getItem('bd-results-history-local');
-        if(localHistory) {
-            setHistory(JSON.parse(localHistory));
-        }
-      } catch(e) {
-        console.error("Could not load local history", e)
+    try {
+      const localHistory = localStorage.getItem('bd-results-history-local');
+      if (localHistory) {
+          setHistory(JSON.parse(localHistory));
       }
+    } catch(e) {
+      console.error("Could not load local history", e)
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
   const clearLocalHistory = () => {
+    if (window.confirm("আপনি কি আপনার সমস্ত অনুসন্ধানের ইতিহাস মুছে ফেলতে চান?")) {
       setHistory([]);
       try {
           localStorage.removeItem('bd-results-history-local');
+          // Also clear stats if desired
+          // localStorage.removeItem('bd-results-stats');
       } catch(e) {
           console.error("Could not clear local history", e)
       }
+    }
   }
 
   const filteredHistory = history.filter(
     item =>
       item.result.studentInfo.name.toLowerCase().includes(filter.toLowerCase()) ||
       item.roll.includes(filter)
-  );
+  ).sort((a, b) => b.timestamp - a.timestamp);
 
   return (
     <div className="container mx-auto max-w-5xl px-4 py-8 md:py-12">
@@ -74,7 +78,7 @@ export default function HistoryPage() {
           </div>
         )}
 
-      {!isInitialized ? (
+      {isLoading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {[...Array(4)].map((_, i) => (
               <Card key={i}><CardHeader><Skeleton className="h-6 w-3/4" /></CardHeader><CardContent><Skeleton className="h-4 w-full" /><Skeleton className="h-4 w-2/3 mt-2" /></CardContent><CardFooter><Skeleton className="h-8 w-1/2" /></CardFooter></Card>
@@ -94,7 +98,7 @@ export default function HistoryPage() {
          <Dialog>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {filteredHistory.map(item => (
-                <Card key={`${item.roll}-${item.exam}`} className="hover:shadow-lg transition-shadow">
+                <Card key={`${item.roll}-${item.exam}-${item.timestamp}`} className="hover:shadow-lg transition-shadow">
                 <CardHeader>
                     <div className="flex justify-between items-start">
                         <div>

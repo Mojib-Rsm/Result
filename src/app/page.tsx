@@ -99,28 +99,6 @@ export default function Home() {
      // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isCaptchaRequired]);
 
-
-  const saveToLocalHistory = (item: HistoryItem) => {
-      try {
-          const key = 'bd-results-history-local';
-          const existingHistoryRaw = localStorage.getItem(key);
-          const existingHistory: HistoryItem[] = existingHistoryRaw ? JSON.parse(existingHistoryRaw) : [];
-          
-          const isDuplicate = existingHistory.some(h => 
-              h.roll === item.roll && h.reg === item.reg && h.exam === item.exam && 
-              h.year === item.year && h.board === item.board
-          );
-
-          if (!isDuplicate) {
-              const newHistory = [item, ...existingHistory].slice(0, 20);
-              localStorage.setItem(key, JSON.stringify(newHistory));
-          }
-      } catch (error) {
-          console.error("Failed to save to local history", error);
-      }
-  };
-
-
   const handleSearch = async (values: z.infer<typeof formSchema>) => {
     if (isCaptchaRequired && !state.captchaChallenge) {
       setState(prevState => ({ ...prevState, error: 'ক্যাপচা লোড করা যায়নি। অনুগ্রহ করে রিফ্রেশ করুন।' }));
@@ -136,8 +114,7 @@ export default function Home() {
       });
       
       const historyEntry: Omit<HistoryItem, 'timestamp'> = { ...values, result: examResult };
-      addHistoryItem(historyEntry); // Save to Firebase for admin
-      saveToLocalHistory({...historyEntry, timestamp: Date.now()}); // Save to local for user view
+      addHistoryItem(historyEntry); 
 
       setState(prevState => ({ ...prevState, result: examResult, isLoading: false }));
 

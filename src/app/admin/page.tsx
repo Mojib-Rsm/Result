@@ -11,8 +11,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import ResultsDisplay from '@/components/results-display';
 import type { HistoryItem } from '@/types';
 import { useRouter } from 'next/navigation';
-import { getDatabase, ref, onValue, get } from 'firebase/database';
-import { app } from '@/lib/firebase';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function AdminPage() {
@@ -32,28 +30,25 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (isAuthenticated) {
-      const db = getDatabase(app);
-      const statsRef = ref(db, 'stats');
-      const historyRef = ref(db, 'history');
+      try {
+        const localStatsRaw = localStorage.getItem('bd-results-stats');
+        if (localStatsRaw) {
+          setStats(JSON.parse(localStatsRaw));
+        }
 
-      const unsubscribeStats = onValue(statsRef, (snapshot) => {
-        const data = snapshot.val();
-        setStats({ visits: data?.visits || 0, searches: data?.searches || 0 });
-      });
-      
-      const unsubscribeHistory = onValue(historyRef, (snapshot) => {
-          const data = snapshot.val();
-          const historyList = data ? Object.values(data).sort((a: any, b: any) => b.timestamp - a.timestamp) as HistoryItem[] : [];
-          setHistory(historyList);
-          setIsLoading(false);
-      });
-
-      return () => {
-        unsubscribeStats();
-        unsubscribeHistory();
-      };
+        const localHistoryRaw = localStorage.getItem('bd-results-history-local');
+        if (localHistoryRaw) {
+          const parsedHistory: HistoryItem[] = JSON.parse(localHistoryRaw);
+          setHistory(parsedHistory.sort((a, b) => b.timestamp - a.timestamp));
+        }
+      } catch (e) {
+        console.error("Could not load local admin data", e);
+      } finally {
+        setIsLoading(false);
+      }
     }
   }, [isAuthenticated]);
+
 
   if (isAuthLoading || !isAuthenticated) {
     return (
@@ -66,8 +61,8 @@ export default function AdminPage() {
   return (
     <div className="container mx-auto max-w-6xl px-4 py-8 md:py-12">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold tracking-tight">অ্যাডমিন প্যানেল</h1>
-        <p className="mt-2 text-lg text-muted-foreground">সাইটের ব্যবহার এবং অনুসন্ধানের ইতিহাস দেখুন।</p>
+        <h1 className="text-4xl font-bold tracking-tight">অ্যাডমিন প্যানেল (শুধুমাত্র এই ব্রাউজার)</h1>
+        <p className="mt-2 text-lg text-muted-foreground">এই ব্রাউজারের ব্যবহার এবং অনুসন্ধানের ইতিহাস দেখুন।</p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-3 mb-8">
@@ -78,7 +73,7 @@ export default function AdminPage() {
             </CardHeader>
             <CardContent>
                 <div className="text-2xl font-bold">{stats.visits.toLocaleString()}</div>
-                <p className="text-xs text-muted-foreground">অ্যাপের মোট ভিজিট সংখ্যা</p>
+                <p className="text-xs text-muted-foreground">এই ব্রাউজারে মোট ভিজিট সংখ্যা</p>
             </CardContent>
         </Card>
         <Card>
@@ -88,7 +83,7 @@ export default function AdminPage() {
             </CardHeader>
             <CardContent>
                 <div className="text-2xl font-bold">{stats.searches.toLocaleString()}</div>
-                <p className="text-xs text-muted-foreground">মোট ফলাফল অনুসন্ধান</p>
+                <p className="text-xs text-muted-foreground">এই ব্রাউজারে মোট ফলাফল অনুসন্ধান</p>
             </CardContent>
         </Card>
         <Card>
