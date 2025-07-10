@@ -256,18 +256,18 @@ async function searchResultLegacy(
         }, {});
         
         const madrasahSubjectMap: Record<string, string> = {
-            '101-102': 'QURAN MAZID AND TAZBID AND HADITH SHARIF',
-            '103-104': 'ARABIC I AND ARABIC II',
+            '101+102': 'QURAN MAZID AND TAZBID AND HADITH SHARIF',
+            '103+104': 'ARABIC I AND ARABIC II',
             '133': 'AQAID & FIQH',
-            '134-135': 'BANGLA I AND BANGLA II',
-            '136-137': 'ENGLISH I AND ENGLISH II',
+            '134+135': 'BANGLA I AND BANGLA II',
+            '136+137': 'ENGLISH I AND ENGLISH II',
         };
 
         let rawGrades: GradeInfo[] = apiResult.display_details.split(',').map((item: string) => {
             const [code, grade] = item.split(':').map((s: string) => s.trim());
             return {
                 code,
-                subject: subjectDetails[code] || code,
+                subject: subjectDetails[code] || madrasahSubjectMap[code] || code,
                 grade
             };
         });
@@ -277,21 +277,23 @@ async function searchResultLegacy(
             const processedCodes = new Set<string>();
 
             for (const combinedCode in madrasahSubjectMap) {
-                const individualCodes = combinedCode.split('-');
-                const firstCode = individualCodes[0];
-                const firstCodeGrade = rawGrades.find(g => g.code === firstCode);
+                if (combinedCode.includes('+')) {
+                    const individualCodes = combinedCode.split('+');
+                    const firstCode = individualCodes[0];
+                    const firstCodeGrade = rawGrades.find(g => g.code === firstCode);
 
-                if (firstCodeGrade) {
-                    combinedGrades.push({
-                        code: combinedCode,
-                        subject: madrasahSubjectMap[combinedCode],
-                        grade: firstCodeGrade.grade, 
-                    });
-                    individualCodes.forEach(code => processedCodes.add(code));
+                    if (firstCodeGrade) {
+                        combinedGrades.push({
+                            code: combinedCode.replace('+', '-'), // Display with hyphen
+                            subject: madrasahSubjectMap[combinedCode],
+                            grade: firstCodeGrade.grade,
+                        });
+                        individualCodes.forEach(code => processedCodes.add(code));
+                    }
                 }
             }
             const otherGrades = rawGrades.filter(g => !processedCodes.has(g.code));
-            rawGrades = [...combinedGrades, ...otherGrades];
+            rawGrades = [...otherGrades, ...combinedGrades].sort((a,b) => parseInt(a.code.split('-')[0]) - parseInt(b.code.split('-')[0]));
         }
 
         const result: ExamResult = {
