@@ -14,7 +14,7 @@ export async function searchResultAction(
   try {
     // 1. Fetch the homepage to get a session cookie and the captcha values.
     mainPageRes = await fetch("http://www.educationboardresults.gov.bd/", {
-      headers: { 'User-Agent': 'Mozilla/5.0' }
+      headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36' }
     });
   } catch (error) {
     console.error("Fetch failed:", error);
@@ -40,7 +40,7 @@ export async function searchResultAction(
   }
 
   // The text is usually like "2 + 8 ="
-  const numbers = captchaText.match(/\d/g);
+  const numbers = captchaText.match(/\d+/g);
   if (!numbers || numbers.length < 2) {
       throw new Error('Could not parse captcha numbers from text: ' + captchaText);
   }
@@ -64,7 +64,9 @@ export async function searchResultAction(
 
   const headers: HeadersInit = {
     "Referer": "http://www.educationboardresults.gov.bd/",
-    "User-Agent": "Mozilla/5.0"
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
+    "Origin": "http://www.educationboardresults.gov.bd",
+    "X-Requested-With": "XMLHttpRequest",
   };
 
   if (sessionCookie) {
