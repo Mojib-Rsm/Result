@@ -111,13 +111,14 @@ async function searchResult2025Ctg(values: z.infer<typeof formSchema>): Promise<
         const infoTable = root.querySelector('.tftable');
         if (!infoTable) {
              const messageNode = root.querySelector('h2');
-             const message = messageNode ? messageNode.innerText.trim() : "Could not parse result page. The result format might have changed.";
+             const message = messageNode ? messageNode.innerText.trim().toLowerCase() : "";
              
-             if (message.toLowerCase().includes('result not found')) {
+             if (message.includes('result not found') || message.includes('board of intermediate')) {
                  throw new Error("Result not found. Please check your roll number and try again.");
              }
              
-             throw new Error(message);
+             const defaultMessage = "Could not parse result page. The result format might have changed.";
+             throw new Error(message ? messageNode.innerText.trim() : defaultMessage);
         }
         
         const infoData: Record<string, string> = {};
