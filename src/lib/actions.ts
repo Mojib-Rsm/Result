@@ -254,12 +254,27 @@ async function searchResultLegacy(
             acc[sub.SUB_CODE] = sub.SUB_NAME;
             return acc;
         }, {});
+        
+        const madrasahSubjectMap: Record<string, string> = {
+            '101-102': 'QURAN MAZID AND TAZBID AND HADITH SHARIF',
+            '103-104': 'ARABIC I AND ARABIC II',
+            '133': 'AQAID & FIQH',
+            '134-135': 'BANGLA I AND BANGLA II',
+            '136-137': 'ENGLISH I AND ENGLISH II',
+        };
 
         const grades: GradeInfo[] = apiResult.display_details.split(',').map((item: string) => {
             const [code, grade] = item.split(':').map((s: string) => s.trim());
+            let subjectName = subjectDetails[code];
+
+            // If subject name is not found from API and board is madrasah, use the map
+            if (!subjectName && values.board === 'madrasah' && madrasahSubjectMap[code]) {
+                subjectName = madrasahSubjectMap[code];
+            }
+
             return {
                 code,
-                subject: subjectDetails[code] || code,
+                subject: subjectName || code, // Fallback to code if name is still not found
                 grade
             };
         });
