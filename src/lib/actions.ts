@@ -340,11 +340,8 @@ async function searchResultLegacy(
         if (data.msg && (data.msg.toLowerCase().includes('captcha') || data.msg.toLowerCase().includes('security key'))) {
             throw new Error('The Security Key is incorrect. Please try again.');
         }
-        if (data.msg && data.msg.toLowerCase().includes('not found')) {
+        if (data.msg && (data.msg.toLowerCase().includes('not found') || data.msg.toLowerCase().includes('incorrect registration'))) {
              throw new Error("Result not found. Please check your roll, registration, board, and year and try again.");
-        }
-        if (data.msg && data.msg.toLowerCase().includes('incorrect registration')) {
-            throw new Error('Incorrect registration number. Please check and try again.');
         }
         throw new Error(data.msg || 'An unknown error occurred while fetching the result.');
     }
