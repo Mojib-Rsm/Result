@@ -14,15 +14,16 @@ interface ResultsDisplayProps {
   onReset: () => void;
 }
 
-const gradeToPoint: Record<string, number> = {
-  'A+': 5.0,
-  'A': 4.0,
-  'A-': 3.5,
-  'B': 3.0,
-  'C': 2.0,
-  'D': 1.0,
-  'F': 0.0,
+const getGpaGrade = (gpa: number): string => {
+    if (gpa === 5) return 'A+';
+    if (gpa >= 4) return 'A';
+    if (gpa >= 3.5) return 'A-';
+    if (gpa >= 3) return 'B';
+    if (gpa >= 2) return 'C';
+    if (gpa >= 1) return 'D';
+    return 'F';
 };
+
 
 export default function ResultsDisplay({ result, onReset }: ResultsDisplayProps) {
   
@@ -49,6 +50,7 @@ export default function ResultsDisplay({ result, onReset }: ResultsDisplayProps)
 
   const gpa = result.gpa.toFixed(2);
   const isPass = result.status === 'Pass';
+  const gpaGrade = getGpaGrade(result.gpa);
 
   return (
     <div className="space-y-8">
@@ -59,9 +61,10 @@ export default function ResultsDisplay({ result, onReset }: ResultsDisplayProps)
               <CardTitle className="text-2xl text-primary">Result Marksheet</CardTitle>
               <CardDescription>{result.exam.toUpperCase()} Examination - {result.year}</CardDescription>
             </div>
-            <div className={`text-right ${isPass ? 'text-green-600' : 'text-destructive'} font-bold text-xl`}>
-                <p>Status: {result.status}</p>
-                {isPass && <p>GPA: {gpa}</p>}
+            <div className={`text-right font-bold text-xl`}>
+                <p className={isPass ? 'text-green-600' : 'text-destructive'}>Status: {result.status}</p>
+                {isPass && <p className="text-green-600">GPA: {gpa}</p>}
+                {isPass && <p className="text-green-600">Grade: {gpaGrade}</p>}
             </div>
           </div>
         </CardHeader>
@@ -76,7 +79,7 @@ export default function ResultsDisplay({ result, onReset }: ResultsDisplayProps)
             <div><strong>Date of Birth:</strong> {result.studentInfo.dob}</div>
             <div className="md:col-span-2"><strong>Institute:</strong> {result.studentInfo.institute}</div>
             <div><strong>Type:</strong> {result.studentInfo.type}</div>
-            <div className="md:col-span-3"><strong>Session:</strong> {result.studentInfo.session}</div>
+            <div className="md:col-span-2"><strong>Session:</strong> {result.studentInfo.session}</div>
           </div>
 
           <Separator className="my-6" />
@@ -87,8 +90,7 @@ export default function ResultsDisplay({ result, onReset }: ResultsDisplayProps)
               <TableRow>
                 <TableHead>Code</TableHead>
                 <TableHead>Subject Name</TableHead>
-                <TableHead>Letter Grade</TableHead>
-                <TableHead className="text-right">Grade Point</TableHead>
+                <TableHead className="text-right">Letter Grade</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -96,8 +98,7 @@ export default function ResultsDisplay({ result, onReset }: ResultsDisplayProps)
                 <TableRow key={g.code}>
                   <TableCell>{g.code}</TableCell>
                   <TableCell className="font-medium">{g.subject}</TableCell>
-                  <TableCell>{g.grade}</TableCell>
-                  <TableCell className="text-right font-bold">{gradeToPoint[g.grade]?.toFixed(2) ?? 'N/A'}</TableCell>
+                  <TableCell className="text-right font-bold">{g.grade}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
