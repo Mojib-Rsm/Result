@@ -1,16 +1,30 @@
+
 'use client';
 
 import { Toaster } from '@/components/ui/toaster';
 import Header from '@/components/header';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
+import Link from 'next/link';
 
 function Footer() {
   return (
-    <footer className="no-print py-6 md:px-8 md:py-0 bg-background/95 border-t">
-      <div className="container flex flex-col items-center justify-center gap-4 md:h-24 md:flex-row">
-        <p className="text-balance text-center text-sm leading-loose text-muted-foreground">
-          Contact: <span className="font-medium text-foreground">mojibrsm@gmail.com</span>.
-        </p>
+    <footer className="no-print py-8 md:px-8 bg-background/95 border-t">
+      <div className="container flex flex-col items-center justify-center gap-4">
+        <div className="text-center">
+            <p className="text-md font-medium text-foreground">Developed & Maintained by: Mojib Rsm</p>
+            <p className="text-sm text-muted-foreground">For any query: mojibrsm@gmail.com</p>
+        </div>
+        <Link href="https://www.bartanow.com" target="_blank" rel="noopener noreferrer" className="mt-2">
+             <Image 
+                src="https://placehold.co/40x40.png"
+                data-ai-hint="logo monogram"
+                alt="Bartanow Logo"
+                width={40}
+                height={40}
+                className="h-10 w-10 rounded-full"
+            />
+        </Link>
       </div>
     </footer>
   )
