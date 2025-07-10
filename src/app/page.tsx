@@ -38,7 +38,7 @@ export default function Home() {
       reg: '',
       board: 'chittagong',
       year: new Date().getFullYear().toString(),
-      exam: 'hsc',
+      exam: 'ssc',
       captcha: '',
     },
   });
@@ -76,8 +76,8 @@ export default function Home() {
         ...values, 
         cookies: state.captchaChallenge.cookies 
       });
-      setState(prevState => ({ ...prevState, result: examResult, isLoading: false }));
       addHistoryItem({ ...values, result: examResult });
+      setState(prevState => ({ ...prevState, result: examResult, isLoading: false }));
 
     } catch (error) {
       console.error(error);
@@ -87,7 +87,10 @@ export default function Home() {
         error: error instanceof Error ? error.message : 'An unexpected error occurred.',
         result: null,
       }));
-      fetchCaptcha();
+      // Re-fetch captcha only on captcha error
+      if (error instanceof Error && error.message.toLowerCase().includes('captcha')) {
+        fetchCaptcha();
+      }
     }
   };
 
@@ -97,7 +100,7 @@ export default function Home() {
       reg: '',
       board: 'chittagong',
       year: new Date().getFullYear().toString(),
-      exam: 'hsc',
+      exam: 'ssc',
       captcha: '',
     });
     setState({

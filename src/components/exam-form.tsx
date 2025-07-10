@@ -37,9 +37,9 @@ const boards = [
 const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 30 }, (_, i) => currentYear - i).map(String);
 const exams = [
+    { value: 'ssc', label: 'SSC/Dakhil' },
     { value: 'hsc', label: 'HSC/Alim/Equivalent' },
     { value: 'jsc', label: 'JSC/JDC' },
-    { value: 'ssc', label: 'SSC/Dakhil' },
     { value: 'ssc_voc', label: 'SSC(Vocational)'},
     { value: 'hsc_voc', label: 'HSC(Vocational)'},
     { value: 'hsc_hbm', label: 'HSC(BM)'},
@@ -138,10 +138,10 @@ export function ExamForm({ form, onSubmit, isSubmitting, captchaImage, isFetchin
             )}
           />
         
-            <div className="space-y-2">
+            <div className="flex flex-col gap-2">
                  <FormLabel>Security Key</FormLabel>
                 <div className="flex items-center gap-4">
-                    <div className='relative h-12 w-32 bg-gray-200 rounded-md'>
+                    <div className='relative h-12 w-40 bg-gray-200 rounded-md'>
                     {isFetchingCaptcha ? (
                         <Skeleton className="h-full w-full" />
                     ) : (
