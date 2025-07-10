@@ -28,35 +28,24 @@ export async function getCaptchaAction(): Promise<CaptchaChallenge> {
 
     const cookies = homeRes.headers.get('set-cookie') || '';
     const homeHtml = await homeRes.text();
-    const root = parse(homeHtml);
-
-    // More robust captcha finding
-    const captchaImgTag = root.querySelector('img.captcha');
-    let captchaImageUrl = captchaImgTag?.getAttribute('src');
-
-    if (!captchaImageUrl) {
-        // Fallback to regex if selector fails, as the src is a base64 string
-        const match = homeHtml.match(/<img class="captcha" src="(data:image\/png;base64,[^"]+)"/);
-        if (match && match[1]) {
-            captchaImageUrl = match[1];
-        } else {
-             throw new Error('Could not find captcha image on the page.');
-        }
-    }
     
-    if (!captchaImageUrl) {
-        throw new Error('Captcha image source not found.');
+    // Use a regular expression to reliably find the base64 encoded captcha image
+    const match = homeHtml.match(/<img class="captcha" src="(data:image\/png;base64,[^"]+)"/);
+
+    if (match && match[1]) {
+      const captchaImageUrl = match[1];
+      return {
+        captchaImage: captchaImageUrl,
+        cookies,
+      };
+    } else {
+      // If regex fails, throw the specific error.
+      throw new Error('Could not find captcha image on the page.');
     }
-
-
-    // The src is a base64 string, so we just return it.
-    return {
-      captchaImage: captchaImageUrl,
-      cookies,
-    };
   } catch (error) {
     console.error("Captcha fetch failed:", error);
     if (error instanceof Error) {
+        // Re-throw the specific error message from the try block or a generic one
         throw new Error(`Failed to load captcha: ${error.message}`);
     }
     throw new Error('An unknown error occurred while fetching the captcha.');
