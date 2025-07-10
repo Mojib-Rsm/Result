@@ -12,11 +12,11 @@ import { Skeleton } from './ui/skeleton';
 
 export const formSchema = z.object({
   roll: z.string().min(6, 'Roll number must be at least 6 digits.').regex(/^\d+$/, 'Roll must be a number.'),
-  reg: z.string().min(9, 'Registration number must be at least 9 digits.').regex(/^\d+$/, 'Registration must be a number.'),
+  reg: z.string().min(1, 'Registration number is required.').regex(/^\d+$/, 'Registration must be a number.'),
   board: z.string(),
   year: z.string(),
   exam: z.string(),
-  captcha: z.string().min(4, 'Please enter the 4-digit security key.').max(4, 'Security key must be 4 digits.'),
+  captcha: z.string().min(1, 'Please enter the security key.'),
 });
 
 const boards = [
@@ -139,7 +139,7 @@ export function ExamForm({ form, onSubmit, isSubmitting, captchaImage, isFetchin
           />
         
             <div className="space-y-2">
-                 <FormLabel>Security Key (4 digits)</FormLabel>
+                 <FormLabel>Security Key</FormLabel>
                 <div className="flex items-center gap-4">
                     <div className='relative h-12 w-32 bg-gray-200 rounded-md'>
                     {isFetchingCaptcha ? (
