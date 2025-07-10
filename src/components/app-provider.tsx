@@ -15,16 +15,21 @@ function Footer() {
             <p className="text-md font-medium text-foreground">Developed & Maintained by: Mojib Rsm</p>
             <p className="text-sm text-muted-foreground">For any query: mojibrsm@gmail.com</p>
         </div>
-        <Link href="https://www.bartanow.com" target="_blank" rel="noopener noreferrer" className="mt-2">
-             <Image 
-                src="https://placehold.co/40x40.png"
-                data-ai-hint="logo monogram"
-                alt="Bartanow Logo"
-                width={40}
-                height={40}
-                className="h-10 w-10 rounded-full"
-            />
-        </Link>
+        <div className="flex flex-col items-center gap-2 mt-2">
+            <Link href="https://www.bartanow.com" target="_blank" rel="noopener noreferrer">
+                 <Image 
+                    src="https://placehold.co/40x40.png"
+                    data-ai-hint="logo monogram"
+                    alt="Bartanow Logo"
+                    width={40}
+                    height={40}
+                    className="h-10 w-10 rounded-full"
+                />
+            </Link>
+             <Link href="https://www.bartanow.com" target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">
+                www.bartanow.com
+            </Link>
+        </div>
       </div>
     </footer>
   )
