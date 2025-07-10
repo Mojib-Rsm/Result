@@ -1,7 +1,6 @@
 
 'use client';
 
-import Image from 'next/image';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
@@ -59,14 +58,14 @@ interface ExamFormProps {
   form: ReturnType<typeof useForm<z.infer<typeof formSchema>>>;
   onSubmit: (values: z.infer<typeof formSchema>) => void;
   isSubmitting: boolean;
-  captchaImage?: string;
+  captchaText?: string;
   isFetchingCaptcha: boolean;
   onReloadCaptcha: () => void;
   isRegRequired: boolean;
   isCaptchaRequired: boolean;
 }
 
-export function ExamForm({ form, onSubmit, isSubmitting, captchaImage, isFetchingCaptcha, onReloadCaptcha, isRegRequired, isCaptchaRequired }: ExamFormProps) {
+export function ExamForm({ form, onSubmit, isSubmitting, captchaText, isFetchingCaptcha, onReloadCaptcha, isRegRequired, isCaptchaRequired }: ExamFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -156,11 +155,11 @@ export function ExamForm({ form, onSubmit, isSubmitting, captchaImage, isFetchin
               <div className="flex flex-col gap-2">
                   <FormLabel>সিক্রেট কোড</FormLabel>
                   <div className="flex items-center gap-4">
-                      <div className='relative h-12 w-48 bg-gray-200 rounded-md'>
+                      <div className='relative h-12 w-48 bg-gray-200 rounded-md flex items-center justify-center'>
                       {isFetchingCaptcha ? (
                           <Skeleton className="h-full w-full" />
                       ) : (
-                          captchaImage && <Image src={captchaImage} alt="Captcha" layout="fill" objectFit="contain" />
+                          captchaText && <p className="text-3xl font-bold tracking-widest">{captchaText}</p>
                       )}
                       </div>
                       <Button type="button" variant="secondary" size="icon" onClick={onReloadCaptcha} disabled={isFetchingCaptcha}>
