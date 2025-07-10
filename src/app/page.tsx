@@ -108,6 +108,8 @@ export default function Home() {
 
 
   const handleSearch = async (values: z.infer<typeof formSchema>) => {
+    if (isFetchingCaptcha) return;
+
     setState({ isLoading: true, error: null, result: null });
     
     try {
