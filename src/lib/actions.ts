@@ -21,7 +21,7 @@ export async function getCaptchaAction(): Promise<CaptchaChallenge> {
     });
 
     if (!homeRes.ok) {
-      throw new Error('Could not connect to the result server. It may be offline.');
+      throw new Error(`Could not connect to the result server. It may be offline or blocking requests. Status: ${homeRes.status}`);
     }
 
     const cookies = homeRes.headers.get('set-cookie') || '';
@@ -52,6 +52,9 @@ export async function getCaptchaAction(): Promise<CaptchaChallenge> {
   } catch (error) {
     console.error("Captcha fetch failed:", error);
     if (error instanceof Error) {
+        if (error.message.includes('fetch failed')) {
+            throw new Error('Failed to load captcha: A network error occurred. Please check your internet connection and if the result server is accessible.');
+        }
         throw new Error(`Failed to load captcha: ${error.message}`);
     }
     throw new Error('An unknown error occurred while fetching the captcha.');
