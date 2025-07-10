@@ -92,7 +92,7 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
             <div><strong>Mother's Name:</strong> {result.studentInfo.motherName}</div>
             <div><strong>Date of Birth:</strong> {result.studentInfo.dob}</div>
             <div className="md:col-span-2"><strong>Institute:</strong> {result.studentInfo.institute}</div>
-            <div className="md:col-span-2"><strong>Session:</strong> {result.studentInfo.session}</div>
+            <div><strong>Session:</strong> {result.studentInfo.session}</div>
           </div>
 
           <Separator className="my-6" />
@@ -121,8 +121,8 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
          <Separator className="my-6" />
         
         <div className="px-6 pb-6 text-center text-xs text-muted-foreground">
-             <p>For any queries, contact: developer.mojibrsm@gmail.com</p>
-             <p>Developed by: <span className="font-semibold text-foreground">Mojib Rsm</span></p>
+             <p>For any queries, contact: mojibrsm@gmail.com</p>
+             <p>Developed by: <span className="font-semibold text-foreground">Mojib Rsm</span> | www.oftern.com</p>
         </div>
 
 
