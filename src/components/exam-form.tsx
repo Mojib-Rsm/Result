@@ -1,3 +1,4 @@
+
 'use client';
 
 import Image from 'next/image';
@@ -36,8 +37,9 @@ const boards = [
     { value: 'dibs', label: 'DIBS(Dhaka)' },
 ];
 
-const currentYear = new Date().getFullYear();
-const years = Array.from({ length: 30 }, (_, i) => currentYear + 5 - i).map(String);
+const maxYear = 2025;
+const years = Array.from({ length: 30 }, (_, i) => maxYear - i).map(String);
+
 const exams = [
     { value: 'ssc', label: 'SSC/Dakhil' },
     { value: 'hsc', label: 'HSC/Alim/Equivalent' },
@@ -164,7 +166,7 @@ export function ExamForm({ form, onSubmit, isSubmitting, captchaImage, isFetchin
                 name="captcha"
                 render={({ field }) => (
                 <FormItem>
-                    <FormLabel className="sr-only">Type the digits visible on the image</FormLabel>
+                    <FormLabel>Type the digits visible on the image</FormLabel>
                     <FormControl><Input placeholder="Type the security key here" {...field} /></FormControl>
                     <FormMessage />
                 </FormItem>
