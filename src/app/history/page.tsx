@@ -94,7 +94,7 @@ export default function HistoryPage() {
             </div>
             {selectedResult && (
                 <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-                    <DialogHeader>
+                    <DialogHeader className="no-print">
                         <DialogTitle>Result Details</DialogTitle>
                     </DialogHeader>
                     <ResultsDisplay result={selectedResult.result} isDialog={true} />

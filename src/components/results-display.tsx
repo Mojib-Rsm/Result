@@ -59,20 +59,29 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
     <div className="space-y-8">
       <Card className="shadow-lg" id="printable-area">
         <CardHeader>
-          <div className="flex flex-col items-center text-center mb-4">
-              <Image 
-                src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Government_Seal_of_Bangladesh.svg/800px-Government_Seal_of_Bangladesh.svg.png" 
-                alt="Government Seal of Bangladesh"
-                width={60}
-                height={60}
-                className="h-16 w-16 mb-2"
-              />
-              <CardTitle className="text-2xl text-primary">Result Marksheet</CardTitle>
-              <CardDescription>{result.exam.toUpperCase()} Examination - {result.year}</CardDescription>
-          </div>
-          <div className="flex flex-col md:flex-row justify-between items-start">
-            <div className='mb-4 md:mb-0'>
-               
+          <div className="flex justify-between items-start">
+            <div className='flex items-center gap-4'>
+                <div className="no-print relative h-32 w-32 bg-gray-200 rounded-md border-2 border-dashed flex items-center justify-center">
+                    <Image 
+                        src="https://placehold.co/128x128.png" 
+                        alt="Student Photo"
+                        width={128}
+                        height={128}
+                        className='rounded-md'
+                        data-ai-hint="student portrait"
+                    />
+                </div>
+                <div className="flex flex-col items-center text-center">
+                    <Image 
+                        src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Government_Seal_of_Bangladesh.svg/800px-Government_Seal_of_Bangladesh.svg.png" 
+                        alt="Government Seal of Bangladesh"
+                        width={60}
+                        height={60}
+                        className="h-16 w-16 mb-2"
+                    />
+                    <CardTitle className="text-2xl text-primary">Result Marksheet</CardTitle>
+                    <CardDescription>{result.exam.toUpperCase()} Examination - {result.year}</CardDescription>
+                </div>
             </div>
             <div className={`text-right font-bold text-xl`}>
                 <p className={isPass ? 'text-green-600' : 'text-destructive'}>Status: {result.status}</p>
@@ -82,7 +91,7 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
           </div>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-2 mb-4 text-sm">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-2 mb-4 text-sm">
             <div><strong>Roll No:</strong> {result.roll}</div>
             <div><strong>Reg No:</strong> {result.reg}</div>
             <div><strong>Name:</strong> {result.studentInfo.name}</div>
@@ -91,8 +100,8 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
             <div><strong>Group:</strong> {result.studentInfo.group}</div>
             <div><strong>Mother's Name:</strong> {result.studentInfo.motherName}</div>
             <div><strong>Date of Birth:</strong> {result.studentInfo.dob}</div>
-            <div className="md:col-span-2"><strong>Institute:</strong> {result.studentInfo.institute}</div>
             <div><strong>Session:</strong> {result.studentInfo.session}</div>
+            <div className="md:col-span-3"><strong>Institute:</strong> {result.studentInfo.institute}</div>
           </div>
 
           <Separator className="my-6" />
