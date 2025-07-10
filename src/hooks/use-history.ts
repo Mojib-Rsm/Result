@@ -10,6 +10,8 @@ export function useHistory() {
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
+    // This code now runs only on the client, after the initial render,
+    // which prevents the hydration mismatch error.
     try {
       const item = window.localStorage.getItem(HISTORY_KEY);
       if (item) {
@@ -36,7 +38,7 @@ export function useHistory() {
     setHistory(prevHistory => {
       // Avoid duplicates based on roll, reg, and exam
       const exists = prevHistory.some(
-        h => h.roll === item.roll && h.reg === item.reg && h.exam === item.exam
+        h => h.roll === item.roll && h.reg === item.reg && h.exam === item.exam && h.year === item.year && h.board === item.board
       );
       if (exists) {
         return prevHistory;
