@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react';
 import { useHistory } from '@/hooks/use-history';
 import { useAdminAuth } from '@/hooks/use-admin-auth';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Eye, School, User, Search, BarChart2 } from 'lucide-react';
@@ -27,6 +27,7 @@ export default function AdminPage() {
   }, [isAuthenticated, router]);
 
   useEffect(() => {
+    // This now runs only on the client, avoiding hydration errors
     const visits = parseInt(localStorage.getItem('app-visits') || '0', 10);
     const searches = parseInt(localStorage.getItem('app-searches') || '0', 10);
     setStats({ visits, searches });
@@ -140,4 +141,3 @@ export default function AdminPage() {
     </div>
   );
 }
-
