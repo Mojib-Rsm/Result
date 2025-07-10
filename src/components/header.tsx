@@ -7,8 +7,6 @@ import { GraduationCap, History } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { useAdminAuth } from '@/hooks/use-admin-auth';
-
 
 export default function Header({ className }: { className?: string }) {
   const pathname = usePathname();
@@ -36,7 +34,7 @@ export default function Header({ className }: { className?: string }) {
             height={32}
             className="h-8 w-8 rounded-full"
           />
-          <span className="font-bold sm:inline-block">BD Education Results</span>
+          <span className="font-bold sm:inline-block">BD Results</span>
         </Link>
         <nav className="flex flex-1 items-center gap-2 text-sm">
           {navLinks.map((link) => (
