@@ -263,21 +263,36 @@ async function searchResultLegacy(
             '136-137': 'ENGLISH I AND ENGLISH II',
         };
 
-        const grades: GradeInfo[] = apiResult.display_details.split(',').map((item: string) => {
+        let rawGrades: GradeInfo[] = apiResult.display_details.split(',').map((item: string) => {
             const [code, grade] = item.split(':').map((s: string) => s.trim());
-            let subjectName = subjectDetails[code];
-
-            // If subject name is not found from API and board is madrasah, use the map
-            if (!subjectName && values.board === 'madrasah' && madrasahSubjectMap[code]) {
-                subjectName = madrasahSubjectMap[code];
-            }
-
             return {
                 code,
-                subject: subjectName || code, // Fallback to code if name is still not found
+                subject: subjectDetails[code] || code,
                 grade
             };
         });
+
+        if (values.board === 'madrasah') {
+            const combinedGrades: GradeInfo[] = [];
+            const processedCodes = new Set<string>();
+
+            for (const combinedCode in madrasahSubjectMap) {
+                const individualCodes = combinedCode.split('-');
+                const firstCode = individualCodes[0];
+                const firstCodeGrade = rawGrades.find(g => g.code === firstCode);
+
+                if (firstCodeGrade) {
+                    combinedGrades.push({
+                        code: combinedCode,
+                        subject: madrasahSubjectMap[combinedCode],
+                        grade: firstCodeGrade.grade, 
+                    });
+                    individualCodes.forEach(code => processedCodes.add(code));
+                }
+            }
+            const otherGrades = rawGrades.filter(g => !processedCodes.has(g.code));
+            rawGrades = [...combinedGrades, ...otherGrades];
+        }
 
         const result: ExamResult = {
             roll: apiResult.roll_no,
@@ -296,7 +311,7 @@ async function searchResultLegacy(
                 institute: apiResult.inst_name,
                 session: apiResult.session,
             },
-            grades: grades,
+            grades: rawGrades,
         };
 
         return result;
