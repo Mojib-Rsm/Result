@@ -3,11 +3,13 @@
 
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2 } from 'lucide-react';
+import { Loader2, RefreshCw } from 'lucide-react';
+import { Skeleton } from './ui/skeleton';
 
 export const formSchema = z.object({
   roll: z.string().min(6, 'রোল নম্বর কমপক্ষে ৬ সংখ্যার হতে হবে।').regex(/^\d+$/, 'রোল নম্বর অবশ্যই একটি সংখ্যা হতে হবে।'),
@@ -15,7 +17,7 @@ export const formSchema = z.object({
   board: z.string(),
   year: z.string(),
   exam: z.string(),
-  captcha: z.string().optional(),
+  captcha: z.string().min(1, 'সিক্রেট কোড আবশ্যক।'),
 });
 
 export const formSchemaWithoutReg = formSchema.omit({ reg: true });
@@ -58,9 +60,13 @@ interface ExamFormProps {
   onSubmit: (values: z.infer<typeof formSchema>) => void;
   isSubmitting: boolean;
   isRegRequired: boolean;
+  isCaptchaRequired: boolean;
+  captchaImage?: string;
+  isFetchingCaptcha: boolean;
+  onRefreshCaptcha: () => void;
 }
 
-export function ExamForm({ form, onSubmit, isSubmitting, isRegRequired }: ExamFormProps) {
+export function ExamForm({ form, onSubmit, isSubmitting, isRegRequired, isCaptchaRequired, captchaImage, isFetchingCaptcha, onRefreshCaptcha }: ExamFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -145,10 +151,61 @@ export function ExamForm({ form, onSubmit, isSubmitting, isRegRequired }: ExamFo
             />
           )}
 
+          {isCaptchaRequired && (
+            <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+              <div className='flex flex-col gap-2'>
+                <div className='flex items-center gap-2'>
+                  {isFetchingCaptcha ? (
+                     <Skeleton className="h-[50px] w-[180px] rounded-md" />
+                  ) : captchaImage ? (
+                    <Image
+                      src={captchaImage}
+                      alt="সিক্রেট কোড"
+                      width={180}
+                      height={50}
+                      className="rounded-md border p-1 bg-white h-[50px] w-auto"
+                      unoptimized
+                    />
+                  ) : <div className="h-[50px] w-[180px] border rounded-md flex items-center justify-center bg-muted text-muted-foreground text-xs">কোড লোড হচ্ছে...</div>}
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={onRefreshCaptcha}
+                    disabled={isFetchingCaptcha || isSubmitting}
+                    aria-label="রিফ্রেশ সিক্রেট কোড"
+                  >
+                    <RefreshCw className={`h-5 w-5 ${isFetchingCaptcha ? 'animate-spin' : ''}`} />
+                  </Button>
+                </div>
+                 <FormDescription>
+                    ছবিতে দেখানো সংখ্যাগুলো লিখুন
+                </FormDescription>
+              </div>
+
+               <FormField
+                control={form.control}
+                name="captcha"
+                render={({ field }) => (
+                  <FormItem>
+                     <FormLabel>সিক্রেট কোড</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="সিক্রেট কোড লিখুন"
+                        {...field}
+                        disabled={isFetchingCaptcha || isSubmitting}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          )}
         </div>
         <div className="flex justify-end pt-4">
-          <Button type="submit" disabled={isSubmitting} className="w-full md:w-auto">
-            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          <Button type="submit" disabled={isSubmitting || isFetchingCaptcha} className="w-full md:w-auto">
+            {(isSubmitting || isFetchingCaptcha) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             ফলাফল দেখুন
           </Button>
         </div>

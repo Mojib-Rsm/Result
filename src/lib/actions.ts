@@ -8,9 +8,8 @@ import { parse } from 'node-html-parser';
 import { readCaptcha } from '@/ai/flows/read-captcha-flow';
 
 export type CaptchaChallenge = {
-  captchaImage: string; // Base64 Data URI
+  image: string; // Base64 Data URI
   cookies: string;
-  solvedCaptcha: string;
 };
 
 // Action 1: Fetch the initial page and the captcha image
@@ -46,17 +45,9 @@ export async function getCaptchaAction(): Promise<CaptchaChallenge> {
     const mimeType = captchaRes.headers.get('content-type') || 'image/jpeg';
     const captchaImageUrl = `data:${mimeType};base64,${base64Image}`;
     
-    // Solve captcha using AI
-    const { text: solvedCaptcha } = await readCaptcha({ photoDataUri: captchaImageUrl });
-
-    if (!solvedCaptcha) {
-      throw new Error('AI could not solve the captcha. Please refresh.');
-    }
-
     return {
-        captchaImage: captchaImageUrl,
+        image: captchaImageUrl,
         cookies: cookies,
-        solvedCaptcha: solvedCaptcha,
     };
 
   } catch (error) {
@@ -335,7 +326,7 @@ async function searchResultLegacy(
 
         return result;
     } else {
-        if (data.msg && data.msg.toLowerCase().includes('captcha') || data.msg.toLowerCase().includes('security key')) {
+        if (data.msg && (data.msg.toLowerCase().includes('captcha') || data.msg.toLowerCase().includes('security key'))) {
             throw new Error('The Security Key is incorrect. Please try again.');
         }
         if (data.msg && data.msg.toLowerCase().includes('not found')) {
@@ -350,6 +341,9 @@ async function searchResultLegacy(
   } catch (error) {
      console.error("Result fetch failed:", error);
      if (error instanceof Error) {
+        if (error.message.includes('fetch failed')) {
+            throw new Error('A network error occurred. Please check your internet connection and if the result server is accessible.');
+        }
         throw new Error(error.message);
      }
      throw new Error('An unknown error occurred while fetching the result.');
