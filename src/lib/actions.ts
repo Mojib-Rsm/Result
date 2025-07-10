@@ -10,6 +10,7 @@ import { readCaptcha } from '@/ai/flows/read-captcha-flow';
 export type CaptchaChallenge = {
   captchaImage: string; // Base64 Data URI
   cookies: string;
+  solvedCaptcha: string;
 };
 
 // Action 1: Fetch the initial page and the captcha image
@@ -44,10 +45,18 @@ export async function getCaptchaAction(): Promise<CaptchaChallenge> {
     const base64Image = Buffer.from(imageBuffer).toString('base64');
     const mimeType = captchaRes.headers.get('content-type') || 'image/jpeg';
     const captchaImageUrl = `data:${mimeType};base64,${base64Image}`;
+    
+    // Solve captcha using AI
+    const { text: solvedCaptcha } = await readCaptcha({ photoDataUri: captchaImageUrl });
+
+    if (!solvedCaptcha || !/^\d+$/.test(solvedCaptcha)) {
+      throw new Error('AI could not solve the captcha. Please refresh.');
+    }
 
     return {
         captchaImage: captchaImageUrl,
         cookies: cookies,
+        solvedCaptcha: solvedCaptcha,
     };
 
   } catch (error) {
@@ -277,7 +286,7 @@ async function searchResultLegacy(
 
         return result;
     } else {
-        if (data.msg && data.msg.toLowerCase().includes('captcha')) {
+        if (data.msg && data.msg.toLowerCase().includes('captcha') || data.msg.toLowerCase().includes('security key')) {
             throw new Error('The Security Key is incorrect. Please try again.');
         }
         if (data.msg && data.msg.toLowerCase().includes('not found')) {

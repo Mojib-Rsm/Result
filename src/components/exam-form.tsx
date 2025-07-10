@@ -59,14 +59,14 @@ interface ExamFormProps {
   form: ReturnType<typeof useForm<z.infer<typeof formSchema>>>;
   onSubmit: (values: z.infer<typeof formSchema>) => void;
   isSubmitting: boolean;
-  captchaImage?: string;
+  solvedCaptcha?: string;
   isFetchingCaptcha: boolean;
   onReloadCaptcha: () => void;
   isRegRequired: boolean;
   isCaptchaRequired: boolean;
 }
 
-export function ExamForm({ form, onSubmit, isSubmitting, captchaImage, isFetchingCaptcha, onReloadCaptcha, isRegRequired, isCaptchaRequired }: ExamFormProps) {
+export function ExamForm({ form, onSubmit, isSubmitting, solvedCaptcha, isFetchingCaptcha, onReloadCaptcha, isRegRequired, isCaptchaRequired }: ExamFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -155,11 +155,15 @@ export function ExamForm({ form, onSubmit, isSubmitting, captchaImage, isFetchin
             <>
               <div className="flex flex-col gap-2">
                   <div className="flex items-center gap-4">
-                      <div className='relative h-10 w-40 bg-gray-200 rounded-md flex items-center justify-center'>
+                      <div className='relative h-12 w-48 bg-gray-200 rounded-md flex items-center justify-center p-2'>
                       {isFetchingCaptcha ? (
                           <Skeleton className="h-full w-full" />
                       ) : (
-                          captchaImage && <Image src={captchaImage} alt="Captcha Image" width={160} height={40} className="rounded-md" />
+                          solvedCaptcha ? (
+                            <span className="text-2xl font-bold tracking-widest text-gray-800">{solvedCaptcha}</span>
+                          ) : (
+                            <span className="text-sm text-muted-foreground">Loading...</span>
+                          )
                       )}
                       </div>
                       <Button type="button" variant="secondary" size="icon" onClick={onReloadCaptcha} disabled={isFetchingCaptcha}>

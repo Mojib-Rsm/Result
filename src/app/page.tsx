@@ -80,6 +80,10 @@ export default function Home() {
     try {
       const challenge = await getCaptchaAction();
       setState(prevState => ({ ...prevState, captchaChallenge: challenge, isFetchingCaptcha: false }));
+      // Pre-fill captcha field for user convenience
+      if (challenge.solvedCaptcha) {
+        form.setValue('captcha', challenge.solvedCaptcha);
+      }
     } catch (error) {
       console.error(error);
       setState(prevState => ({ 
@@ -127,7 +131,7 @@ export default function Home() {
         result: null,
       }));
       // Re-fetch captcha only on captcha error
-      if (isCaptchaRequired && error instanceof Error && error.message.toLowerCase().includes('captcha')) {
+      if (isCaptchaRequired && error instanceof Error && (error.message.toLowerCase().includes('captcha') || error.message.toLowerCase().includes('security key'))) {
         fetchCaptcha();
       }
     }
@@ -183,7 +187,7 @@ export default function Home() {
               form={form} 
               onSubmit={handleSearch} 
               isSubmitting={isSubmitting}
-              captchaImage={state.captchaChallenge?.captchaImage}
+              solvedCaptcha={state.captchaChallenge?.solvedCaptcha}
               isFetchingCaptcha={state.isFetchingCaptcha}
               onReloadCaptcha={fetchCaptcha}
               isRegRequired={isRegRequired}
