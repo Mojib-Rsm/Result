@@ -155,11 +155,11 @@ export function ExamForm({ form, onSubmit, isSubmitting, captchaImage, isFetchin
             <>
               <div className="flex flex-col gap-2">
                   <div className="flex items-center gap-4">
-                      <div className='relative h-12 w-48 bg-gray-200 rounded-md flex items-center justify-center'>
+                      <div className='relative h-10 w-40 bg-gray-200 rounded-md flex items-center justify-center'>
                       {isFetchingCaptcha ? (
                           <Skeleton className="h-full w-full" />
                       ) : (
-                          captchaImage && <Image src={captchaImage} alt="Captcha Image" width={192} height={48} className="rounded-md" />
+                          captchaImage && <Image src={captchaImage} alt="Captcha Image" width={160} height={40} className="rounded-md" />
                       )}
                       </div>
                       <Button type="button" variant="secondary" size="icon" onClick={onReloadCaptcha} disabled={isFetchingCaptcha}>
