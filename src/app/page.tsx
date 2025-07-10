@@ -201,7 +201,7 @@ export default function Home() {
           <CardHeader>
             <Skeleton className="h-8 w-3/4" />
             <Skeleton className="h-4 w-1/2" />
-          </Header>
+          </CardHeader>
           <CardContent className="space-y-6 pt-6">
             <div className="space-y-2 text-center">
               <p className="text-lg font-semibold animate-pulse">আপনার ফলাফল আনা হচ্ছে...</p>
