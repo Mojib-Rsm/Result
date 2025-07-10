@@ -111,11 +111,8 @@ async function searchResult2025Ctg(values: z.infer<typeof formSchema>): Promise<
         const infoTable = root.querySelector('.tftable');
         if (!infoTable) {
              const messageNode = root.querySelector('h2');
-             const message = messageNode ? messageNode.innerText.trim() : "Result not found";
-             if (message.includes("Result Not Found")) {
-                throw new Error("Result not found. Please check your roll number.");
-             }
-             throw new Error("Could not parse result page. The result format might have changed.");
+             const message = messageNode ? messageNode.innerText.trim() : "Could not parse result page. The result format might have changed.";
+             throw new Error(message);
         }
         
         const infoData: Record<string, string> = {};
@@ -202,10 +199,7 @@ async function searchResult2025Ctg(values: z.infer<typeof formSchema>): Promise<
     } catch (error) {
         console.error("2025 Result fetch failed:", error);
         if (error instanceof Error) {
-            if (error.message.includes('Result Not Found')) {
-                throw new Error("Result not found. Please check your roll number and try again.");
-            }
-            throw new Error(error.message);
+             throw new Error(error.message);
         }
         throw new Error('An unknown error occurred while fetching the 2025 result.');
     }
