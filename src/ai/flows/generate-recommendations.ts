@@ -104,8 +104,7 @@ const prompt = ai.definePrompt({
 Exam Name: {{{examName}}}
 Exam Year: {{{examYear}}}
 Board Name: {{{boardName}}}
-Grades: {{#each grades}}{{{@key}}}: {{{this}}}, {{/each}}
-
+Grades: {{grades}}
 
 First, use the getScholarshipInfo tool to find relevant scholarships.
 
@@ -122,7 +121,11 @@ const generateRecommendationsFlow = ai.defineFlow(
     outputSchema: GenerateRecommendationsOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
-    return output!;
+    const response = await prompt(input);
+    const output = response?.output;
+    if (!output) {
+      throw new Error('Failed to generate recommendations. The AI model did not return any output.');
+    }
+    return output;
   }
 );
