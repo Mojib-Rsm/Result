@@ -110,11 +110,12 @@ async function searchResult2025Ctg(values: z.infer<typeof formSchema>): Promise<
 
         const infoTable = root.querySelector('.tftable');
         if (!infoTable) {
-             const message = root.querySelector('h2')?.innerText.trim() || "Result not found";
+             const messageNode = root.querySelector('h2');
+             const message = messageNode ? messageNode.innerText.trim() : "Result not found";
              if (message.includes("Result Not Found")) {
                 throw new Error("Result not found. Please check your roll number.");
              }
-             throw new Error(message);
+             throw new Error("Could not parse result page. The result format might have changed.");
         }
         
         const infoData: Record<string, string> = {};
