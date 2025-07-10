@@ -30,15 +30,24 @@ export async function getCaptchaAction(): Promise<CaptchaChallenge> {
     const homeHtml = await homeRes.text();
     const root = parse(homeHtml);
 
+    // More robust captcha finding
     const captchaImgTag = root.querySelector('img.captcha');
-    if (!captchaImgTag) {
-      throw new Error('Could not find captcha image on the page.');
-    }
+    let captchaImageUrl = captchaImgTag?.getAttribute('src');
 
-    const captchaImageUrl = captchaImgTag.getAttribute('src');
+    if (!captchaImageUrl) {
+        // Fallback to regex if selector fails, as the src is a base64 string
+        const match = homeHtml.match(/<img class="captcha" src="(data:image\/png;base64,[^"]+)"/);
+        if (match && match[1]) {
+            captchaImageUrl = match[1];
+        } else {
+             throw new Error('Could not find captcha image on the page.');
+        }
+    }
+    
     if (!captchaImageUrl) {
         throw new Error('Captcha image source not found.');
     }
+
 
     // The src is a base64 string, so we just return it.
     return {
