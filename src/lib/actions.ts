@@ -257,43 +257,60 @@ async function searchResultLegacy(
         
         const madrasahSubjectMap: Record<string, string> = {
             '101+102': 'QURAN MAZID AND TAZBID AND HADITH SHARIF',
-            '103+104': 'ARABIC I AND ARABIC II',
+            '103+104': 'ARABIC-I AND ARABIC-II',
             '133': 'AQAID & FIQH',
-            '134+135': 'BANGLA I AND BANGLA II',
-            '136+137': 'ENGLISH I AND ENGLISH II',
+            '134+135': 'BANGLA-I AND BANGLA-II',
+            '136+137': 'ENGLISH-I AND ENGLISH-II',
         };
 
         let rawGrades: GradeInfo[] = apiResult.display_details.split(',').map((item: string) => {
             const [code, grade] = item.split(':').map((s: string) => s.trim());
             return {
                 code,
-                subject: subjectDetails[code] || madrasahSubjectMap[code] || code,
+                subject: subjectDetails[code] || code,
                 grade
             };
         });
 
         if (values.board === 'madrasah') {
-            const combinedGrades: GradeInfo[] = [];
+            const finalGrades: GradeInfo[] = [];
             const processedCodes = new Set<string>();
 
+            // Process combined subjects first
             for (const combinedCode in madrasahSubjectMap) {
                 if (combinedCode.includes('+')) {
                     const individualCodes = combinedCode.split('+');
                     const firstCode = individualCodes[0];
-                    const firstCodeGrade = rawGrades.find(g => g.code === firstCode);
+                    const secondCode = individualCodes[1];
 
-                    if (firstCodeGrade) {
-                        combinedGrades.push({
-                            code: combinedCode.replace('+', '-'), // Display with hyphen
+                    const firstGradeEntry = rawGrades.find(g => g.code === firstCode);
+                    const secondGradeEntry = rawGrades.find(g => g.code === secondCode);
+                    
+                    if (firstGradeEntry) { // Combined subjects must have at least the first part
+                        finalGrades.push({
+                            code: combinedCode,
                             subject: madrasahSubjectMap[combinedCode],
-                            grade: firstCodeGrade.grade,
+                            grade: firstGradeEntry.grade, // Grade is usually same for both parts
                         });
-                        individualCodes.forEach(code => processedCodes.add(code));
+                        processedCodes.add(firstCode);
+                        if(secondGradeEntry) {
+                           processedCodes.add(secondCode);
+                        }
                     }
                 }
             }
-            const otherGrades = rawGrades.filter(g => !processedCodes.has(g.code));
-            rawGrades = [...otherGrades, ...combinedGrades].sort((a,b) => parseInt(a.code.split('-')[0]) - parseInt(b.code.split('-')[0]));
+
+            // Add remaining subjects
+            rawGrades.forEach(grade => {
+                if (!processedCodes.has(grade.code)) {
+                    finalGrades.push({
+                      ...grade,
+                      subject: subjectDetails[grade.code] || madrasahSubjectMap[grade.code] || grade.code
+                    });
+                }
+            });
+            
+            rawGrades = finalGrades.sort((a,b) => parseInt(a.code.split('+')[0]) - parseInt(b.code.split('+')[0]));
         }
 
         const result: ExamResult = {

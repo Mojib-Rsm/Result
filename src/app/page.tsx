@@ -54,6 +54,7 @@ export default function Home() {
       board: 'chittagong',
       year: new Date().getFullYear().toString(),
       exam: 'ssc',
+      captcha: '',
     },
   });
 
@@ -98,6 +99,8 @@ export default function Home() {
   }, [isCaptchaRequired]);
 
   const handleSearch = async (values: z.infer<typeof formSchema>) => {
+    if (state.isFetchingCaptcha) return; // Prevent submission while captcha is being fetched
+    
     if (isCaptchaRequired && !state.captchaChallenge?.solvedCaptcha) {
       setState(prevState => ({ ...prevState, error: 'ক্যাপচা স্বয়ংক্রিয়ভাবে সমাধান করা যায়নি। অনুগ্রহ করে পৃষ্ঠাটি রিফ্রেশ করুন।' }));
       return;
