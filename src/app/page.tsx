@@ -183,7 +183,7 @@ export default function Home() {
               form={form} 
               onSubmit={handleSearch} 
               isSubmitting={isSubmitting}
-              captchaText={state.captchaChallenge?.solvedCaptcha}
+              captchaImage={state.captchaChallenge?.captchaImage}
               isFetchingCaptcha={state.isFetchingCaptcha}
               onReloadCaptcha={fetchCaptcha}
               isRegRequired={isRegRequired}

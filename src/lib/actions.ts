@@ -10,7 +10,6 @@ import { readCaptcha } from '@/ai/flows/read-captcha-flow';
 export type CaptchaChallenge = {
   captchaImage: string; // Base64 Data URI
   cookies: string;
-  solvedCaptcha: string; // The text read from the captcha image
 };
 
 // Action 1: Fetch the initial page and the captcha image
@@ -46,13 +45,9 @@ export async function getCaptchaAction(): Promise<CaptchaChallenge> {
     const mimeType = captchaRes.headers.get('content-type') || 'image/jpeg';
     const captchaImageUrl = `data:${mimeType};base64,${base64Image}`;
 
-    // Use Genkit AI to read the captcha
-    const solvedCaptcha = await readCaptcha({ photoDataUri: captchaImageUrl });
-
     return {
         captchaImage: captchaImageUrl,
         cookies: cookies,
-        solvedCaptcha: solvedCaptcha.text,
     };
 
   } catch (error) {

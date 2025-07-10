@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Loader2, RefreshCw } from 'lucide-react';
 import { Skeleton } from './ui/skeleton';
+import Image from 'next/image';
 
 export const formSchema = z.object({
   roll: z.string().min(6, 'রোল নম্বর কমপক্ষে ৬ সংখ্যার হতে হবে।').regex(/^\d+$/, 'রোল নম্বর অবশ্যই একটি সংখ্যা হতে হবে।'),
@@ -58,14 +59,14 @@ interface ExamFormProps {
   form: ReturnType<typeof useForm<z.infer<typeof formSchema>>>;
   onSubmit: (values: z.infer<typeof formSchema>) => void;
   isSubmitting: boolean;
-  captchaText?: string;
+  captchaImage?: string;
   isFetchingCaptcha: boolean;
   onReloadCaptcha: () => void;
   isRegRequired: boolean;
   isCaptchaRequired: boolean;
 }
 
-export function ExamForm({ form, onSubmit, isSubmitting, captchaText, isFetchingCaptcha, onReloadCaptcha, isRegRequired, isCaptchaRequired }: ExamFormProps) {
+export function ExamForm({ form, onSubmit, isSubmitting, captchaImage, isFetchingCaptcha, onReloadCaptcha, isRegRequired, isCaptchaRequired }: ExamFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -159,7 +160,7 @@ export function ExamForm({ form, onSubmit, isSubmitting, captchaText, isFetching
                       {isFetchingCaptcha ? (
                           <Skeleton className="h-full w-full" />
                       ) : (
-                          captchaText && <p className="text-3xl font-bold tracking-widest">{captchaText}</p>
+                          captchaImage && <Image src={captchaImage} alt="Captcha Image" width={192} height={48} className="rounded-md" />
                       )}
                       </div>
                       <Button type="button" variant="secondary" size="icon" onClick={onReloadCaptcha} disabled={isFetchingCaptcha}>
