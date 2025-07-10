@@ -81,23 +81,27 @@ export default function Home() {
       });
       setState(prevState => ({ ...prevState, result: examResult }));
 
-      const grades = examResult.grades.reduce((acc, g) => {
-        acc[g.subject] = g.grade;
-        return acc;
-      }, {} as Record<string, string>);
+      if (examResult.status === 'Pass') {
+        const grades = examResult.grades.reduce((acc, g) => {
+          acc[g.subject] = g.grade;
+          return acc;
+        }, {} as Record<string, string>);
 
-      const recommendations = await getRecommendationsAction({
-        examName: values.exam.toUpperCase(),
-        grades,
-        examYear: values.year,
-        boardName: values.board,
-      });
+        const recommendations = await getRecommendationsAction({
+          examName: values.exam.toUpperCase(),
+          grades,
+          examYear: values.year,
+          boardName: values.board,
+        });
+        setState(prevState => ({ ...prevState, isLoading: false, recommendations }));
+        addHistoryItem({ ...values, result: examResult, recommendations });
+      } else {
+        setState(prevState => ({ ...prevState, isLoading: false }));
+        addHistoryItem({ ...values, result: examResult, recommendations: null });
+      }
 
-      setState(prevState => ({ ...prevState, isLoading: false, recommendations }));
-      addHistoryItem({ ...values, result: examResult, recommendations });
     } catch (error) {
       console.error(error);
-      // Fetch a new captcha on error, as the old one is likely invalid
       fetchCaptcha();
       setState(prevState => ({
         ...prevState,
@@ -124,9 +128,9 @@ export default function Home() {
       error: null,
       result: null,
       recommendations: null,
-      captchaChallenge: state.captchaChallenge, // Keep the existing captcha
+      captchaChallenge: null,
     });
-    fetchCaptcha(); // Or fetch a new one
+    fetchCaptcha();
   };
   
   const isSubmitting = state.isLoading || state.isFetchingCaptcha;
@@ -186,7 +190,7 @@ export default function Home() {
           <ResultsDisplay 
             result={state.result} 
             recommendations={state.recommendations} 
-            isLoadingRecommendations={state.isLoading}
+            isLoadingRecommendations={state.isLoading && state.result.status === 'Pass'}
             onReset={resetSearch}
           />
         </>

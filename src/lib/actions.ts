@@ -5,9 +5,7 @@ import type { GenerateRecommendationsInput } from '@/ai/flows/generate-recommend
 import type { ExamResult, GradeInfo } from '@/types';
 import { z } from 'zod';
 import { formSchema } from '@/components/exam-form';
-import { parse } from 'node-html-parser';
 
-// This is a new type for the two-step form process
 export type CaptchaChallenge = {
   captchaImage: string; // Base64 Data URI
   cookies: string;
@@ -27,25 +25,33 @@ export async function getCaptchaAction(): Promise<CaptchaChallenge> {
     }
 
     const cookies = homeRes.headers.get('set-cookie') || '';
-    const homeHtml = await homeRes.text();
     
-    // Use a regular expression to reliably find the base64 encoded captcha image
-    const match = homeHtml.match(/<img class="captcha" src="(data:image\/png;base64,[^"]+)"/);
+    // Now fetch the captcha image using the session cookie
+    const captchaRes = await fetch(`https://app.eboardresults.com/v2/captcha?t=${Date.now()}`, {
+        headers: {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
+            "Referer": "https://app.eboardresults.com/v2/home",
+            "Cookie": cookies,
+        }
+    });
 
-    if (match && match[1]) {
-      const captchaImageUrl = match[1];
-      return {
-        captchaImage: captchaImageUrl,
-        cookies,
-      };
-    } else {
-      // If regex fails, throw the specific error.
-      throw new Error('Could not find captcha image on the page.');
+    if (!captchaRes.ok) {
+        throw new Error('Could not fetch the captcha image.');
     }
+
+    const imageBuffer = await captchaRes.arrayBuffer();
+    const base64Image = Buffer.from(imageBuffer).toString('base64');
+    const mimeType = captchaRes.headers.get('content-type') || 'image/jpeg';
+    const captchaImageUrl = `data:${mimeType};base64,${base64Image}`;
+
+    return {
+        captchaImage: captchaImageUrl,
+        cookies: cookies,
+    };
+
   } catch (error) {
     console.error("Captcha fetch failed:", error);
     if (error instanceof Error) {
-        // Re-throw the specific error message from the try block or a generic one
         throw new Error(`Failed to load captcha: ${error.message}`);
     }
     throw new Error('An unknown error occurred while fetching the captcha.');
@@ -55,7 +61,7 @@ export async function getCaptchaAction(): Promise<CaptchaChallenge> {
 
 // Action 2: Submit the form with the captcha to get the result
 export async function searchResultAction(
-  values: z.infer<typeof formSchema> & { captcha: string, cookies: string }
+  values: z.infer<typeof formSchema> & { cookies: string }
 ): Promise<ExamResult> {
   
   const params = new URLSearchParams();
@@ -65,7 +71,6 @@ export async function searchResultAction(
   params.append('roll', values.roll);
   params.append('reg', values.reg);
   params.append('captcha', values.captcha);
-  // These seem to be static or optional values for individual results
   params.append('result_type', '1');
   params.append('eiin', '');
   params.append('dcode', '');
@@ -100,7 +105,7 @@ export async function searchResultAction(
         }, {});
 
         const grades: GradeInfo[] = apiResult.display_details.split(',').map((item: string) => {
-            const [code, grade] = item.split(':').map(s => s.trim());
+            const [code, grade] = item.split(':').map((s: string) => s.trim());
             return {
                 code,
                 subject: subjectDetails[code] || 'Unknown Subject',
@@ -128,7 +133,6 @@ export async function searchResultAction(
 
         return result;
     } else {
-        // Handle specific API errors
         if (data.msg && data.msg.toLowerCase().includes('captcha')) {
             throw new Error('The Security Key is incorrect. Please try again.');
         }
