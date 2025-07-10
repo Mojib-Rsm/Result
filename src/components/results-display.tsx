@@ -10,6 +10,7 @@ import { Download, RotateCcw } from 'lucide-react';
 import type { ExamResult } from '@/types';
 import { Separator } from './ui/separator';
 import { cn } from '@/lib/utils';
+import Link from 'next/link';
 
 interface ResultsDisplayProps {
   result: ExamResult;
@@ -79,8 +80,9 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
                         height={60}
                         className="h-16 w-16 mb-2"
                     />
-                    <CardTitle className="text-2xl text-primary">Result Marksheet</CardTitle>
-                    <CardDescription>{result.exam.toUpperCase()} Examination - {result.year}</CardDescription>
+                    <Link href="https://www.oftern.com" target="_blank" rel="noopener noreferrer" className="text-xs text-muted-foreground hover:underline">
+                        www.oftern.com
+                    </Link>
                 </div>
             </div>
             <div className={`text-right font-bold text-xl`}>
@@ -89,13 +91,17 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
                 {isPass && <p>Grade: {gpaGrade}</p>}
             </div>
           </div>
+          <div className="text-center mt-4">
+            <CardTitle className="text-2xl text-primary">Result Marksheet</CardTitle>
+            <CardDescription>{result.exam.toUpperCase()} Examination - {result.year}</CardDescription>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-2 mb-4 text-sm">
             <div><strong>Roll No:</strong> {result.roll}</div>
-            <div><strong>Reg No:</strong> {result.reg}</div>
             <div><strong>Name:</strong> {result.studentInfo.name}</div>
             <div><strong>Father's Name:</strong> {result.studentInfo.fatherName}</div>
+            <div><strong>Reg No:</strong> {result.reg}</div>
             <div><strong>Board:</strong> <span className="capitalize">{result.board}</span></div>
             <div><strong>Group:</strong> {result.studentInfo.group}</div>
             <div><strong>Mother's Name:</strong> {result.studentInfo.motherName}</div>
@@ -131,7 +137,7 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
         
         <div className="px-6 pb-6 text-center text-xs text-muted-foreground">
              <p>For any queries, contact: mojibrsm@gmail.com</p>
-             <p>Developed by: <span className="font-semibold text-foreground">Mojib Rsm</span> | www.oftern.com</p>
+             <p>Developed by: <span className="font-semibold text-foreground">Mojib Rsm</span></p>
         </div>
 
 
