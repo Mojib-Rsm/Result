@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { History as HistoryIcon, Search, Trash2, Eye, School } from 'lucide-react';
+import { History as HistoryIcon, Search, Trash2, Eye, School, User, BarChart2 } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import ResultsDisplay from '@/components/results-display';
 import type { HistoryItem } from '@/types';
@@ -15,31 +15,37 @@ import { Skeleton } from '@/components/ui/skeleton';
 export default function HistoryPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [stats, setStats] = useState<{ visits: number; searches: number }>({ visits: 0, searches: 0 });
   const [filter, setFilter] = useState('');
   const [selectedResult, setSelectedResult] = useState<HistoryItem | null>(null);
 
   useEffect(() => {
     try {
+      const localStatsRaw = localStorage.getItem('bd-results-stats');
+      if (localStatsRaw) {
+        setStats(JSON.parse(localStatsRaw));
+      }
+
       const localHistory = localStorage.getItem('bd-results-history-local');
       if (localHistory) {
           setHistory(JSON.parse(localHistory));
       }
     } catch(e) {
-      console.error("Could not load local history", e)
+      console.error("Could not load local history/stats", e)
     } finally {
       setIsLoading(false);
     }
   }, []);
 
   const clearLocalHistory = () => {
-    if (window.confirm("আপনি কি আপনার সমস্ত অনুসন্ধানের ইতিহাস মুছে ফেলতে চান?")) {
+    if (window.confirm("আপনি কি আপনার সমস্ত অনুসন্ধানের ইতিহাস এবং পরিসংখ্যান মুছে ফেলতে চান?")) {
       setHistory([]);
+      setStats({ visits: 0, searches: 0 });
       try {
           localStorage.removeItem('bd-results-history-local');
-          // Also clear stats if desired
-          // localStorage.removeItem('bd-results-stats');
+          localStorage.removeItem('bd-results-stats');
       } catch(e) {
-          console.error("Could not clear local history", e)
+          console.error("Could not clear local data", e)
       }
     }
   }
@@ -51,12 +57,47 @@ export default function HistoryPage() {
   ).sort((a, b) => b.timestamp - a.timestamp);
 
   return (
-    <div className="container mx-auto max-w-5xl px-4 py-8 md:py-12">
-      <div className="flex flex-col items-start mb-8 md:flex-row md:items-center md:justify-between">
-        <div className="mb-4 md:mb-0">
-          <h1 className="text-4xl font-bold tracking-tight">অনুসন্ধানের ইতিহাস</h1>
-          <p className="mt-2 text-lg text-muted-foreground">আপনার এই ব্রাউজারের অনুসন্ধানের ইতিহাস দেখুন।</p>
-        </div>
+    <div className="container mx-auto max-w-6xl px-4 py-8 md:py-12">
+      <div className="mb-8">
+        <h1 className="text-4xl font-bold tracking-tight">ব্যবহারের ইতিহাস এবং পরিসংখ্যান</h1>
+        <p className="mt-2 text-lg text-muted-foreground">এই ব্রাউজারের ব্যবহার এবং অনুসন্ধানের ইতিহাস দেখুন।</p>
+      </div>
+
+       <div className="grid gap-6 md:grid-cols-3 mb-8">
+        <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">মোট ভিজিট</CardTitle>
+                <User className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+                <div className="text-2xl font-bold">{stats.visits.toLocaleString()}</div>
+                <p className="text-xs text-muted-foreground">এই ব্রাউজারে মোট ভিজিট সংখ্যা</p>
+            </CardContent>
+        </Card>
+        <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">মোট অনুসন্ধান</CardTitle>
+                <Search className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+                <div className="text-2xl font-bold">{stats.searches.toLocaleString()}</div>
+                <p className="text-xs text-muted-foreground">এই ব্রাউজারে মোট ফলাফল অনুসন্ধান</p>
+            </CardContent>
+        </Card>
+        <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">সংরক্ষিত ইতিহাস</CardTitle>
+                <BarChart2 className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+                <div className="text-2xl font-bold">{history.length}</div>
+                <p className="text-xs text-muted-foreground">সর্বশেষ অনুসন্ধানের ফলাফল</p>
+            </CardContent>
+        </Card>
+      </div>
+
+      <div className="flex flex-col items-start mb-4 md:flex-row md:items-center md:justify-between">
+         <h2 className="text-2xl font-bold mb-4 md:mb-0">অনুসন্ধানের ইতিহাস</h2>
         <div className="relative w-full md:w-auto">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
           <Input
@@ -73,14 +114,14 @@ export default function HistoryPage() {
           <div className="flex justify-end mb-4">
             <Button variant="destructive" size="sm" onClick={clearLocalHistory}>
               <Trash2 className="mr-2 h-4 w-4" />
-              ইতিহাস মুছুন
+              ইতিহাস ও পরিসংখ্যান মুছুন
             </Button>
           </div>
         )}
 
       {isLoading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {[...Array(4)].map((_, i) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(6)].map((_, i) => (
               <Card key={i}><CardHeader><Skeleton className="h-6 w-3/4" /></CardHeader><CardContent><Skeleton className="h-4 w-full" /><Skeleton className="h-4 w-2/3 mt-2" /></CardContent><CardFooter><Skeleton className="h-8 w-1/2" /></CardFooter></Card>
             ))}
           </div>
@@ -96,7 +137,7 @@ export default function HistoryPage() {
         </div>
       ) : (
          <Dialog>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredHistory.map(item => (
                 <Card key={`${item.roll}-${item.exam}-${item.timestamp}`} className="hover:shadow-lg transition-shadow">
                 <CardHeader>
