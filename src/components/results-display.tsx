@@ -121,9 +121,19 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
     </div>
   );
 
+  const containerClasses = cn(
+    "space-y-4",
+    !isDialog && "space-y-8"
+  );
+  
+  const cardClasses = cn(
+      "shadow-lg",
+      isDialog && "shadow-none border-none"
+  );
+
   return (
-    <div className="space-y-8">
-       <div className="flex justify-end gap-2 no-print">
+    <div className={containerClasses}>
+       <div className={cn("flex justify-end gap-2", !isDialog && "no-print")}>
           {!isDialog && onReset && (
               <Button variant="outline" onClick={onReset} disabled={isDownloading} size="icon">
                   <Search className="h-4 w-4" />
@@ -141,7 +151,7 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
       </div>
 
       <div id="pdf-container">
-        <Card className="shadow-lg" id="printable-area">
+        <Card className={cardClasses} id="printable-area">
             <CardHeader>
                  <div className="relative">
                     <div className="flex flex-col items-center justify-center text-center">
@@ -211,23 +221,26 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
             </div>
         </Card>
       </div>
+      
+      {!isDialog && (
+         <CardFooter className="flex justify-end gap-2 no-print">
+            {onReset && (
+                <Button variant="outline" onClick={onReset} disabled={isDownloading}>
+                    <Search className="mr-2 h-4 w-4" />
+                    অন্য ফলাফল খুঁজুন
+                </Button>
+            )}
+            <Button onClick={handleDownloadPdf} disabled={isDownloading}>
+                {isDownloading ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Download className="mr-2 h-4 w-4" />
+                )}
+                ডাউনলোড পিডিএফ
+            </Button>
+        </CardFooter>
+      )}
 
-       <CardFooter className="flex justify-end gap-2 no-print">
-          {!isDialog && onReset && (
-              <Button variant="outline" onClick={onReset} disabled={isDownloading}>
-                  <Search className="mr-2 h-4 w-4" />
-                  অন্য ফলাফল খুঁজুন
-              </Button>
-          )}
-          <Button onClick={handleDownloadPdf} disabled={isDownloading}>
-              {isDownloading ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <Download className="mr-2 h-4 w-4" />
-              )}
-              ডাউনলোড পিডিএফ
-          </Button>
-      </CardFooter>
     </div>
   );
 }

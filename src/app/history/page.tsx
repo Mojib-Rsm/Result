@@ -174,11 +174,13 @@ export default function HistoryPage() {
             ))}
             </div>
             {selectedResult && (
-                <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                <DialogContent className="max-w-4xl h-[95vh] flex flex-col">
                     <DialogHeader className="no-print">
                         <DialogTitle>ফলাফলের বিবরণ</DialogTitle>
                     </DialogHeader>
-                    <ResultsDisplay result={selectedResult.result} isDialog={true} />
+                    <div className="flex-grow overflow-y-auto">
+                        <ResultsDisplay result={selectedResult.result} isDialog={true} />
+                    </div>
                 </DialogContent>
             )}
         </Dialog>
