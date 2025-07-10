@@ -3,17 +3,16 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { GraduationCap, History } from 'lucide-react';
+import { GraduationCap, History, Lock } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { useAdminAuth } from '@/hooks/use-admin-auth';
 
-interface HeaderProps {
-    className?: string;
-}
 
-export default function Header({ className }: HeaderProps) {
+export default function Header({ className }: { className?: string }) {
   const pathname = usePathname();
+  const { promptLogin } = useAdminAuth();
 
   const navLinks = [
     { href: '/', label: 'হোম', icon: GraduationCap },
@@ -33,7 +32,7 @@ export default function Header({ className }: HeaderProps) {
           />
           <Image 
             src="https://www.oftern.com/uploads/logo/favicon_67c1bdb47ee422-18965133.png"
-            alt="Oftern Logo"
+            alt="Bartanow Logo"
             width={32}
             height={32}
             className="h-8 w-8 rounded-full"
@@ -55,6 +54,19 @@ export default function Header({ className }: HeaderProps) {
             </Button>
           ))}
         </nav>
+        <div className="ml-auto">
+           <Button
+              variant="ghost"
+              onClick={promptLogin}
+              className={cn(
+                'transition-colors hover:text-foreground/80',
+                pathname === '/admin' ? 'text-foreground' : 'text-foreground/60'
+              )}
+            >
+              <Lock className="mr-2 h-4 w-4" />
+              অ্যাডমিন
+            </Button>
+        </div>
       </div>
     </header>
   );
