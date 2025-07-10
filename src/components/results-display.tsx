@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect } from 'react';
@@ -26,7 +27,20 @@ const gradeToPoint: Record<string, number> = {
 export default function ResultsDisplay({ result, onReset }: ResultsDisplayProps) {
   
   useEffect(() => {
-    // This empty useEffect is for client-side hydration compatibility
+    const handleBeforePrint = () => {
+      document.body.classList.add('printing');
+    };
+    const handleAfterPrint = () => {
+      document.body.classList.remove('printing');
+    };
+
+    window.addEventListener('beforeprint', handleBeforePrint);
+    window.addEventListener('afterprint', handleAfterPrint);
+
+    return () => {
+      window.removeEventListener('beforeprint', handleBeforePrint);
+      window.removeEventListener('afterprint', handleAfterPrint);
+    };
   }, []);
   
   const handlePrint = () => {
