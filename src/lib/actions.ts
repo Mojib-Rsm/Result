@@ -128,7 +128,7 @@ export async function searchResultAction(
                 motherName: apiResult.mname,
                 group: apiResult.stud_group,
                 dob: apiResult.dob,
-                institute: apiResult.institute_name,
+                institute: apiResult.inst_name,
                 type: apiResult.st_type,
                 session: apiResult.session,
             },
