@@ -21,7 +21,7 @@ const ReadCaptchaInputSchema = z.object({
 export type ReadCaptchaInput = z.infer<typeof ReadCaptchaInputSchema>;
 
 const ReadCaptchaOutputSchema = z.object({
-  text: z.string().describe('The text extracted from the captcha image. Should contain only digits.'),
+  text: z.string().describe('The text extracted from the captcha image. Should contain only digits and be between 4 to 6 characters long.'),
 });
 export type ReadCaptchaOutput = z.infer<typeof ReadCaptchaOutputSchema>;
 
@@ -33,9 +33,9 @@ const prompt = ai.definePrompt({
   name: 'readCaptchaPrompt',
   input: {schema: ReadCaptchaInputSchema},
   output: {schema: ReadCaptchaOutputSchema},
-  prompt: `You are an expert OCR (Optical Character Recognition) tool. Your task is to extract the numerical digits from the provided image. The image is a captcha. Read the numbers from the image and provide them as plain text.
+  prompt: `You are an expert OCR (Optical Character Recognition) tool specializing in reading distorted captcha images. Your primary task is to extract the numerical digits from the provided image, ignoring all background noise, distortions, and other non-numeric elements.
 
-The image might be noisy or distorted. Do your best to identify the numbers correctly. The output should only contain the digits you see in the image.
+The image is a heavily distorted captcha. Focus exclusively on identifying the core sequence of numbers, which are typically between 4 and 6 digits long. Do your absolute best to decipher the correct numbers.
 
 Image: {{media url=photoDataUri}}`,
 });
@@ -51,11 +51,14 @@ const readCaptchaFlow = ai.defineFlow(
     if (!output?.text) {
       throw new Error("AI could not read the security code from the image.");
     }
-    // Clean up the output to ensure only digits are returned
+    // Clean up the output to ensure only digits are returned and it's within a reasonable length.
     const cleanedText = output.text.replace(/\D/g, '');
 
-    if (!cleanedText) {
-      throw new Error("AI failed to extract any digits from the security code image.");
+    if (!cleanedText || cleanedText.length < 4 || cleanedText.length > 6) {
+      console.warn(`AI returned an unlikely captcha result: "${cleanedText}". The image might be too complex.`);
+      // Return a plausible but likely incorrect value to avoid crashing, but the server will reject it.
+      // This allows the user to see the incorrect value and refresh.
+      return { text: cleanedText || "0000" }
     }
 
     return { text: cleanedText };
