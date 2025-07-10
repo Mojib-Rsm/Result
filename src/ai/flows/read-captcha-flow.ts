@@ -48,11 +48,16 @@ const readCaptchaFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await prompt(input);
-    if (!output) {
-      throw new Error("Could not read captcha from image.");
+    if (!output?.text) {
+      throw new Error("AI could not read the security code from the image.");
     }
     // Clean up the output to ensure only digits are returned
     const cleanedText = output.text.replace(/\D/g, '');
+
+    if (!cleanedText) {
+      throw new Error("AI failed to extract any digits from the security code image.");
+    }
+
     return { text: cleanedText };
   }
 );

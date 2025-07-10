@@ -49,7 +49,7 @@ export async function getCaptchaAction(): Promise<CaptchaChallenge> {
     // Solve captcha using AI
     const { text: solvedCaptcha } = await readCaptcha({ photoDataUri: captchaImageUrl });
 
-    if (!solvedCaptcha || !/^\d+$/.test(solvedCaptcha)) {
+    if (!solvedCaptcha) {
       throw new Error('AI could not solve the captcha. Please refresh.');
     }
 
@@ -65,9 +65,9 @@ export async function getCaptchaAction(): Promise<CaptchaChallenge> {
         if (error.message.includes('fetch failed')) {
             throw new Error('Failed to load captcha: A network error occurred. Please check your internet connection and if the result server is accessible.');
         }
-        throw new Error(`Failed to load captcha: ${error.message}`);
+        throw new Error(`Failed to load security code: ${error.message}`);
     }
-    throw new Error('An unknown error occurred while fetching the captcha.');
+    throw new Error('An unknown error occurred while fetching the security code.');
   }
 }
 
