@@ -2,7 +2,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useHistory } from '@/hooks/use-history';
 import { useAdminAuth } from '@/hooks/use-admin-auth';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,28 +11,51 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import ResultsDisplay from '@/components/results-display';
 import type { HistoryItem } from '@/types';
 import { useRouter } from 'next/navigation';
+import { getDatabase, ref, onValue, get } from 'firebase/database';
+import { app } from '@/lib/firebase';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function AdminPage() {
-  const { isAuthenticated } = useAdminAuth();
-  const { history } = useHistory();
+  const { isAuthenticated, isAuthLoading } = useAdminAuth();
   const router = useRouter();
+
   const [stats, setStats] = useState<{ visits: number; searches: number }>({ visits: 0, searches: 0 });
+  const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [selectedResult, setSelectedResult] = useState<HistoryItem | null>(null);
 
   useEffect(() => {
-    if (isAuthenticated === false) {
+    if (!isAuthLoading && isAuthenticated === false) {
       router.push('/');
     }
-  }, [isAuthenticated, router]);
+  }, [isAuthenticated, isAuthLoading, router]);
 
   useEffect(() => {
-    // This now runs only on the client, avoiding hydration errors
-    const visits = parseInt(localStorage.getItem('app-visits') || '0', 10);
-    const searches = parseInt(localStorage.getItem('app-searches') || '0', 10);
-    setStats({ visits, searches });
-  }, []);
+    if (isAuthenticated) {
+      const db = getDatabase(app);
+      const statsRef = ref(db, 'stats');
+      const historyRef = ref(db, 'history');
 
-  if (isAuthenticated === null || !isAuthenticated) {
+      const unsubscribeStats = onValue(statsRef, (snapshot) => {
+        const data = snapshot.val();
+        setStats({ visits: data?.visits || 0, searches: data?.searches || 0 });
+      });
+      
+      const unsubscribeHistory = onValue(historyRef, (snapshot) => {
+          const data = snapshot.val();
+          const historyList = data ? Object.values(data).sort((a: any, b: any) => b.timestamp - a.timestamp) as HistoryItem[] : [];
+          setHistory(historyList);
+          setIsLoading(false);
+      });
+
+      return () => {
+        unsubscribeStats();
+        unsubscribeHistory();
+      };
+    }
+  }, [isAuthenticated]);
+
+  if (isAuthLoading || !isAuthenticated) {
     return (
         <div className="flex min-h-[calc(100vh-10rem)] items-center justify-center">
             <p>প্রবেশাধিকার যাচাই করা হচ্ছে...</p>
@@ -45,7 +67,7 @@ export default function AdminPage() {
     <div className="container mx-auto max-w-6xl px-4 py-8 md:py-12">
       <div className="mb-8">
         <h1 className="text-4xl font-bold tracking-tight">অ্যাডমিন প্যানেল</h1>
-        <p className="mt-2 text-lg text-muted-foreground">সাইটের ব্যবহার এবং অনুসন্ধানের ইতিহাস দেখুন। (শুধুমাত্র এই ব্রাউজারের জন্য)</p>
+        <p className="mt-2 text-lg text-muted-foreground">সাইটের ব্যবহার এবং অনুসন্ধানের ইতিহাস দেখুন।</p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-3 mb-8">
@@ -56,7 +78,7 @@ export default function AdminPage() {
             </CardHeader>
             <CardContent>
                 <div className="text-2xl font-bold">{stats.visits.toLocaleString()}</div>
-                <p className="text-xs text-muted-foreground">এই ব্রাউজার থেকে মোট ভিজিট সংখ্যা</p>
+                <p className="text-xs text-muted-foreground">অ্যাপের মোট ভিজিট সংখ্যা</p>
             </CardContent>
         </Card>
         <Card>
@@ -66,7 +88,7 @@ export default function AdminPage() {
             </CardHeader>
             <CardContent>
                 <div className="text-2xl font-bold">{stats.searches.toLocaleString()}</div>
-                <p className="text-xs text-muted-foreground">এই ব্রাউজার থেকে মোট ফলাফল অনুসন্ধান</p>
+                <p className="text-xs text-muted-foreground">মোট ফলাফল অনুসন্ধান</p>
             </CardContent>
         </Card>
         <Card>
@@ -76,7 +98,7 @@ export default function AdminPage() {
             </CardHeader>
             <CardContent>
                 <div className="text-2xl font-bold">{history.length}</div>
-                <p className="text-xs text-muted-foreground">সর্বশেষ ২০টি অনুসন্ধানের ফলাফল</p>
+                <p className="text-xs text-muted-foreground">সর্বশেষ অনুসন্ধানের ফলাফল</p>
             </CardContent>
         </Card>
       </div>
@@ -84,16 +106,22 @@ export default function AdminPage() {
 
       <div>
         <h2 className="text-2xl font-bold mb-4">অনুসন্ধানের ইতিহাস</h2>
-        {history.length === 0 ? (
+        {isLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(6)].map((_, i) => (
+              <Card key={i}><CardHeader><Skeleton className="h-6 w-3/4" /></CardHeader><CardContent><Skeleton className="h-4 w-full" /><Skeleton className="h-4 w-2/3 mt-2" /></CardContent><CardFooter><Skeleton className="h-8 w-1/2" /></CardFooter></Card>
+            ))}
+          </div>
+        ) : history.length === 0 ? (
           <div className="text-center py-16 border-2 border-dashed rounded-lg">
             <h3 className="text-lg font-medium">কোনো ইতিহাস পাওয়া যায়নি</h3>
-            <p className="mt-1 text-sm text-muted-foreground">এই ব্রাউজার থেকে এখনো কোনো ফলাফল অনুসন্ধান করা হয়নি।</p>
+            <p className="mt-1 text-sm text-muted-foreground">এখনো কোনো ফলাফল অনুসন্ধান করা হয়নি।</p>
           </div>
         ) : (
           <Dialog>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {history.map(item => (
-                <Card key={`${item.roll}-${item.exam}`} className="hover:shadow-lg transition-shadow">
+                <Card key={`${item.roll}-${item.exam}-${item.timestamp}`} className="hover:shadow-lg transition-shadow">
                   <CardHeader>
                     <div className="flex justify-between items-start">
                       <div>

@@ -1,70 +1,53 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import type { HistoryItem } from '@/types';
+import { getDatabase, ref, runTransaction, push, set } from "firebase/database";
+import { app as firebaseApp } from '@/lib/firebase';
 
-const HISTORY_KEY = 'bd-results-history';
-const VISIT_COUNT_KEY = 'app-visits';
-const SEARCH_COUNT_KEY = 'app-searches';
+const VISIT_SESSION_KEY = 'visit-counted';
 
 export function useHistory() {
-  const [history, setHistory] = useState<HistoryItem[]>([]);
   const [isInitialized, setIsInitialized] = useState(false);
+  const db = getDatabase(firebaseApp);
 
-  useEffect(() => {
-    // This code now runs only on the client, after the initial render.
+  const incrementVisitCount = useCallback(() => {
     try {
-      // Increment visit count
-      const currentVisits = parseInt(localStorage.getItem(VISIT_COUNT_KEY) || '0', 10);
-      localStorage.setItem(VISIT_COUNT_KEY, (currentVisits + 1).toString());
-
-      // Load history
-      const item = window.localStorage.getItem(HISTORY_KEY);
-      if (item) {
-        setHistory(JSON.parse(item));
+      if (sessionStorage.getItem(VISIT_SESSION_KEY)) {
+        return; 
       }
+      const visitsRef = ref(db, 'stats/visits');
+      runTransaction(visitsRef, (currentValue) => (currentValue || 0) + 1);
+      sessionStorage.setItem(VISIT_SESSION_KEY, 'true');
     } catch (error) {
-      console.error('Failed to access localStorage', error);
-      setHistory([]);
+      console.error("Firebase visit count increment failed: ", error);
     }
-    setIsInitialized(true);
-  }, []);
+  }, [db]);
 
   useEffect(() => {
-    if (isInitialized) {
-        try {
-            window.localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
-        } catch (error) {
-            console.error('Failed to save history to localStorage', error);
-        }
-    }
-  }, [history, isInitialized]);
+    incrementVisitCount();
+    setIsInitialized(true);
+  }, [incrementVisitCount]);
 
-  const addHistoryItem = (item: HistoryItem) => {
-    // Increment search count
-     try {
-        const currentSearches = parseInt(localStorage.getItem(SEARCH_COUNT_KEY) || '0', 10);
-        localStorage.setItem(SEARCH_COUNT_KEY, (currentSearches + 1).toString());
+  const addHistoryItem = useCallback(async (item: Omit<HistoryItem, 'timestamp'>) => {
+    try {
+      const searchesRef = ref(db, 'stats/searches');
+      runTransaction(searchesRef, (currentValue) => (currentValue || 0) + 1);
+      
+      const historyRef = ref(db, 'history');
+      const newHistoryRef = push(historyRef);
+
+      const itemWithTimestamp: HistoryItem = {
+        ...item,
+        timestamp: Date.now()
+      };
+
+      await set(newHistoryRef, itemWithTimestamp);
     } catch (error) {
-        console.error('Failed to update search count in localStorage', error);
+       console.error("Firebase history write failed: ", error);
     }
+  }, [db]);
 
-    setHistory(prevHistory => {
-      // Avoid duplicates based on roll, reg, and exam
-      const exists = prevHistory.some(
-        h => h.roll === item.roll && h.reg === item.reg && h.exam === item.exam && h.year === item.year && h.board === item.board
-      );
-      if (exists) {
-        return prevHistory;
-      }
-      return [item, ...prevHistory].slice(0, 20); // Keep last 20 results
-    });
-  };
-
-  const clearHistory = () => {
-    setHistory([]);
-  };
-
-  return { history, addHistoryItem, clearHistory, isInitialized };
+  return { addHistoryItem, isInitialized };
 }

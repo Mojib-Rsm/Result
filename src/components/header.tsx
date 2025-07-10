@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { GraduationCap, History, Lock } from 'lucide-react';
+import { GraduationCap, History } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -12,7 +12,6 @@ import { useAdminAuth } from '@/hooks/use-admin-auth';
 
 export default function Header({ className }: { className?: string }) {
   const pathname = usePathname();
-  const { promptLogin } = useAdminAuth();
 
   const navLinks = [
     { href: '/', label: 'হোম', icon: GraduationCap },

@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -10,11 +11,34 @@ import { History as HistoryIcon, Search, Trash2, Eye, School } from 'lucide-reac
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import ResultsDisplay from '@/components/results-display';
 import type { HistoryItem } from '@/types';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function HistoryPage() {
-  const { history, clearHistory, isInitialized } = useHistory();
+  const { isInitialized } = useHistory();
+  const [history, setHistory] = useState<HistoryItem[]>([]);
   const [filter, setFilter] = useState('');
   const [selectedResult, setSelectedResult] = useState<HistoryItem | null>(null);
+
+  // This is a workaround to show local history since we moved to Firebase for admin
+  useEffect(() => {
+      try {
+        const localHistory = localStorage.getItem('bd-results-history-local');
+        if(localHistory) {
+            setHistory(JSON.parse(localHistory));
+        }
+      } catch(e) {
+        console.error("Could not load local history", e)
+      }
+  }, []);
+
+  const clearLocalHistory = () => {
+      setHistory([]);
+      try {
+          localStorage.removeItem('bd-results-history-local');
+      } catch(e) {
+          console.error("Could not clear local history", e)
+      }
+  }
 
   const filteredHistory = history.filter(
     item =>
@@ -27,7 +51,7 @@ export default function HistoryPage() {
       <div className="flex flex-col items-start mb-8 md:flex-row md:items-center md:justify-between">
         <div className="mb-4 md:mb-0">
           <h1 className="text-4xl font-bold tracking-tight">অনুসন্ধানের ইতিহাস</h1>
-          <p className="mt-2 text-lg text-muted-foreground">আপনার পূর্ববর্তী ফলাফল অনুসন্ধানের ইতিহাস দেখুন।</p>
+          <p className="mt-2 text-lg text-muted-foreground">আপনার এই ব্রাউজারের অনুসন্ধানের ইতিহাস দেখুন।</p>
         </div>
         <div className="relative w-full md:w-auto">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
@@ -43,14 +67,20 @@ export default function HistoryPage() {
 
       {history.length > 0 && (
           <div className="flex justify-end mb-4">
-            <Button variant="destructive" size="sm" onClick={clearHistory}>
+            <Button variant="destructive" size="sm" onClick={clearLocalHistory}>
               <Trash2 className="mr-2 h-4 w-4" />
               ইতিহাস মুছুন
             </Button>
           </div>
         )}
 
-      {isInitialized && filteredHistory.length === 0 ? (
+      {!isInitialized ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {[...Array(4)].map((_, i) => (
+              <Card key={i}><CardHeader><Skeleton className="h-6 w-3/4" /></CardHeader><CardContent><Skeleton className="h-4 w-full" /><Skeleton className="h-4 w-2/3 mt-2" /></CardContent><CardFooter><Skeleton className="h-8 w-1/2" /></CardFooter></Card>
+            ))}
+          </div>
+      ) : filteredHistory.length === 0 ? (
         <div className="text-center py-16 border-2 border-dashed rounded-lg">
           <HistoryIcon className="mx-auto h-12 w-12 text-muted-foreground" />
           <h3 className="mt-4 text-lg font-medium">

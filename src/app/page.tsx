@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -11,7 +12,7 @@ import { ExamForm, formSchema, formSchemaWithoutReg, formSchema2025 } from '@/co
 import ResultsDisplay from '@/components/results-display';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
-import type { ExamResult } from '@/types';
+import type { ExamResult, HistoryItem } from '@/types';
 import { useHistory } from '@/hooks/use-history';
 
 export default function Home() {
@@ -98,6 +99,28 @@ export default function Home() {
      // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isCaptchaRequired]);
 
+
+  const saveToLocalHistory = (item: HistoryItem) => {
+      try {
+          const key = 'bd-results-history-local';
+          const existingHistoryRaw = localStorage.getItem(key);
+          const existingHistory: HistoryItem[] = existingHistoryRaw ? JSON.parse(existingHistoryRaw) : [];
+          
+          const isDuplicate = existingHistory.some(h => 
+              h.roll === item.roll && h.reg === item.reg && h.exam === item.exam && 
+              h.year === item.year && h.board === item.board
+          );
+
+          if (!isDuplicate) {
+              const newHistory = [item, ...existingHistory].slice(0, 20);
+              localStorage.setItem(key, JSON.stringify(newHistory));
+          }
+      } catch (error) {
+          console.error("Failed to save to local history", error);
+      }
+  };
+
+
   const handleSearch = async (values: z.infer<typeof formSchema>) => {
     if (isCaptchaRequired && !state.captchaChallenge) {
       setState(prevState => ({ ...prevState, error: 'ক্যাপচা লোড করা যায়নি। অনুগ্রহ করে রিফ্রেশ করুন।' }));
@@ -111,7 +134,11 @@ export default function Home() {
         ...values, 
         cookies: state.captchaChallenge?.cookies ?? ''
       });
-      addHistoryItem({ ...values, result: examResult });
+      
+      const historyEntry: Omit<HistoryItem, 'timestamp'> = { ...values, result: examResult };
+      addHistoryItem(historyEntry); // Save to Firebase for admin
+      saveToLocalHistory({...historyEntry, timestamp: Date.now()}); // Save to local for user view
+
       setState(prevState => ({ ...prevState, result: examResult, isLoading: false }));
 
     } catch (error) {

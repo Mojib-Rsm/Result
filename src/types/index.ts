@@ -35,4 +35,5 @@ export interface HistoryItem {
     year: string;
     exam: string;
     result: ExamResult;
+    timestamp: number;
 }
