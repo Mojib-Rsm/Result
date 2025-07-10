@@ -112,6 +112,11 @@ async function searchResult2025Ctg(values: z.infer<typeof formSchema>): Promise<
         if (!infoTable) {
              const messageNode = root.querySelector('h2');
              const message = messageNode ? messageNode.innerText.trim() : "Could not parse result page. The result format might have changed.";
+             
+             if (message.toLowerCase().includes('result not found')) {
+                 throw new Error("Result not found. Please check your roll number and try again.");
+             }
+             
              throw new Error(message);
         }
         
