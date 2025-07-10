@@ -109,7 +109,7 @@ const prompt = ai.definePrompt({
 Exam Name: {{{examName}}}
 Exam Year: {{{examYear}}}
 Board Name: {{{boardName}}}
-Grades: {{#each grades}}{{@key}}: {{this}}{{/each}}
+Grades: {{grades}}
 
 First, use the getScholarshipInfo tool to find relevant scholarships.
 
@@ -125,12 +125,18 @@ const generateRecommendationsFlow = ai.defineFlow(
     inputSchema: GenerateRecommendationsInputSchema,
     outputSchema: GenerateRecommendationsOutputSchema,
   },
-  async input => {
-    const response = await prompt(input);
-    const output = response?.output;
-    if (!output) {
-      throw new Error('Failed to generate recommendations. The AI model did not return any output.');
+  async (input) => {
+    try {
+      const response = await prompt(input);
+      const output = response?.output;
+
+      if (!output) {
+        throw new Error('Failed to generate recommendations. The AI model did not return any output.');
+      }
+      return output;
+    } catch (error) {
+      console.error('AI recommendation flow failed:', error);
+      throw new Error('Could not get AI recommendations at this time. Please try again later.');
     }
-    return output;
   }
 );
