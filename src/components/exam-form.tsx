@@ -1,26 +1,29 @@
 'use client';
 
+import Image from 'next/image';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2 } from 'lucide-react';
+import { Loader2, RefreshCw } from 'lucide-react';
+import { Skeleton } from './ui/skeleton';
 
 export const formSchema = z.object({
   roll: z.string().min(6, 'Roll number must be at least 6 digits.').regex(/^\d+$/, 'Roll must be a number.'),
-  reg: z.string().min(10, 'Registration number must be at least 10 digits.').regex(/^\d+$/, 'Registration must be a number.'),
+  reg: z.string().min(9, 'Registration number must be at least 9 digits.').regex(/^\d+$/, 'Registration must be a number.'),
   board: z.string(),
   year: z.string(),
   exam: z.string(),
+  captcha: z.string().min(4, 'Please enter the 4-digit security key.').max(4, 'Security key must be 4 digits.'),
 });
 
 const boards = [
-    { value: 'dhaka', label: 'Dhaka' },
     { value: 'barisal', label: 'Barisal' },
     { value: 'chittagong', label: 'Chittagong' },
     { value: 'comilla', label: 'Comilla' },
+    { value: 'dhaka', label: 'Dhaka' },
     { value: 'dinajpur', label: 'Dinajpur' },
     { value: 'jessore', label: 'Jessore' },
     { value: 'mymensingh', label: 'Mymensingh' },
@@ -28,22 +31,32 @@ const boards = [
     { value: 'sylhet', label: 'Sylhet' },
     { value: 'madrasah', label: 'Madrasah' },
     { value: 'tec', label: 'Technical' },
+    { value: 'dibs', label: 'DIBS(Dhaka)' },
 ];
 
-const years = Array.from({ length: 15 }, (_, i) => new Date().getFullYear() - i).map(String);
+const currentYear = new Date().getFullYear();
+const years = Array.from({ length: 30 }, (_, i) => currentYear - i).map(String);
 const exams = [
     { value: 'hsc', label: 'HSC/Alim/Equivalent' },
     { value: 'jsc', label: 'JSC/JDC' },
-    { value: 'ssc', label: 'SSC/Dakhil/Equivalent' },
+    { value: 'ssc', label: 'SSC/Dakhil' },
+    { value: 'ssc_voc', label: 'SSC(Vocational)'},
+    { value: 'hsc_voc', label: 'HSC(Vocational)'},
+    { value: 'hsc_hbm', label: 'HSC(BM)'},
+    { value: 'hsc_dic', label: 'Diploma in Commerce'},
+    { value: 'hsc_dba', label: 'Diploma in Business Studies'},
 ];
 
 interface ExamFormProps {
   form: ReturnType<typeof useForm<z.infer<typeof formSchema>>>;
   onSubmit: (values: z.infer<typeof formSchema>) => void;
   isSubmitting: boolean;
+  captchaImage?: string;
+  isFetchingCaptcha: boolean;
+  onReloadCaptcha: () => void;
 }
 
-export function ExamForm({ form, onSubmit, isSubmitting }: ExamFormProps) {
+export function ExamForm({ form, onSubmit, isSubmitting, captchaImage, isFetchingCaptcha, onReloadCaptcha }: ExamFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -124,6 +137,34 @@ export function ExamForm({ form, onSubmit, isSubmitting }: ExamFormProps) {
               </FormItem>
             )}
           />
+        
+            <div className="space-y-2">
+                 <FormLabel>Security Key (4 digits)</FormLabel>
+                <div className="flex items-center gap-4">
+                    <div className='relative h-12 w-32 bg-gray-200 rounded-md'>
+                    {isFetchingCaptcha ? (
+                        <Skeleton className="h-full w-full" />
+                    ) : (
+                        captchaImage && <Image src={captchaImage} alt="Captcha" layout="fill" objectFit="contain" />
+                    )}
+                    </div>
+                     <Button type="button" variant="secondary" size="icon" onClick={onReloadCaptcha} disabled={isFetchingCaptcha}>
+                        <RefreshCw className={`h-4 w-4 ${isFetchingCaptcha ? 'animate-spin' : ''}`} />
+                    </Button>
+                </div>
+            </div>
+             <FormField
+                control={form.control}
+                name="captcha"
+                render={({ field }) => (
+                <FormItem>
+                    <FormLabel className="sr-only">Type the digits visible on the image</FormLabel>
+                    <FormControl><Input placeholder="Type the security key here" {...field} /></FormControl>
+                    <FormMessage />
+                </FormItem>
+                )}
+            />
+
         </div>
         <div className="flex justify-end pt-4">
           <Button type="submit" disabled={isSubmitting} className="w-full md:w-auto">

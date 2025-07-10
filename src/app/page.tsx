@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
-import { searchResultAction, getRecommendationsAction } from '@/lib/actions';
+import { searchResultAction, getRecommendationsAction, getCaptchaAction } from '@/lib/actions';
+import type { CaptchaChallenge } from '@/lib/actions';
 import { ExamForm, formSchema } from '@/components/exam-form';
 import ResultsDisplay from '@/components/results-display';
 import { Button } from '@/components/ui/button';
@@ -18,14 +19,18 @@ import { useHistory } from '@/hooks/use-history';
 export default function Home() {
   const [state, setState] = useState<{
     isLoading: boolean;
+    isFetchingCaptcha: boolean;
     error: string | null;
     result: ExamResult | null;
     recommendations: GenerateRecommendationsOutput | null;
+    captchaChallenge: CaptchaChallenge | null;
   }>({
     isLoading: false,
+    isFetchingCaptcha: true,
     error: null,
     result: null,
     recommendations: null,
+    captchaChallenge: null,
   });
 
   const { addHistoryItem } = useHistory();
@@ -35,16 +40,45 @@ export default function Home() {
     defaultValues: {
       roll: '',
       reg: '',
-      board: 'dhaka',
+      board: 'chittagong',
       year: new Date().getFullYear().toString(),
       exam: 'hsc',
+      captcha: '',
     },
   });
 
-  const handleSearch = async (values: z.infer<typeof formSchema>) => {
-    setState({ isLoading: true, error: null, result: null, recommendations: null });
+  const fetchCaptcha = async () => {
+    setState(prevState => ({ ...prevState, isFetchingCaptcha: true, error: null }));
     try {
-      const examResult = await searchResultAction(values);
+      const challenge = await getCaptchaAction();
+      setState(prevState => ({ ...prevState, captchaChallenge: challenge, isFetchingCaptcha: false }));
+    } catch (error) {
+      console.error(error);
+      setState(prevState => ({ 
+        ...prevState, 
+        isFetchingCaptcha: false, 
+        error: error instanceof Error ? error.message : 'Could not load security key.' 
+      }));
+    }
+  };
+
+  useEffect(() => {
+    fetchCaptcha();
+  }, []);
+
+  const handleSearch = async (values: z.infer<typeof formSchema>) => {
+    if (!state.captchaChallenge) {
+      setState(prevState => ({ ...prevState, error: 'Captcha not loaded. Please refresh.' }));
+      return;
+    }
+
+    setState({ ...state, isLoading: true, error: null, result: null, recommendations: null });
+    
+    try {
+      const examResult = await searchResultAction({ 
+        ...values, 
+        cookies: state.captchaChallenge.cookies 
+      });
       setState(prevState => ({ ...prevState, result: examResult }));
 
       const grades = examResult.grades.reduce((acc, g) => {
@@ -63,24 +97,39 @@ export default function Home() {
       addHistoryItem({ ...values, result: examResult, recommendations });
     } catch (error) {
       console.error(error);
-      setState({
+      // Fetch a new captcha on error, as the old one is likely invalid
+      fetchCaptcha();
+      setState(prevState => ({
+        ...prevState,
         isLoading: false,
         error: error instanceof Error ? error.message : 'An unexpected error occurred.',
         result: null,
         recommendations: null,
-      });
+      }));
     }
   };
 
   const resetSearch = () => {
-    form.reset();
+    form.reset({
+      roll: '',
+      reg: '',
+      board: 'chittagong',
+      year: new Date().getFullYear().toString(),
+      exam: 'hsc',
+      captcha: '',
+    });
     setState({
       isLoading: false,
+      isFetchingCaptcha: false,
       error: null,
       result: null,
       recommendations: null,
+      captchaChallenge: state.captchaChallenge, // Keep the existing captcha
     });
+    fetchCaptcha(); // Or fetch a new one
   };
+  
+  const isSubmitting = state.isLoading || state.isFetchingCaptcha;
 
   return (
     <div className="container mx-auto max-w-4xl px-4 py-8 md:py-12">
@@ -93,14 +142,26 @@ export default function Home() {
         </p>
       </div>
 
-      {!state.result && !state.isLoading && !state.error && (
+      {!state.result && !state.isLoading && (
         <Card className="shadow-lg">
           <CardHeader>
             <CardTitle>Enter Exam Information</CardTitle>
             <CardDescription>Fill in your details as they appear on your admit card.</CardDescription>
           </CardHeader>
           <CardContent>
-            <ExamForm form={form} onSubmit={handleSearch} isSubmitting={state.isLoading} />
+             {state.error && (
+                <div className="bg-destructive/10 text-destructive p-3 rounded-md mb-6 text-center">
+                    <p>{state.error}</p>
+                </div>
+              )}
+            <ExamForm 
+              form={form} 
+              onSubmit={handleSearch} 
+              isSubmitting={isSubmitting}
+              captchaImage={state.captchaChallenge?.captchaImage}
+              isFetchingCaptcha={state.isFetchingCaptcha}
+              onReloadCaptcha={fetchCaptcha}
+            />
           </CardContent>
         </Card>
       )}
@@ -111,32 +172,11 @@ export default function Home() {
             <Skeleton className="h-8 w-3/4" />
             <Skeleton className="h-4 w-1/2" />
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-2">
-              <Skeleton className="h-6 w-1/4" />
-              <Skeleton className="h-10 w-full" />
+          <CardContent className="space-y-6 pt-6">
+            <div className="space-y-2 text-center">
+              <p className="text-lg font-semibold animate-pulse">Fetching your result...</p>
+              <p className="text-muted-foreground">This may take a moment.</p>
             </div>
-            <div className="space-y-2">
-              <Skeleton className="h-6 w-1/4" />
-              <Skeleton className="h-10 w-full" />
-            </div>
-             <div className="flex justify-end">
-                <Skeleton className="h-10 w-28" />
-             </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {state.error && (
-        <Card className="shadow-lg border-destructive">
-          <CardHeader>
-            <CardTitle>Error</CardTitle>
-          </CardHeader>
-          <CardContent className="text-center">
-            <p className="mb-4 text-destructive">{state.error}</p>
-            <Button onClick={() => handleSearch(form.getValues())} variant="destructive">
-              Retry
-            </Button>
           </CardContent>
         </Card>
       )}
