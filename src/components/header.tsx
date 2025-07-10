@@ -30,14 +30,6 @@ export default function Header({ className }: HeaderProps) {
             height={32}
             className="h-8 w-8"
           />
-           <Image
-            src="https://placehold.co/32x32.png"
-            alt="Custom Logo"
-            width={32}
-            height={32}
-            className="h-8 w-8 rounded-full"
-            data-ai-hint="letter O"
-          />
           <span className="font-bold sm:inline-block">BD Education Results</span>
         </Link>
         <nav className="flex items-center gap-2 text-sm">
