@@ -83,6 +83,7 @@ async function searchResult2025Ctg(values: z.infer<typeof formSchema>): Promise<
                 "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
                 "content-type": "application/x-www-form-urlencoded",
                 "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
+                "Referer": "https://sresult.bise-ctg.gov.bd/rxto2025/individual/",
             },
             "body": `roll=${values.roll}&button2=`,
             "method": "POST"
@@ -95,13 +96,19 @@ async function searchResult2025Ctg(values: z.infer<typeof formSchema>): Promise<
         const html = await res.text();
         const root = parse(html);
 
-        const resultTable = root.querySelector('.tftable');
-        if (!resultTable) {
-            throw new Error("Result not found. Please check your roll number.");
+        const infoTable = root.querySelector('.tftable');
+        if (!infoTable) {
+             const message = root.querySelector('h2')?.innerText.trim() || "Result not found";
+             if (message.includes("Result Not Found")) {
+                throw new Error("Result not found. Please check your roll number.");
+             }
+             throw new Error(message);
         }
-        const resultCells = resultTable.querySelectorAll('td');
+        
+        const infoRows = infoTable.querySelectorAll('tr');
 
-        const gpaText = resultCells[11]?.innerText.trim().split('=')[1] || '0';
+        const gpaText = infoRows[5]?.querySelectorAll('td')[1]?.innerText.trim().split('=')[1] || '0';
+        const gpa = parseFloat(gpaText);
 
         const gradesTable = root.querySelector('.tftable2');
         const gradeRows = gradesTable?.querySelectorAll('tr') || [];
@@ -110,36 +117,51 @@ async function searchResult2025Ctg(values: z.infer<typeof formSchema>): Promise<
         for (let i = 1; i < gradeRows.length; i++) { // Skip header row
             const cells = gradeRows[i].querySelectorAll('td');
             if (cells.length === 3) {
+                 const subject = cells[1].innerText.trim();
+                 if (subject.toLowerCase().includes('result of ca')) continue; // Skip CA result header
+
                  const gradeText = cells[2].innerText.trim();
-                 const gradeMatch = gradeText.match(/\((\w[+-]?)\s*\)/);
-                 const grade = gradeMatch ? gradeMatch[1] : gradeText;
+                 const gradeMatch = gradeText.match(/\((.*?)\)/);
+                 const grade = gradeMatch ? gradeMatch[1].trim() : gradeText;
 
                 grades.push({
                     code: cells[0].innerText.trim(),
-                    subject: cells[1].innerText.trim(),
+                    subject: subject,
                     grade: grade,
                 });
             }
         }
         
         const result: ExamResult = {
-            roll: resultCells[1].innerText.trim(),
-            reg: resultCells[7].innerText.trim(),
-            board: resultCells[3].innerText.trim(),
+            roll: infoRows[0].querySelectorAll('td')[1].innerText.trim(),
+            name: infoRows[0].querySelectorAll('td')[3].innerText.trim(),
+            board: infoRows[1].querySelectorAll('td')[1].innerText.trim(),
+            fatherName: infoRows[1].querySelectorAll('td')[3].innerText.trim(),
+            group: infoRows[2].querySelectorAll('td')[1].innerText.trim(),
+            motherName: infoRows[2].querySelectorAll('td')[3].innerText.trim(),
+            session: infoRows[3].querySelectorAll('td')[1].innerText.trim(),
+            reg: infoRows[3].querySelectorAll('td')[3].innerText.trim(),
+            institute: infoRows[4].querySelectorAll('td')[3].innerText.trim(),
+            dob: infoRows[5].querySelectorAll('td')[3].innerText.trim(),
+
+            // Data from form
             year: values.year,
             exam: values.exam.toUpperCase(),
-            gpa: parseFloat(gpaText),
-            status: parseFloat(gpaText) > 0 ? 'Pass' : 'Fail',
+            
+            // Parsed result data
+            gpa: gpa,
+            status: gpa > 0 ? 'Pass' : 'Fail',
+            
             studentInfo: {
-                name: resultCells[5].innerText.trim(),
-                fatherName: resultCells[4].innerText.trim(),
-                motherName: resultCells[6].innerText.trim(),
-                group: resultCells[2].innerText.trim(),
-                dob: resultCells[12].innerText.trim(),
-                institute: resultCells[10].innerText.trim(),
-                session: resultCells[8].innerText.trim(),
+                name: infoRows[0].querySelectorAll('td')[3].innerText.trim(),
+                fatherName: infoRows[1].querySelectorAll('td')[3].innerText.trim(),
+                motherName: infoRows[2].querySelectorAll('td')[3].innerText.trim(),
+                group: infoRows[2].querySelectorAll('td')[1].innerText.trim(),
+                dob: infoRows[5].querySelectorAll('td')[3].innerText.trim(),
+                institute: infoRows[4].querySelectorAll('td')[3].innerText.trim(),
+                session: infoRows[3].querySelectorAll('td')[1].innerText.trim(),
             },
-            grades: grades.filter(g => !g.subject.includes('Result of CA')), // Filter out non-subject rows
+            grades: grades.filter(g => g.subject && g.code),
         };
 
         return result;
@@ -147,6 +169,9 @@ async function searchResult2025Ctg(values: z.infer<typeof formSchema>): Promise<
     } catch (error) {
         console.error("2025 Result fetch failed:", error);
         if (error instanceof Error) {
+            if (error.message.includes('Result Not Found')) {
+                throw new Error("Result not found. Please check your roll number and try again.");
+            }
             throw new Error(error.message);
         }
         throw new Error('An unknown error occurred while fetching the 2025 result.');
