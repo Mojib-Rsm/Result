@@ -153,8 +153,8 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
       <div id="pdf-container">
         <Card className={cardClasses} id="printable-area">
             <CardHeader>
-                 <div className="relative">
-                    <div className="flex flex-col items-center justify-center text-center">
+                 <div className="relative text-center">
+                    <div className="flex justify-center">
                         <Image 
                             src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Government_Seal_of_Bangladesh.svg/800px-Government_Seal_of_Bangladesh.svg.png" 
                             alt="Government Seal of Bangladesh"
@@ -162,8 +162,8 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
                             height={60}
                             className="h-16 w-16 mb-2"
                         />
-                         <CardTitle className="text-2xl text-primary">Result Marksheet</CardTitle>
                     </div>
+                     <CardTitle className="text-2xl text-primary">Result Marksheet</CardTitle>
 
                     <div className="absolute top-0 right-0 text-right font-bold text-xl min-w-[120px]">
                         <p className={isPass ? 'text-green-600' : 'text-destructive'}>Status: {result.status}</p>
