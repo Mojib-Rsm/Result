@@ -48,8 +48,7 @@ export default function Home() {
   });
 
   const fetchCaptcha = async () => {
-    // Only clear the error if we are not already showing one.
-    setState(prevState => ({ ...prevState, isFetchingCaptcha: true, error: prevState.error ? prevState.error : null }));
+    setState(prevState => ({ ...prevState, isFetchingCaptcha: true, error: null }));
     try {
       const challenge = await getCaptchaAction();
       setState(prevState => ({ ...prevState, captchaChallenge: challenge, isFetchingCaptcha: false }));
@@ -65,6 +64,7 @@ export default function Home() {
 
   useEffect(() => {
     fetchCaptcha();
+     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSearch = async (values: z.infer<typeof formSchema>) => {
@@ -103,7 +103,6 @@ export default function Home() {
 
     } catch (error) {
       console.error(error);
-      // Don't fetch captcha here, let the user decide.
       setState(prevState => ({
         ...prevState,
         isLoading: false,
@@ -137,8 +136,8 @@ export default function Home() {
   const isSubmitting = state.isLoading || state.isFetchingCaptcha;
 
   return (
-    <div className="container mx-auto max-w-4xl px-4 py-8 md:py-12">
-      <div className="flex flex-col items-center text-center mb-12">
+    <div className="container mx-auto max-w-4xl px-4 py-8 md:py-12" id="main-content">
+      <div className="flex flex-col items-center text-center mb-12 no-print">
         <h1 className="text-4xl md:text-5xl font-bold tracking-tight bg-gradient-to-br from-primary to-accent bg-clip-text text-transparent">
           Check Your Results
         </h1>
@@ -148,7 +147,7 @@ export default function Home() {
       </div>
 
       {!state.result && !state.isLoading && (
-        <Card className="shadow-lg">
+        <Card className="shadow-lg no-print">
           <CardHeader>
             <CardTitle>Enter Exam Information</CardTitle>
             <CardDescription>Fill in your details as they appear on your admit card.</CardDescription>
@@ -172,7 +171,7 @@ export default function Home() {
       )}
 
       {state.isLoading && (
-         <Card className="shadow-lg">
+         <Card className="shadow-lg no-print">
           <CardHeader>
             <Skeleton className="h-8 w-3/4" />
             <Skeleton className="h-4 w-1/2" />

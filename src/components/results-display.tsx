@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -17,6 +18,29 @@ interface ResultsDisplayProps {
 }
 
 export default function ResultsDisplay({ result, recommendations, isLoadingRecommendations, onReset }: ResultsDisplayProps) {
+  
+  useEffect(() => {
+    const originalBodyClassName = document.body.className;
+    const mainContent = document.getElementById('main-content');
+    const header = document.querySelector('header');
+
+    window.onbeforeprint = () => {
+      document.body.className = 'printing';
+      if (mainContent) mainContent.classList.remove('no-print');
+      if (header) header.classList.add('no-print');
+    };
+    
+    window.onafterprint = () => {
+      document.body.className = originalBodyClassName;
+       if (header) header.classList.remove('no-print');
+    };
+
+    return () => {
+      window.onbeforeprint = null;
+      window.onafterprint = null;
+    }
+  }, []);
+  
   const handlePrint = () => {
     window.print();
   };
@@ -81,10 +105,10 @@ export default function ResultsDisplay({ result, recommendations, isLoadingRecom
       </Card>
       
       {isPass && (
-        <>
+        <div className="no-print">
             <Separator />
             <AiRecommendations recommendations={recommendations} isLoading={isLoadingRecommendations} />
-        </>
+        </div>
       )}
 
     </div>
