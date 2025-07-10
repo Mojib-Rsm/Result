@@ -135,7 +135,6 @@ export default function Home() {
         result: null,
       }));
 
-      // If captcha is wrong, fetch a new one.
       if (errorMessage.toLowerCase().includes('security key') || errorMessage.toLowerCase().includes('captcha')) {
          if (isCaptchaRequired) fetchNewCaptcha();
       }
@@ -149,6 +148,7 @@ export default function Home() {
       board: 'chittagong',
       year: new Date().getFullYear().toString(),
       exam: 'ssc',
+      captcha: ''
     });
     setState({
       isLoading: false,
