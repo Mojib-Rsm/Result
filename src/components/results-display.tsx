@@ -112,6 +112,7 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
   const gpa = result.gpa.toFixed(2);
   const isPass = result.status === 'Pass';
   const gpaGrade = getGpaGrade(result.gpa);
+  const showMarks = result.year === '2025' && result.grades.some(g => g.marks);
   
   const InfoItem = ({ label, value }: { label: string, value: string | undefined}) => (
     <div className="flex flex-col p-2 bg-muted/30 rounded-md">
@@ -141,9 +142,9 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
 
       <div id="pdf-container">
         <Card className="shadow-lg" id="printable-area">
-            <CardHeader className="text-center">
-                <div className="relative">
-                     <div className="flex flex-col items-center justify-center">
+            <CardHeader>
+                 <div className="relative">
+                    <div className="flex flex-col items-center justify-center text-center">
                         <Image 
                             src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Government_Seal_of_Bangladesh.svg/800px-Government_Seal_of_Bangladesh.svg.png" 
                             alt="Government Seal of Bangladesh"
@@ -160,7 +161,7 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
                         {isPass && <p>Grade: {gpaGrade}</p>}
                     </div>
                 </div>
-                 <CardDescription>{result.exam.toUpperCase()} Examination - {result.year}</CardDescription>
+                 <CardDescription className="text-center">{result.exam.toUpperCase()} Examination - {result.year}</CardDescription>
             </CardHeader>
             <CardContent>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
@@ -186,6 +187,7 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
                 <TableRow>
                     <TableHead>Code</TableHead>
                     <TableHead>Subject Name</TableHead>
+                    {showMarks && <TableHead className="text-right">Marks</TableHead>}
                     <TableHead className="text-right">Letter Grade</TableHead>
                 </TableRow>
                 </TableHeader>
@@ -194,6 +196,7 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
                     <TableRow key={g.code} className={cn(index % 2 !== 0 && 'bg-muted/50')}>
                     <TableCell>{g.code}</TableCell>
                     <TableCell className="font-medium">{g.subject}</TableCell>
+                    {showMarks && <TableCell className="text-right font-bold">{g.marks}</TableCell>}
                     <TableCell className="text-right font-bold">{g.grade}</TableCell>
                     </TableRow>
                 ))}

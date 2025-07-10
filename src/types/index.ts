@@ -2,6 +2,7 @@ export interface GradeInfo {
   code: string;
   subject: string;
   grade: string;
+  marks?: string;
 }
 
 export interface StudentInfo {

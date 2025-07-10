@@ -106,19 +106,35 @@ async function searchResult2025Ctg(values: z.infer<typeof formSchema>): Promise<
              throw new Error(message);
         }
         
-        const infoRows = infoTable.querySelectorAll('tr');
         const infoData: Record<string, string> = {};
-
-        infoRows.forEach(row => {
-            const cells = row.querySelectorAll('td');
-            if (cells.length === 4) {
-                infoData[cells[0].innerText.trim()] = cells[1].innerText.trim();
-                infoData[cells[2].innerText.trim()] = cells[3].innerText.trim();
-            } else if (cells.length === 2) {
-                infoData[cells[0].innerText.trim()] = cells[1].innerText.trim();
-            }
-        });
+        const infoRows = infoTable.querySelectorAll('tr');
         
+        const extractData = (label: string) => {
+            const row = infoRows.find(r => r.innerText.toLowerCase().includes(label.toLowerCase()));
+            if (!row) return '';
+            const cells = row.querySelectorAll('td');
+            // This handles rows with 2 or 4 cells
+            for (let i = 0; i < cells.length; i += 2) {
+                if (cells[i]?.innerText.trim().toLowerCase() === label.toLowerCase()) {
+                    return cells[i + 1]?.innerText.trim() || '';
+                }
+            }
+            return '';
+        };
+
+        infoData['Roll No'] = extractData('roll no');
+        infoData['Name'] = extractData('name');
+        infoData["Father's Name"] = extractData("father's name");
+        infoData["Mother's Name"] = extractData("mother's name");
+        infoData['Group'] = extractData('group');
+        infoData['Reg. NO'] = extractData('reg. no');
+        infoData['Board'] = extractData('board');
+        infoData['Institute'] = extractData('institute');
+        infoData['Result'] = extractData('result');
+        infoData['DATE OF BIRTH'] = extractData('date of birth');
+        infoData['Session'] = extractData('session');
+
+
         const gpaText = infoData['Result']?.split('=')[1] || '0';
         const gpa = parseFloat(gpaText);
 
@@ -134,12 +150,16 @@ async function searchResult2025Ctg(values: z.infer<typeof formSchema>): Promise<
 
                  const gradeText = cells[2].innerText.trim();
                  const gradeMatch = gradeText.match(/\((.*?)\)/);
+                 const marksMatch = gradeText.match(/^(\d+)/);
+
                  const grade = gradeMatch ? gradeMatch[1].trim() : gradeText;
+                 const marks = marksMatch ? marksMatch[1].trim() : '';
 
                 grades.push({
                     code: cells[0].innerText.trim(),
                     subject: subject,
                     grade: grade,
+                    marks: marks,
                 });
             }
         }
