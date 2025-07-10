@@ -28,37 +28,13 @@ export default function Home() {
   const [captchaChallenge, setCaptchaChallenge] = useState<{
     image: string;
     cookies: string;
+    text: string;
   } | null>(null);
   const [isFetchingCaptcha, setIsFetchingCaptcha] = useState(true);
   
   const { addHistoryItem } = useHistory();
   const [isRegRequired, setIsRegRequired] = useState(true);
   const [isCaptchaRequired, setIsCaptchaRequired] = useState(true);
-
-  const fetchNewCaptcha = useCallback(async () => {
-    setIsFetchingCaptcha(true);
-    setState(prevState => ({ ...prevState, error: null }));
-    try {
-      const challenge = await getCaptchaAction();
-      setCaptchaChallenge(challenge);
-    } catch (error) {
-       setState(prevState => ({
-        ...prevState,
-        error: error instanceof Error ? error.message : 'Failed to load security code. Please refresh.',
-      }));
-    } finally {
-      setIsFetchingCaptcha(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (isCaptchaRequired) {
-      fetchNewCaptcha();
-    } else {
-      setCaptchaChallenge(null);
-      setIsFetchingCaptcha(false);
-    }
-  }, [isCaptchaRequired, fetchNewCaptcha]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: (data, context, options) => {
@@ -83,6 +59,37 @@ export default function Home() {
       captcha: '',
     },
   });
+
+  const fetchNewCaptcha = useCallback(async () => {
+    setIsFetchingCaptcha(true);
+    setState(prevState => ({ ...prevState, error: null }));
+    try {
+      const challenge = await getCaptchaAction();
+      setCaptchaChallenge(challenge);
+      if(challenge.text) {
+        form.setValue('captcha', challenge.text, { shouldValidate: true });
+      } else {
+        form.setValue('captcha', '');
+      }
+    } catch (error) {
+       setState(prevState => ({
+        ...prevState,
+        error: error instanceof Error ? error.message : 'Failed to load security code. Please refresh.',
+      }));
+    } finally {
+      setIsFetchingCaptcha(false);
+    }
+  }, [form]);
+
+  useEffect(() => {
+    if (isCaptchaRequired) {
+      fetchNewCaptcha();
+    } else {
+      setCaptchaChallenge(null);
+      setIsFetchingCaptcha(false);
+    }
+  }, [isCaptchaRequired, fetchNewCaptcha]);
+
 
   const selectedYear = form.watch('year');
   const selectedBoard = form.watch('board');

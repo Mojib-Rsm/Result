@@ -10,6 +10,7 @@ import { readCaptcha } from '@/ai/flows/read-captcha-flow';
 export type CaptchaChallenge = {
   image: string; // Base64 Data URI
   cookies: string;
+  text: string; // AI-read text from captcha
 };
 
 // Action 1: Fetch the initial page and the captcha image
@@ -45,9 +46,18 @@ export async function getCaptchaAction(): Promise<CaptchaChallenge> {
     const mimeType = captchaRes.headers.get('content-type') || 'image/jpeg';
     const captchaImageUrl = `data:${mimeType};base64,${base64Image}`;
     
+    let captchaText = '';
+    try {
+        const result = await readCaptcha({ photoDataUri: captchaImageUrl });
+        captchaText = result.text;
+    } catch(aiError) {
+        console.warn("AI captcha read failed, user will have to enter manually.", aiError);
+    }
+    
     return {
         image: captchaImageUrl,
         cookies: cookies,
+        text: captchaText,
     };
 
   } catch (error) {
