@@ -7,9 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, RefreshCw } from 'lucide-react';
-import { Skeleton } from './ui/skeleton';
-import Image from 'next/image';
+import { Loader2 } from 'lucide-react';
 
 export const formSchema = z.object({
   roll: z.string().min(6, 'রোল নম্বর কমপক্ষে ৬ সংখ্যার হতে হবে।').regex(/^\d+$/, 'রোল নম্বর অবশ্যই একটি সংখ্যা হতে হবে।'),
@@ -17,7 +15,7 @@ export const formSchema = z.object({
   board: z.string(),
   year: z.string(),
   exam: z.string(),
-  captcha: z.string().min(1, 'অনুগ্রহ করে সিক্রেট কোড লিখুন।'),
+  captcha: z.string().optional(),
 });
 
 export const formSchemaWithoutReg = formSchema.omit({ reg: true });
@@ -59,14 +57,10 @@ interface ExamFormProps {
   form: ReturnType<typeof useForm<z.infer<typeof formSchema>>>;
   onSubmit: (values: z.infer<typeof formSchema>) => void;
   isSubmitting: boolean;
-  solvedCaptcha?: string;
-  isFetchingCaptcha: boolean;
-  onReloadCaptcha: () => void;
   isRegRequired: boolean;
-  isCaptchaRequired: boolean;
 }
 
-export function ExamForm({ form, onSubmit, isSubmitting, solvedCaptcha, isFetchingCaptcha, onReloadCaptcha, isRegRequired, isCaptchaRequired }: ExamFormProps) {
+export function ExamForm({ form, onSubmit, isSubmitting, isRegRequired }: ExamFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -149,40 +143,6 @@ export function ExamForm({ form, onSubmit, isSubmitting, solvedCaptcha, isFetchi
                 </FormItem>
               )}
             />
-          )}
-        
-          {isCaptchaRequired && (
-            <>
-              <div className="flex flex-col gap-2">
-                  <div className="flex items-center gap-4">
-                      <div className='relative h-12 w-48 bg-gray-200 rounded-md flex items-center justify-center p-2'>
-                      {isFetchingCaptcha ? (
-                          <Skeleton className="h-full w-full" />
-                      ) : (
-                          solvedCaptcha ? (
-                            <span className="text-2xl font-bold tracking-widest text-gray-800">{solvedCaptcha}</span>
-                          ) : (
-                            <span className="text-sm text-muted-foreground">Loading...</span>
-                          )
-                      )}
-                      </div>
-                      <Button type="button" variant="secondary" size="icon" onClick={onReloadCaptcha} disabled={isFetchingCaptcha}>
-                          <RefreshCw className={`h-4 w-4 ${isFetchingCaptcha ? 'animate-spin' : ''}`} />
-                      </Button>
-                  </div>
-              </div>
-              <FormField
-                  control={form.control}
-                  name="captcha"
-                  render={({ field }) => (
-                  <FormItem>
-                      <FormLabel>ছবিতে দেখানো সংখ্যাগুলো লিখুন</FormLabel>
-                      <FormControl><Input placeholder="সিক্রেট কোড এখানে লিখুন" {...field} /></FormControl>
-                      <FormMessage />
-                  </FormItem>
-                  )}
-              />
-            </>
           )}
 
         </div>

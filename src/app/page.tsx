@@ -54,7 +54,6 @@ export default function Home() {
       board: 'chittagong',
       year: new Date().getFullYear().toString(),
       exam: 'ssc',
-      captcha: '',
     },
   });
 
@@ -70,7 +69,6 @@ export default function Home() {
 
     if (is2025Ctg) {
       form.setValue('reg', '');
-      form.setValue('captcha', '');
     }
 
   }, [selectedYear, selectedBoard, form]);
@@ -80,10 +78,6 @@ export default function Home() {
     try {
       const challenge = await getCaptchaAction();
       setState(prevState => ({ ...prevState, captchaChallenge: challenge, isFetchingCaptcha: false }));
-      // Pre-fill captcha field for user convenience
-      if (challenge.solvedCaptcha) {
-        form.setValue('captcha', challenge.solvedCaptcha);
-      }
     } catch (error) {
       console.error(error);
       setState(prevState => ({ 
@@ -104,8 +98,8 @@ export default function Home() {
   }, [isCaptchaRequired]);
 
   const handleSearch = async (values: z.infer<typeof formSchema>) => {
-    if (isCaptchaRequired && !state.captchaChallenge) {
-      setState(prevState => ({ ...prevState, error: 'ক্যাপচা লোড করা যায়নি। অনুগ্রহ করে রিফ্রেশ করুন।' }));
+    if (isCaptchaRequired && !state.captchaChallenge?.solvedCaptcha) {
+      setState(prevState => ({ ...prevState, error: 'ক্যাপচা স্বয়ংক্রিয়ভাবে সমাধান করা যায়নি। অনুগ্রহ করে পৃষ্ঠাটি রিফ্রেশ করুন।' }));
       return;
     }
 
@@ -113,7 +107,8 @@ export default function Home() {
     
     try {
       const examResult = await searchResultAction({ 
-        ...values, 
+        ...values,
+        captcha: state.captchaChallenge?.solvedCaptcha ?? '',
         cookies: state.captchaChallenge?.cookies ?? ''
       });
       
@@ -144,7 +139,6 @@ export default function Home() {
       board: 'chittagong',
       year: new Date().getFullYear().toString(),
       exam: 'ssc',
-      captcha: '',
     });
     setState({
       isLoading: false,
@@ -187,11 +181,7 @@ export default function Home() {
               form={form} 
               onSubmit={handleSearch} 
               isSubmitting={isSubmitting}
-              solvedCaptcha={state.captchaChallenge?.solvedCaptcha}
-              isFetchingCaptcha={state.isFetchingCaptcha}
-              onReloadCaptcha={fetchCaptcha}
               isRegRequired={isRegRequired}
-              isCaptchaRequired={isCaptchaRequired}
             />
           </CardContent>
         </Card>
