@@ -108,7 +108,7 @@ export default function Home() {
 
 
   const handleSearch = async (values: z.infer<typeof formSchema>) => {
-    setState({ ...state, isLoading: true, error: null, result: null });
+    setState({ isLoading: true, error: null, result: null });
     
     try {
       if (isCaptchaRequired && !captchaChallenge) {
@@ -123,17 +123,16 @@ export default function Home() {
       const historyEntry: Omit<HistoryItem, 'timestamp'> = { ...values, result: examResult };
       addHistoryItem(historyEntry); 
 
-      setState(prevState => ({ ...prevState, result: examResult, isLoading: false }));
+      setState({ result: examResult, isLoading: false, error: null });
 
     } catch (error) {
       console.error(error);
       const errorMessage = error instanceof Error ? error.message : 'একটি অপ্রত্যাশিত ত্রুটি ঘটেছে।';
-       setState(prevState => ({
-        ...prevState,
+       setState({
         isLoading: false,
         error: errorMessage,
         result: null,
-      }));
+      });
 
       if (errorMessage.toLowerCase().includes('security key') || errorMessage.toLowerCase().includes('captcha')) {
          if (isCaptchaRequired) fetchNewCaptcha();
