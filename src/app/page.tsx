@@ -135,9 +135,9 @@ export default function Home() {
         error: errorMessage,
         result: null,
       });
-
-      if (errorMessage.toLowerCase().includes('security key') || errorMessage.toLowerCase().includes('captcha')) {
-         if (isCaptchaRequired) fetchNewCaptcha();
+      
+      if (isCaptchaRequired && (errorMessage.toLowerCase().includes('security key') || errorMessage.toLowerCase().includes('captcha'))) {
+         fetchNewCaptcha();
       }
     }
   };
