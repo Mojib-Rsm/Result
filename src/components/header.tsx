@@ -39,7 +39,7 @@ export default function Header({ className }: { className?: string }) {
           />
           <span className="font-bold sm:inline-block">BD Education Results</span>
         </Link>
-        <nav className="flex items-center gap-2 text-sm">
+        <nav className="flex flex-1 items-center gap-2 text-sm">
           {navLinks.map((link) => (
             <Button
               key={link.href}
@@ -54,19 +54,6 @@ export default function Header({ className }: { className?: string }) {
             </Button>
           ))}
         </nav>
-        <div className="ml-auto">
-           <Button
-              variant="ghost"
-              onClick={promptLogin}
-              className={cn(
-                'transition-colors hover:text-foreground/80',
-                pathname === '/admin' ? 'text-foreground' : 'text-foreground/60'
-              )}
-            >
-              <Lock className="mr-2 h-4 w-4" />
-              অ্যাডমিন
-            </Button>
-        </div>
       </div>
     </header>
   );

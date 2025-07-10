@@ -62,7 +62,7 @@ export default function HistoryPage() {
         </div>
       ) : (
          <Dialog>
-            <div className="grid gap-6 md:grid-cols-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {filteredHistory.map(item => (
                 <Card key={`${item.roll}-${item.exam}`} className="hover:shadow-lg transition-shadow">
                 <CardHeader>

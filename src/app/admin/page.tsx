@@ -45,7 +45,7 @@ export default function AdminPage() {
     <div className="container mx-auto max-w-6xl px-4 py-8 md:py-12">
       <div className="mb-8">
         <h1 className="text-4xl font-bold tracking-tight">অ্যাডমিন প্যানেল</h1>
-        <p className="mt-2 text-lg text-muted-foreground">সাইটের ব্যবহার এবং অনুসন্ধানের ইতিহাস দেখুন।</p>
+        <p className="mt-2 text-lg text-muted-foreground">সাইটের ব্যবহার এবং অনুসন্ধানের ইতিহাস দেখুন। (শুধুমাত্র এই ব্রাউজারের জন্য)</p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-3 mb-8">
@@ -91,7 +91,7 @@ export default function AdminPage() {
           </div>
         ) : (
           <Dialog>
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {history.map(item => (
                 <Card key={`${item.roll}-${item.exam}`} className="hover:shadow-lg transition-shadow">
                   <CardHeader>
