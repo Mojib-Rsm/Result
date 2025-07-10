@@ -9,7 +9,7 @@ function Footer() {
     <footer className="no-print py-6 md:px-8 md:py-0 bg-background/95 border-t">
       <div className="container flex flex-col items-center justify-center gap-4 md:h-24 md:flex-row">
         <p className="text-balance text-center text-sm leading-loose text-muted-foreground">
-          For any queries, contact: <span className="font-medium text-foreground">mojibrsm@gmail.com</span>.
+          Thanks for using our service. Contact: <span className="font-medium text-foreground">mojibrsm@gmail.com</span>.
         </p>
       </div>
     </footer>
