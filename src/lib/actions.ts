@@ -22,8 +22,6 @@ export async function searchResultAction(
   }
   
   const sessionCookie = mainPageRes.headers.get('set-cookie')?.split(';')[0] || '';
-  
-  // The cookie might not always be sent, so we don't fail here. We'll pass it if we have it.
 
   const mainPageHtml = await mainPageRes.text();
   const mainRoot = parse(mainPageHtml);
@@ -66,7 +64,6 @@ export async function searchResultAction(
     "Referer": "http://www.educationboardresults.gov.bd/",
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
     "Origin": "http://www.educationboardresults.gov.bd",
-    "X-Requested-With": "XMLHttpRequest",
   };
 
   if (sessionCookie) {
@@ -87,7 +84,7 @@ export async function searchResultAction(
   const resultRoot = parse(resultHtml);
 
   // Check for result not found message
-  if (resultHtml.includes("Result Not Found")) {
+  if (resultHtml.includes("Result not found") || resultHtml.includes("Result Not Found")) {
       throw new Error("Result not found. Please check your roll, registration, board, and year and try again.");
   }
   
@@ -103,14 +100,17 @@ export async function searchResultAction(
     if (bodyText && bodyText.includes('are not numeric')) {
         throw new Error('Security answer is not correct. Please try again.');
     }
-    throw new Error('Could not parse the result page. The result format might have changed.');
+    // Generic error if no specific message is found
+    throw new Error('Could not parse the result page. The website may be down or the layout has changed.');
   }
 
   // 4. Parse the result HTML.
-  const infoTable = resultDiv.querySelector('table');
-  if (!infoTable) {
-    throw new Error('Could not find student information table.');
+  const infoTables = resultDiv.querySelectorAll('table');
+  if (infoTables.length < 2) {
+    throw new Error('Could not find the required data tables on the result page.');
   }
+  const infoTable = infoTables[0];
+  const gradesTable = infoTables[1];
 
   const getTableValue = (label: string): string => {
       const row = infoTable.querySelector(`tr:has(td:contains(${label}))`);
@@ -118,24 +118,22 @@ export async function searchResultAction(
   };
 
   const gpaStr = getTableValue('GPA');
-  const gpa = gpaStr.toLowerCase() !== 'failed' ? parseFloat(gpaStr) : 0;
+  const gpa = gpaStr && !isNaN(parseFloat(gpaStr)) ? parseFloat(gpaStr) : 0;
   const status = gpa > 0 ? 'Pass' : 'Fail';
 
+
   const grades: GradeInfo[] = [];
-  const gradesTable = resultDiv.querySelectorAll('table')[1];
-  if(gradesTable) {
-    const gradeRows = gradesTable.querySelectorAll('tr');
-    gradeRows.slice(1).forEach(row => { // Skip header row
-      const cols = row.querySelectorAll('td');
-      if (cols.length === 3) {
-        grades.push({
-          code: cols[0].innerText.trim(),
-          subject: cols[1].innerText.trim(),
-          grade: cols[2].innerText.trim(),
-        });
-      }
-    });
-  }
+  const gradeRows = gradesTable.querySelectorAll('tr');
+  gradeRows.slice(1).forEach(row => { // Skip header row
+    const cols = row.querySelectorAll('td');
+    if (cols.length === 3) {
+      grades.push({
+        code: cols[0].innerText.trim(),
+        subject: cols[1].innerText.trim(),
+        grade: cols[2].innerText.trim(),
+      });
+    }
+  });
 
 
   const result: ExamResult = {
@@ -144,7 +142,7 @@ export async function searchResultAction(
     board: getTableValue('Board'),
     year: values.year,
     exam: values.exam.toUpperCase(),
-    gpa: isNaN(gpa) ? 0 : gpa,
+    gpa: gpa,
     status,
     studentInfo: {
       name: getTableValue('Name'),
