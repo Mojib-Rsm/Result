@@ -78,7 +78,13 @@ export function useHistory() {
      if (typeof window === 'undefined') return;
       try {
           localStorage.removeItem(LOCAL_HISTORY_KEY);
-          localStorage.removeItem(STATS_KEY);
+          // Also reset stats when clearing history
+          const statsRaw = localStorage.getItem(STATS_KEY);
+          if (statsRaw) {
+              const stats = JSON.parse(statsRaw);
+              stats.searches = 0;
+              localStorage.setItem(STATS_KEY, JSON.stringify(stats));
+          }
       } catch(e) {
           console.error("Could not clear local data", e)
       }

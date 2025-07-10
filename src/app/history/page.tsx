@@ -57,7 +57,9 @@ export default function HistoryPage() {
 
   const handleClearAll = () => {
     clearAllHistoryAndStats();
-    loadData();
+    // Optimistically update UI
+    setHistory([]);
+    setStats(prev => ({...prev, searches: 0}));
   }
 
   const handleRemoveItem = (timestamp: number) => {
