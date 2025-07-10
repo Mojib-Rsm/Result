@@ -7,125 +7,129 @@ import { z } from 'zod';
 import { formSchema } from '@/components/exam-form';
 import { parse } from 'node-html-parser';
 
-const calculateGpa = (grades: GradeInfo[]): number => {
-    const gradePoints: { [key: string]: number } = { 'A+': 5.0, 'A': 4.0, 'A-': 3.5, 'B': 3.0, 'C': 2.0, 'D': 1.0, 'F': 0.0 };
-    let totalPoints = 0;
-    let subjectCount = 0;
-    grades.forEach(g => {
-        // Assuming optional subjects don't count towards GPA if failed, or handle specific board rules.
-        // This is a simplified calculation.
-        if (gradePoints[g.grade] !== undefined) {
-            totalPoints += gradePoints[g.grade];
-            subjectCount++;
-        }
-    });
-    if (subjectCount === 0) return 0;
-    const gpa = totalPoints / subjectCount;
-    return gpa < 1 ? 0 : gpa; // Fail if GPA is less than 1
-};
-
-
 export async function searchResultAction(
   values: z.infer<typeof formSchema>
 ): Promise<ExamResult> {
-  // We need a session cookie to make the request.
-  // Let's fetch the homepage to get one.
-  const sessionRes = await fetch("https://app.eboardresults.com/v2/home", { headers: { 'User-Agent': 'Mozilla/5.0' }});
-  const sessionCookie = sessionRes.headers.get('set-cookie')?.split(';')[0] || '';
+  // 1. Fetch the homepage to get a session cookie and the captcha values.
+  const mainPageRes = await fetch("http://www.educationboardresults.gov.bd/", {
+    headers: { 'User-Agent': 'Mozilla/5.0' }
+  });
+  const sessionCookie = mainPageRes.headers.get('set-cookie')?.split(';')[0] || '';
   
   if (!sessionCookie) {
-    throw new Error('Could not establish session with results server.');
+    throw new Error('Could not establish session with the results server.');
   }
 
-  // Now, let's try to get the captcha. It's inside an image.
-  // We'll skip this for now as it requires OCR. We will use a placeholder.
-  const captcha = '12345'; // The API doesn't seem to validate this heavily.
+  const mainPageHtml = await mainPageRes.text();
+  const mainRoot = parse(mainPageHtml);
 
-  const body = new URLSearchParams({
-    exam: values.exam,
-    year: values.year,
-    board: values.board,
-    result_type: '1', // Individual result
-    roll: values.roll,
-    reg: values.reg,
-    captcha: captcha,
-  });
+  // 2. Extract captcha values from the form.
+  const captchaRow = mainRoot.querySelector('tr:nth-child(8)');
+  if (!captchaRow) {
+    throw new Error('Could not find the captcha on the page.');
+  }
 
-  const res = await fetch("https://app.eboardresults.com/v2/getres", {
+  const captchaText = captchaRow.querySelector('td:nth-child(2)')?.innerText.trim();
+  if (!captchaText) {
+      throw new Error('Could not read the captcha text.');
+  }
+  const numbers = captchaText.match(/\d+/g);
+  if (!numbers || numbers.length < 2) {
+      throw new Error('Could not parse captcha numbers.');
+  }
+
+  const value_a = parseInt(numbers[0], 10);
+  const value_b = parseInt(numbers[1], 10);
+  const value_s = value_a + value_b;
+
+  // 3. Construct and send the result request.
+  const formData = new FormData();
+  formData.append('sr', '1');
+  formData.append('et', '2'); // These seem to be static values for individual results
+  formData.append('exam', values.exam);
+  formData.append('year', values.year);
+  formData.append('board', values.board);
+  formData.append('roll', values.roll);
+  formData.append('reg', values.reg);
+  formData.append('value_a', String(value_a));
+  formData.append('value_b', String(value_b));
+  formData.append('value_s', String(value_s));
+
+  const res = await fetch("http://www.educationboardresults.gov.bd/result.php", {
     method: 'POST',
     headers: {
-      "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
       "Cookie": sessionCookie,
-      "Referer": "https://app.eboardresults.com/v2/home",
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36"
+      "Referer": "http://www.educationboardresults.gov.bd/",
+      "User-Agent": "Mozilla/5.0"
     },
-    body: body.toString(),
+    body: formData,
   });
 
   if (!res.ok) {
-    throw new Error('Failed to fetch result from the server.');
+    throw new Error(`Failed to fetch result. Server responded with status: ${res.status}`);
   }
 
-  const html = await res.text();
-  const root = parse(html);
+  const resultHtml = await res.text();
+  const resultRoot = parse(resultHtml);
 
-  if (html.includes("No result found")) {
-      throw new Error('Result not found for the provided information.');
-  }
-  if (html.includes("Sorry! we are unable to process your request")) {
-      throw new Error('The results server is currently busy. Please try again.');
+  const resultDiv = resultRoot.querySelector('.result_display');
+  if (!resultDiv) {
+    // Check for specific error messages
+    const bodyText = resultRoot.querySelector('body')?.innerText.trim();
+    if (bodyText && bodyText.includes('Roll No. does not exist')) {
+        throw new Error('The provided Roll Number does not exist for the selected board and year.');
+    }
+    if (bodyText && bodyText.includes('Registration No. mismatched')) {
+        throw new Error('Registration number mismatched.');
+    }
+    throw new Error('Could not parse the result page. The result format might have changed.');
   }
 
-  const resultContainer = root.querySelector('.container-fluid');
-  if (!resultContainer) {
-    throw new Error('Could not parse the result page.');
+  // 4. Parse the result HTML.
+  const infoTable = resultDiv.querySelector('table');
+  if (!infoTable) {
+    throw new Error('Could not find student information table.');
   }
 
-  const studentInfoTable = resultContainer.querySelectorAll('table')[0];
-  const gradesTable = resultContainer.querySelectorAll('table')[1];
-  
-  const studentInfoRows = studentInfoTable.querySelectorAll('tr');
-  const studentInfo: Partial<StudentInfo> & { [key: string]: string } = {};
-  studentInfoRows.forEach(row => {
-      const cols = row.querySelectorAll('td');
-      if (cols.length === 2) {
-          const key = cols[0].innerText.trim().replace(/:/g, '').replace(/\s+/g, '');
-          const value = cols[1].innerText.trim();
-          studentInfo[key] = value;
-      }
-  });
+  const getTableValue = (label: string): string => {
+      const row = infoTable.querySelector(`tr:has(td:contains(${label}))`);
+      return row?.querySelectorAll('td')[1]?.innerText.trim() || '';
+  };
+
+  const gpa = parseFloat(getTableValue('GPA'));
+  const status = isNaN(gpa) || gpa === 0 ? 'Fail' : 'Pass';
 
   const grades: GradeInfo[] = [];
-  const gradeRows = gradesTable.querySelectorAll('tr');
-  gradeRows.slice(1).forEach(row => { // Skip header row
+  const gradesTable = resultDiv.querySelectorAll('table')[1];
+  if(gradesTable) {
+    const gradeRows = gradesTable.querySelectorAll('tr');
+    gradeRows.slice(1).forEach(row => { // Skip header row
       const cols = row.querySelectorAll('td');
       if (cols.length === 3) {
-          grades.push({
-              code: cols[0].innerText.trim(),
-              subject: cols[1].innerText.trim(),
-              grade: cols[2].innerText.trim(),
-          });
+        grades.push({
+          code: cols[0].innerText.trim(),
+          subject: cols[1].innerText.trim(),
+          grade: cols[2].innerText.trim(),
+        });
       }
-  });
+    });
+  }
 
-  const gpaText = resultContainer.querySelector('tr:last-child td:last-child')?.innerText?.trim()?.split(" ")[1] || '0';
-  const gpa = parseFloat(gpaText);
-  const status = gpa > 0 ? 'Pass' : 'Fail';
 
   const result: ExamResult = {
-    roll: values.roll,
-    reg: values.reg,
-    board: values.board,
-    year: values.year,
-    exam: values.exam,
-    gpa: gpa || 0,
+    roll: getTableValue('Roll No'),
+    reg: values.reg, // This API doesn't return the reg no in the result page
+    board: getTableValue('Board'),
+    year: values.year, // Nor the year
+    exam: values.exam.toUpperCase(), // Nor the exam name
+    gpa: isNaN(gpa) ? 0 : gpa,
     status,
     studentInfo: {
-      name: studentInfo['Name'] || '',
-      fatherName: studentInfo["Father'sName"] || '',
-      motherName: studentInfo["Mother'sName"] || '',
-      group: studentInfo['Group'] || '',
-      dob: studentInfo['DateofBirth'] || '',
+      name: getTableValue('Name'),
+      fatherName: getTableValue("Father's Name"),
+      motherName: getTableValue("Mother's Name"),
+      group: getTableValue('Group'),
+      dob: getTableValue('Date of Birth'),
     },
     grades,
   };
