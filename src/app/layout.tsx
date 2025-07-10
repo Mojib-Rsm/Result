@@ -1,15 +1,13 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { Inter } from 'next/font/google';
-import { cn } from '@/lib/utils';
-import { Toaster } from '@/components/ui/toaster';
-import Header from '@/components/header';
+import AppProvider from '@/components/app-provider';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 export const metadata: Metadata = {
   title: 'BD Education Results',
-  description: 'Check your Bangladesh education board exam results and get AI-powered recommendations.',
+  description: 'Check your Bangladesh education board exam results.',
 };
 
 export default function RootLayout({
@@ -19,14 +17,8 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body>
-        <div className={cn('font-sans antialiased', inter.variable, 'bg-background text-foreground')}>
-          <div className="relative flex min-h-screen flex-col">
-            <Header />
-            <main className="flex-1">{children}</main>
-          </div>
-          <Toaster />
-        </div>
+      <body className={inter.variable}>
+        <AppProvider>{children}</AppProvider>
       </body>
     </html>
   );

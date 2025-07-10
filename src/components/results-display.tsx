@@ -8,10 +8,12 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Download, RotateCcw } from 'lucide-react';
 import type { ExamResult } from '@/types';
 import { Separator } from './ui/separator';
+import { cn } from '@/lib/utils';
 
 interface ResultsDisplayProps {
   result: ExamResult;
-  onReset: () => void;
+  onReset?: () => void;
+  isDialog?: boolean;
 }
 
 const getGpaGrade = (gpa: number): string => {
@@ -25,7 +27,7 @@ const getGpaGrade = (gpa: number): string => {
 };
 
 
-export default function ResultsDisplay({ result, onReset }: ResultsDisplayProps) {
+export default function ResultsDisplay({ result, onReset, isDialog = false }: ResultsDisplayProps) {
   
   useEffect(() => {
     const handleBeforePrint = () => {
@@ -94,8 +96,8 @@ export default function ResultsDisplay({ result, onReset }: ResultsDisplayProps)
               </TableRow>
             </TableHeader>
             <TableBody>
-              {result.grades.map((g) => (
-                <TableRow key={g.code}>
+              {result.grades.map((g, index) => (
+                <TableRow key={g.code} className={cn(index % 2 !== 0 && 'bg-muted/50')}>
                   <TableCell>{g.code}</TableCell>
                   <TableCell className="font-medium">{g.subject}</TableCell>
                   <TableCell className="text-right font-bold">{g.grade}</TableCell>
@@ -105,10 +107,12 @@ export default function ResultsDisplay({ result, onReset }: ResultsDisplayProps)
           </Table>
         </CardContent>
         <CardFooter className="flex justify-end gap-2 no-print mt-6">
-            <Button variant="outline" onClick={onReset}>
-                <RotateCcw className="mr-2 h-4 w-4" />
-                Check Another
-            </Button>
+            {!isDialog && onReset && (
+                <Button variant="outline" onClick={onReset}>
+                    <RotateCcw className="mr-2 h-4 w-4" />
+                    Check Another
+                </Button>
+            )}
             <Button onClick={handlePrint}>
                 <Download className="mr-2 h-4 w-4" />
                 Download PDF

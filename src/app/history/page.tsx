@@ -6,11 +6,15 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { History as HistoryIcon, Search, Trash2 } from 'lucide-react';
+import { History as HistoryIcon, Search, Trash2, Eye } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import ResultsDisplay from '@/components/results-display';
+import type { HistoryItem } from '@/types';
 
 export default function HistoryPage() {
   const { history, clearHistory, isInitialized } = useHistory();
   const [filter, setFilter] = useState('');
+  const [selectedResult, setSelectedResult] = useState<HistoryItem | null>(null);
 
   const filteredHistory = history.filter(
     item =>
@@ -57,33 +61,46 @@ export default function HistoryPage() {
           </p>
         </div>
       ) : (
-        <div className="grid gap-6 md:grid-cols-2">
-          {filteredHistory.map(item => (
-            <Card key={`${item.roll}-${item.exam}`} className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="flex justify-between items-start">
-                    <div>
-                        <CardTitle>{item.result.studentInfo.name}</CardTitle>
-                        <CardDescription>Roll: {item.roll} | Reg: {item.reg}</CardDescription>
+         <Dialog>
+            <div className="grid gap-6 md:grid-cols-2">
+            {filteredHistory.map(item => (
+                <Card key={`${item.roll}-${item.exam}`} className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                    <div className="flex justify-between items-start">
+                        <div>
+                            <CardTitle>{item.result.studentInfo.name}</CardTitle>
+                            <CardDescription>Roll: {item.roll} | Reg: {item.reg}</CardDescription>
+                        </div>
+                        <Badge variant={item.result.status === 'Pass' ? 'default' : 'destructive'} className={item.result.status === 'Pass' ? 'bg-green-600' : ''}>
+                            {item.result.status}
+                        </Badge>
                     </div>
-                    <Badge variant={item.result.status === 'Pass' ? 'default' : 'destructive'} className={item.result.status === 'Pass' ? 'bg-green-600' : ''}>
-                        {item.result.status}
-                    </Badge>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p><strong>Exam:</strong> <span className="uppercase">{item.exam}</span>, {item.year}</p>
-                <p><strong>Board:</strong> <span className="capitalize">{item.board}</span></p>
-                {item.result.status === 'Pass' && <p><strong>GPA:</strong> {item.result.gpa.toFixed(2)}</p>}
-              </CardContent>
-              <CardFooter>
-                 <Button variant="link" className="p-0 h-auto" disabled>
-                    View Details (Feature coming soon)
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
+                </CardHeader>
+                <CardContent>
+                    <p><strong>Exam:</strong> <span className="uppercase">{item.exam}</span>, {item.year}</p>
+                    <p><strong>Board:</strong> <span className="capitalize">{item.board}</span></p>
+                    {item.result.status === 'Pass' && <p><strong>GPA:</strong> {item.result.gpa.toFixed(2)}</p>}
+                </CardContent>
+                <CardFooter>
+                    <DialogTrigger asChild>
+                        <Button variant="link" className="p-0 h-auto" onClick={() => setSelectedResult(item)}>
+                            <Eye className="mr-2 h-4 w-4" />
+                            View Details
+                        </Button>
+                    </DialogTrigger>
+                </CardFooter>
+                </Card>
+            ))}
+            </div>
+            {selectedResult && (
+                <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                    <DialogHeader>
+                        <DialogTitle>Result Details</DialogTitle>
+                    </DialogHeader>
+                    <ResultsDisplay result={selectedResult.result} isDialog={true} />
+                </DialogContent>
+            )}
+        </Dialog>
       )}
     </div>
   );

@@ -6,7 +6,11 @@ import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
-export default function Header() {
+interface HeaderProps {
+    className?: string;
+}
+
+export default function Header({ className }: HeaderProps) {
   const pathname = usePathname();
 
   const navLinks = [
@@ -15,7 +19,7 @@ export default function Header() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className={cn("sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60", className)}>
       <div className="container flex h-14 max-w-screen-2xl items-center">
         <Link href="/" className="mr-6 flex items-center space-x-2">
           <GraduationCap className="h-6 w-6 text-primary" />
