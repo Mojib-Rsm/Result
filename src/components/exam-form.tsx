@@ -10,7 +10,6 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Loader2, RefreshCw } from 'lucide-react';
 import { Skeleton } from './ui/skeleton';
-import { useEffect } from 'react';
 
 export const formSchema = z.object({
   exam: z.string().min(1, 'পরীক্ষা নির্বাচন আবশ্যক।'),

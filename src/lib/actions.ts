@@ -136,6 +136,23 @@ async function searchResultLegacy(
     
     if (data.status === '1' && data.data) {
         const apiResult = data.data;
+
+        // If the result is HTML content (for institution/center results), pass it directly.
+        if (data.html) {
+             return {
+                roll: values.roll || '',
+                reg: values.reg || '',
+                board: values.board,
+                year: values.year,
+                exam: values.exam,
+                gpa: 0,
+                status: 'Pass', // Status might not be applicable here
+                studentInfo: { name: '', fatherName: '', motherName: '', group: '', dob: '', institute: '', session: '' },
+                grades: [],
+                rawHtml: data.html,
+            };
+        }
+
         const subjectDetails: Record<string, string> = (data.sub_details || []).reduce((acc: Record<string, string>, sub: {SUB_CODE: string, SUB_NAME: string}) => {
             acc[sub.SUB_CODE] = sub.SUB_NAME;
             return acc;
@@ -168,8 +185,6 @@ async function searchResultLegacy(
                 session: apiResult.session || '',
             },
             grades: rawGrades.sort((a,b) => parseInt(a.code) - parseInt(b.code)),
-            // Handle non-individual results which might be pure HTML
-            rawHtml: data.html || undefined,
         };
 
         return result;
@@ -194,4 +209,3 @@ async function searchResultLegacy(
      throw new Error('An unknown error occurred while fetching the result.');
   }
 }
-
