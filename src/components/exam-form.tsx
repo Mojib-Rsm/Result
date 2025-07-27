@@ -163,7 +163,7 @@ export function ExamForm({ form, onSubmit, isSubmitting, isRegRequired, isCaptch
                       alt="সিক্রেট কোড"
                       width={180}
                       height={50}
-                      className="rounded-md border p-1 bg-white h-[50px] w-auto"
+                      className="rounded-md border p-1 bg-white"
                       unoptimized
                     />
                   ) : <div className="h-[50px] w-[180px] border rounded-md flex items-center justify-center bg-muted text-muted-foreground text-xs">কোড লোড হচ্ছে...</div>}
