@@ -13,11 +13,11 @@ import { Skeleton } from './ui/skeleton';
 import { useEffect } from 'react';
 
 export const formSchema = z.object({
+  exam: z.string().min(1, 'পরীক্ষা নির্বাচন আবশ্যক।'),
+  year: z.string().min(1, 'বছর নির্বাচন আবশ্যক।'),
+  board: z.string().min(1, 'বোর্ড নির্বাচন আবশ্যক।'),
   roll: z.string().min(1, 'রোল নম্বর আবশ্যক।').regex(/^\d+$/, 'রোল নম্বর অবশ্যই একটি সংখ্যা হতে হবে।').optional(),
   reg: z.string().min(1, 'রেজিস্ট্রেশন নম্বর আবশ্যক।').regex(/^\d+$/, 'রেজিস্ট্রেশন নম্বর অবশ্যই একটি সংখ্যা হতে হবে।').optional(),
-  board: z.string(),
-  year: z.string(),
-  exam: z.string(),
   result_type: z.string(),
   captcha: z.string().min(1, 'সিক্রেট কোড আবশ্যক।'),
 });
@@ -37,12 +37,12 @@ const boards = [
     { value: 'dibs', label: 'ডিপ্লোমা ইন বিজনেস স্টাডিজ (DIBS)' },
 ];
 
-const maxYear = 2025;
-const years = Array.from({ length: maxYear - 1996 + 1 }, (_, i) => maxYear - i).map(String);
+const currentYear = new Date().getFullYear();
+const years = Array.from({ length: currentYear - 1996 + 1 }, (_, i) => currentYear - i).map(String);
 
 
 const exams = [
-    { value: 'ssc', label: 'এসএসসি/দাখিল' },
+    { value: 'ssc', label: 'এসএসসি/দাখিল/সমমান' },
     { value: 'hsc', label: 'এইচএসসি/আলিম/সমমান' },
     { value: 'jsc', label: 'জেএসসি/জেডিসি' },
     { value: 'ssc_voc', label: 'এসএসসি (ভোকেশনাল)'},
@@ -99,7 +99,7 @@ export function ExamForm({ form, onSubmit, isSubmitting, captchaImage, isFetchin
             render={({ field }) => (
               <FormItem>
                 <FormLabel>পরীক্ষা</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
                     <SelectTrigger><SelectValue placeholder="পরীক্ষা নির্বাচন করুন" /></SelectTrigger>
                   </FormControl>
@@ -117,7 +117,7 @@ export function ExamForm({ form, onSubmit, isSubmitting, captchaImage, isFetchin
             render={({ field }) => (
               <FormItem>
                 <FormLabel>বছর</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
                     <SelectTrigger><SelectValue placeholder="বছর নির্বাচন করুন" /></SelectTrigger>
                   </FormControl>
@@ -135,7 +135,7 @@ export function ExamForm({ form, onSubmit, isSubmitting, captchaImage, isFetchin
             render={({ field }) => (
               <FormItem>
                 <FormLabel>বোর্ড</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
                     <SelectTrigger><SelectValue placeholder="বোর্ড নির্বাচন করুন" /></SelectTrigger>
                   </FormControl>

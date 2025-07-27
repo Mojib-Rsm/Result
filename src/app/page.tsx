@@ -39,9 +39,9 @@ export default function Home() {
     defaultValues: {
       roll: '',
       reg: '',
-      board: 'chittagong',
-      year: new Date().getFullYear().toString(),
-      exam: 'ssc',
+      board: '',
+      year: '',
+      exam: '',
       result_type: '1',
       captcha: '',
     },
@@ -114,9 +114,9 @@ export default function Home() {
     form.reset({
       roll: '',
       reg: '',
-      board: 'chittagong',
-      year: new Date().getFullYear().toString(),
-      exam: 'ssc',
+      board: '',
+      year: '',
+      exam: '',
       result_type: '1',
       captcha: ''
     });
