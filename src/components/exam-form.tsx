@@ -15,29 +15,35 @@ export const formSchema = z.object({
   exam: z.string().min(1, 'পরীক্ষা নির্বাচন আবশ্যক।'),
   year: z.string().min(1, 'বছর নির্বাচন আবশ্যক।'),
   board: z.string().min(1, 'বোর্ড নির্বাচন আবশ্যক।'),
-  roll: z.string().min(1, 'রোল নম্বর আবশ্যক।').regex(/^\d+$/, 'রোল নম্বর অবশ্যই একটি সংখ্যা হতে হবে।'),
-  reg: z.string().min(1, 'রেজিস্ট্রেশন নম্বর আবশ্যক।').regex(/^\d+$/, 'রেজিস্ট্রেশন নম্বর অবশ্যই একটি সংখ্যা হতে হবে।'),
+  roll: z.string().regex(/^\d*$/, 'রোল নম্বর অবশ্যই একটি সংখ্যা হতে হবে।').optional(),
+  reg: z.string().regex(/^\d*$/, 'রেজিস্ট্রেশন নম্বর অবশ্যই একটি সংখ্যা হতে হবে।').optional(),
   result_type: z.string().min(1, 'ফলাফলের ধরন আবশ্যক।'),
   captcha: z.string().min(1, 'সিক্রেট কোড আবশ্যক।'),
-  eiin: z.string().min(1, 'EIIN নম্বর আবশ্যক।').regex(/^\d+$/, 'EIIN অবশ্যই একটি সংখ্যা হতে হবে।').optional(),
+  eiin: z.string().regex(/^\d*$/, 'EIIN অবশ্যই একটি সংখ্যা হতে হবে।').optional(),
 }).refine(data => {
-    // If result type is 'Institution Result' or 'Institution Analytics', EIIN is required.
-    if ((data.result_type === '2' || data.result_type === '6') && !data.eiin) {
+    if ((data.result_type === '1' || data.result_type === '7') && (!data.roll || data.roll.length === 0)) {
+        return false;
+    }
+    return true;
+}, {
+    message: 'রোল নম্বর আবশ্যক।',
+    path: ['roll'],
+}).refine(data => {
+    if ((data.result_type === '1' || data.result_type === '7') && (!data.reg || data.reg.length === 0)) {
+        return false;
+    }
+    return true;
+}, {
+    message: 'রেজিস্ট্রেশন নম্বর আবশ্যক।',
+    path: ['reg'],
+}).refine(data => {
+    if ((data.result_type === '2' || data.result_type === '6') && (!data.eiin || data.eiin.length === 0)) {
         return false;
     }
     return true;
 }, {
     message: 'EIIN নম্বর আবশ্যক।',
     path: ['eiin'],
-}).refine(data => {
-    // If result type is 'Individual Result' or 'Re-scrutiny Result', roll and reg are required.
-    if ((data.result_type === '1' || data.result_type === '7') && (!data.roll || !data.reg)) {
-        return false;
-    }
-    return true;
-}, {
-    message: 'রোল এবং রেজিস্ট্রেশন নম্বর আবশ্যক।',
-    path: ['roll'], // Show error on roll, but it applies to both
 });
 
 
