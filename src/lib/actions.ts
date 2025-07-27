@@ -16,7 +16,7 @@ export type CaptchaChallenge = {
 // Action 1: Fetch the initial page and the captcha image
 export async function getCaptchaAction(): Promise<CaptchaChallenge> {
   try {
-    const homeRes = await fetch('https://app.eboardresults.com/v2/home', {
+    const homeRes = await fetch('https://eboardresults.com/v2/home', {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36',
       },
@@ -29,10 +29,10 @@ export async function getCaptchaAction(): Promise<CaptchaChallenge> {
     const cookies = homeRes.headers.get('set-cookie') || '';
     
     // Now fetch the captcha image using the session cookie
-    const captchaRes = await fetch(`https://app.eboardresults.com/v2/captcha?t=${Date.now()}`, {
+    const captchaRes = await fetch(`https://eboardresults.com/v2/captcha?t=${Date.now()}`, {
         headers: {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
-            "Referer": "https://app.eboardresults.com/v2/home",
+            "Referer": "https://eboardresults.com/v2/home",
             "Cookie": cookies,
         }
     });
@@ -47,14 +47,12 @@ export async function getCaptchaAction(): Promise<CaptchaChallenge> {
     const captchaImageUrl = `data:${mimeType};base64,${base64Image}`;
     
     let captchaText = '';
-    // Temporarily disable AI captcha reading to avoid server errors on Vercel if API key is not set.
-    // The app can function without it, requiring manual entry.
-    // try {
-    //     const result = await readCaptcha({ photoDataUri: captchaImageUrl });
-    //     captchaText = result.text;
-    // } catch(aiError) {
-    //     console.warn("AI captcha read failed, user will have to enter manually.", aiError);
-    // }
+    try {
+        const result = await readCaptcha({ photoDataUri: captchaImageUrl });
+        captchaText = result.text;
+    } catch(aiError) {
+        console.warn("AI captcha read failed, user will have to enter manually.", aiError);
+    }
     
     return {
         image: captchaImageUrl,
@@ -218,7 +216,7 @@ async function searchResult2025Ctg(values: z.infer<typeof formSchema>): Promise<
 async function searchResultLegacy(
   values: z.infer<typeof formSchema> & { cookies: string }
 ): Promise<ExamResult> {
-  const apiUrl = "https://app.eboardresults.com/v2/getres";
+  const apiUrl = "https://eboardresults.com/v2/getres";
 
   const params = new URLSearchParams();
   params.append('exam', values.exam);
@@ -240,7 +238,7 @@ async function searchResultLegacy(
         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
         "X-Requested-With": "XMLHttpRequest",
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
-        "Referer": "https://app.eboardresults.com/v2/home",
+        "Referer": "https://eboardresults.com/v2/home",
         "Cookie": values.cookies,
       },
       body: params.toString(),
