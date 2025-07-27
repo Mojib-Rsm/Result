@@ -240,3 +240,4 @@ async function searchResultLegacy(
      throw new Error('An unknown error occurred while fetching the result.');
   }
 }
+
