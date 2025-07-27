@@ -38,4 +38,5 @@ export interface HistoryItem {
     result_type: string;
     result: ExamResult;
     timestamp: number;
+    eiin?: string;
 }

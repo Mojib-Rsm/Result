@@ -100,7 +100,7 @@ async function searchResultLegacy(
 ): Promise<ExamResult> {
   const apiUrl = "https://eboardresults.com/v2/getres";
 
-  const body = `exam=${values.exam}&year=${values.year}&board=${values.board}&roll=${values.roll || ''}&reg=${values.reg || ''}&captcha=${values.captcha}&result_type=${values.result_type}&eiin=&dcode=&ccode=`;
+  const body = `exam=${values.exam}&year=${values.year}&board=${values.board}&roll=${values.roll || ''}&reg=${values.reg || ''}&captcha=${values.captcha}&result_type=${values.result_type}&eiin=${values.eiin || ''}&dcode=&ccode=`;
 
   try {
     const res = await fetch(apiUrl, {

@@ -19,6 +19,7 @@ export const formSchema = z.object({
   reg: z.string().min(1, 'রেজিস্ট্রেশন নম্বর আবশ্যক।').regex(/^\d+$/, 'রেজিস্ট্রেশন নম্বর অবশ্যই একটি সংখ্যা হতে হবে।').optional(),
   result_type: z.string(),
   captcha: z.string().min(1, 'সিক্রেট কোড আবশ্যক।'),
+  eiin: z.string().min(1, 'EIIN নম্বর আবশ্যক।').regex(/^\d+$/, 'EIIN অবশ্যই একটি সংখ্যা হতে হবে।').optional(),
 });
 
 const boards = [
@@ -76,6 +77,7 @@ interface ExamFormProps {
 export function ExamForm({ form, onSubmit, isSubmitting, captchaImage, isFetchingCaptcha, onRefreshCaptcha }: ExamFormProps) {
   const resultType = form.watch('result_type');
   const isRollRegRequired = resultType === '1' || resultType === '7';
+  const isEiinRequired = resultType === '2' || resultType === '6';
   
   return (
     <Form {...form}>
@@ -181,6 +183,21 @@ export function ExamForm({ form, onSubmit, isSubmitting, captchaImage, isFetchin
               />
             </>
           )}
+
+          {isEiinRequired && (
+             <FormField
+                control={form.control}
+                name="eiin"
+                render={({ field }) => (
+                  <FormItem className="md:col-span-2">
+                    <FormLabel>প্রতিষ্ঠানের EIIN নম্বর</FormLabel>
+                    <FormControl><Input placeholder="আপনার প্রতিষ্ঠানের EIIN নম্বর লিখুন" {...field} value={field.value || ''} /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+          )}
+
 
             <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
               <div className='flex flex-col gap-2'>
