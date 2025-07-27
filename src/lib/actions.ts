@@ -219,7 +219,7 @@ async function searchResultLegacy(
         if (error.message.includes('fetch failed')) {
             throw new Error('A network error occurred. Please check your internet connection and if the result server is accessible.');
         }
-        throw new Error(error.message);
+        throw error;
      }
      throw new Error('An unknown error occurred while fetching the result.');
   }
