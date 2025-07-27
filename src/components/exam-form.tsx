@@ -17,10 +17,20 @@ export const formSchema = z.object({
   board: z.string().min(1, 'বোর্ড নির্বাচন আবশ্যক।'),
   roll: z.string().min(1, 'রোল নম্বর আবশ্যক।').regex(/^\d+$/, 'রোল নম্বর অবশ্যই একটি সংখ্যা হতে হবে।').optional(),
   reg: z.string().min(1, 'রেজিস্ট্রেশন নম্বর আবশ্যক।').regex(/^\d+$/, 'রেজিস্ট্রেশন নম্বর অবশ্যই একটি সংখ্যা হতে হবে।').optional(),
-  result_type: z.string(),
+  result_type: z.string().min(1, 'ফলাফলের ধরন আবশ্যক।'),
   captcha: z.string().min(1, 'সিক্রেট কোড আবশ্যক।'),
   eiin: z.string().min(1, 'EIIN নম্বর আবশ্যক।').regex(/^\d+$/, 'EIIN অবশ্যই একটি সংখ্যা হতে হবে।').optional(),
+}).refine(data => {
+    // If result type is 'Institution Result' or 'Institution Analytics', EIIN is required.
+    if ((data.result_type === '2' || data.result_type === '6') && !data.eiin) {
+        return false;
+    }
+    return true;
+}, {
+    message: 'EIIN নম্বর আবশ্যক।',
+    path: ['eiin'],
 });
+
 
 const boards = [
     { value: 'barisal', label: 'বরিশাল' },
