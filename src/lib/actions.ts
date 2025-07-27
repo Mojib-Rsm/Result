@@ -59,7 +59,7 @@ export async function getCaptchaAction(): Promise<CaptchaChallenge> {
     return {
         image: captchaImageUrl,
         cookies: cookies,
-        text: captchaText, // Will be an empty string
+        text: captchaText,
     };
 
   } catch (error) {
@@ -252,8 +252,8 @@ async function searchResultLegacy(
 
     const data = await res.json();
     
-    if (data.status === 0 && data.msg === "Success" && data.res) {
-        const apiResult = data.res;
+    if (data.status === '1' && data.data) {
+        const apiResult = data.data;
         const subjectDetails: Record<string, string> = data.sub_details.reduce((acc: Record<string, string>, sub: {SUB_CODE: string, SUB_NAME: string}) => {
             acc[sub.SUB_CODE] = sub.SUB_NAME;
             return acc;
@@ -267,7 +267,7 @@ async function searchResultLegacy(
             '136+137': 'ENGLISH-I AND ENGLISH-II',
         };
 
-        let rawGrades: GradeInfo[] = apiResult.display_details.split(',').map((item: string) => {
+        let rawGrades: GradeInfo[] = apiResult.gpa_details.split(',').map((item: string) => {
             const [code, grade] = item.split(':').map((s: string) => s.trim());
             return {
                 code,
@@ -318,34 +318,34 @@ async function searchResultLegacy(
         }
 
         const result: ExamResult = {
-            roll: apiResult.roll_no,
+            roll: apiResult.roll,
             reg: values.reg || apiResult.reg_no || 'N/A', // Use registration from input, fallback to API or N/A
-            board: apiResult.board_name,
-            year: apiResult.pass_year,
-            exam: apiResult.exam_name,
+            board: apiResult.board,
+            year: apiResult.year,
+            exam: apiResult.exam,
             gpa: parseFloat(apiResult.gpa) || 0,
-            status: apiResult.result === 'P' ? 'Pass' : 'Fail',
+            status: parseFloat(apiResult.gpa) > 0 ? 'Pass' : 'Fail',
             studentInfo: {
                 name: apiResult.name,
                 fatherName: apiResult.fname,
                 motherName: apiResult.mname,
-                group: apiResult.stud_group,
+                group: apiResult.group,
                 dob: apiResult.dob,
-                institute: apiResult.inst_name,
-                session: apiResult.session,
+                institute: apiResult.institute,
+                session: apiResult.session || '',
             },
             grades: rawGrades,
         };
 
         return result;
     } else {
-        if (data.msg && (data.msg.toLowerCase().includes('captcha') || data.msg.toLowerCase().includes('security key'))) {
+        if (data.message && (data.message.toLowerCase().includes('captcha') || data.message.toLowerCase().includes('security key'))) {
             throw new Error('The Security Key is incorrect. Please try again.');
         }
-        if (data.msg && (data.msg.toLowerCase().includes('not found') || data.msg.toLowerCase().includes('incorrect registration'))) {
+        if (data.message && (data.message.toLowerCase().includes('not found') || data.message.toLowerCase().includes('incorrect registration'))) {
              throw new Error("Result not found. Please check your roll, registration, board, and year and try again.");
         }
-        throw new Error(data.msg || 'An unknown error occurred while fetching the result.');
+        throw new Error(data.message || 'An unknown error occurred while fetching the result.');
     }
 
   } catch (error) {
