@@ -113,10 +113,13 @@ async function searchResultLegacy(
         // Check for non-JSON error messages from the server
         if (text.trim().startsWith('<') || !text.trim().startsWith('{')) {
             const root = parse(text);
-            const errorMessage = root.querySelector('.alert-danger')?.innerText.trim();
+            const errorMessage = root.querySelector('.alert-danger')?.innerText.trim() || root.querySelector('.panel-body')?.innerText.trim();
             if (errorMessage) {
                 if (errorMessage.toLowerCase().includes('captcha') || errorMessage.toLowerCase().includes('security key')) {
                     throw new Error('The Security Key is incorrect. Please try again.');
+                }
+                 if (errorMessage.toLowerCase().includes('result not yet published')) {
+                    throw new Error("Result not yet published or your inputs are invalid.");
                 }
                 throw new Error(errorMessage);
             }
@@ -138,14 +141,6 @@ async function searchResultLegacy(
             return acc;
         }, {});
         
-        const madrasahSubjectMap: Record<string, string> = {
-            '101+102': 'QURAN MAZID AND TAZBID AND HADITH SHARIF',
-            '103+104': 'ARABIC-I AND ARABIC-II',
-            '133': 'AQAID & FIQH',
-            '134+135': 'BANGLA-I AND BANGLA-II',
-            '136+137': 'ENGLISH-I AND ENGLISH-II',
-        };
-
         let rawGrades: GradeInfo[] = (apiResult.gpa_details || '').split(',').filter(Boolean).map((item: string) => {
             const [code, grade] = item.split(':').map((s: string) => s.trim());
             return {
@@ -154,47 +149,6 @@ async function searchResultLegacy(
                 grade
             };
         });
-
-        if (values.board === 'madrasah' && rawGrades.length > 0) {
-            const finalGrades: GradeInfo[] = [];
-            const processedCodes = new Set<string>();
-
-            // Process combined subjects first
-            for (const combinedCode in madrasahSubjectMap) {
-                if (combinedCode.includes('+')) {
-                    const individualCodes = combinedCode.split('+');
-                    const firstCode = individualCodes[0];
-                    const secondCode = individualCodes[1];
-
-                    const firstGradeEntry = rawGrades.find(g => g.code === firstCode);
-                    const secondGradeEntry = rawGrades.find(g => g.code === secondCode);
-                    
-                    if (firstGradeEntry) { // Combined subjects must have at least the first part
-                        finalGrades.push({
-                            code: combinedCode,
-                            subject: madrasahSubjectMap[combinedCode],
-                            grade: firstGradeEntry.grade, // Grade is usually same for both parts
-                        });
-                        processedCodes.add(firstCode);
-                        if(secondGradeEntry) {
-                           processedCodes.add(secondCode);
-                        }
-                    }
-                }
-            }
-
-            // Add remaining subjects
-            rawGrades.forEach(grade => {
-                if (!processedCodes.has(grade.code)) {
-                    finalGrades.push({
-                      ...grade,
-                      subject: subjectDetails[grade.code] || madrasahSubjectMap[grade.code] || grade.code
-                    });
-                }
-            });
-            
-            rawGrades = finalGrades.sort((a,b) => parseInt(a.code.split('+')[0]) - parseInt(b.code.split('+')[0]));
-        }
 
         const result: ExamResult = {
             roll: apiResult.roll,
@@ -213,7 +167,7 @@ async function searchResultLegacy(
                 institute: apiResult.institute,
                 session: apiResult.session || '',
             },
-            grades: rawGrades,
+            grades: rawGrades.sort((a,b) => parseInt(a.code) - parseInt(b.code)),
             // Handle non-individual results which might be pure HTML
             rawHtml: data.html || undefined,
         };

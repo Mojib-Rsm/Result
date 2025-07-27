@@ -76,19 +76,8 @@ interface ExamFormProps {
 
 export function ExamForm({ form, onSubmit, isSubmitting, captchaImage, isFetchingCaptcha, onRefreshCaptcha }: ExamFormProps) {
   const resultType = form.watch('result_type');
-  const isIndividualResult = resultType === '1';
-
-   useEffect(() => {
-    if (!isIndividualResult) {
-      form.setValue('roll', '000000'); // Provide a dummy value
-      form.setValue('reg', '0000000000');
-    } else {
-       if (form.getValues('roll') === '000000') form.setValue('roll', '');
-       if (form.getValues('reg') === '0000000000') form.setValue('reg', '');
-    }
-  }, [isIndividualResult, form]);
-
-
+  const isRollRegRequired = resultType === '1' || resultType === '7';
+  
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -167,7 +156,7 @@ export function ExamForm({ form, onSubmit, isSubmitting, captchaImage, isFetchin
               )}
             />
 
-          {isIndividualResult && (
+          {isRollRegRequired && (
             <>
               <FormField
                 control={form.control}
@@ -175,7 +164,7 @@ export function ExamForm({ form, onSubmit, isSubmitting, captchaImage, isFetchin
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>রোল নম্বর</FormLabel>
-                    <FormControl><Input placeholder="যেমন: 123456" {...field} /></FormControl>
+                    <FormControl><Input placeholder="যেমন: 123456" {...field} value={field.value || ''} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -186,7 +175,7 @@ export function ExamForm({ form, onSubmit, isSubmitting, captchaImage, isFetchin
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>রেজিস্ট্রেশন নম্বর</FormLabel>
-                    <FormControl><Input placeholder="যেমন: 1234567890" {...field} /></FormControl>
+                    <FormControl><Input placeholder="যেমন: 1234567890" {...field} value={field.value || ''} /></FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
