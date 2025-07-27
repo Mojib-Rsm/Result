@@ -76,139 +76,7 @@ export async function getCaptchaAction(): Promise<CaptchaChallenge> {
 export async function searchResultAction(
   values: z.infer<typeof formSchema> & { cookies: string }
 ): Promise<ExamResult> {
-  
-  const yearNumber = parseInt(values.year, 10);
-  const is2025Ctg = yearNumber === 2025 && values.board === 'chittagong';
-
-  if (is2025Ctg) {
-      return searchResult2025Ctg(values);
-  }
-
   return searchResultLegacy(values);
-}
-
-// Handler for 2025 Chittagong Board API
-async function searchResult2025Ctg(values: z.infer<typeof formSchema>): Promise<ExamResult> {
-    try {
-        const res = await fetch("https://sresult.bise-ctg.gov.bd/rxto2025/individual/result.php", {
-            "headers": {
-                "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-                "content-type": "application/x-www-form-urlencoded",
-                "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
-                "Referer": "https://sresult.bise-ctg.gov.bd/rxto2025/individual/",
-            },
-            "body": `roll=${values.roll}&button2=`,
-            "method": "POST"
-        });
-
-        if (!res.ok) {
-            throw new Error(`Result server responded with status: ${res.status}`);
-        }
-
-        const html = await res.text();
-        const root = parse(html);
-
-        const infoTable = root.querySelector('.tftable');
-        if (!infoTable) {
-             const messageNode = root.querySelector('h2');
-             const message = messageNode ? messageNode.innerText.trim().toLowerCase() : "";
-             
-             if (message.includes('result not found') || message.includes('board of intermediate')) {
-                 throw new Error("Result not found. Please check your roll number and try again.");
-             }
-             
-             const defaultMessage = "Could not parse result page. The result format might have changed.";
-             throw new Error(message ? messageNode.innerText.trim() : defaultMessage);
-        }
-        
-        const infoData: Record<string, string> = {};
-        const infoRows = infoTable.querySelectorAll('tr');
-        
-        const extractData = (label: string) => {
-            const row = infoRows.find(r => r.innerText.toLowerCase().includes(label.toLowerCase()));
-            if (!row) return '';
-            const cells = row.querySelectorAll('td');
-            // This handles rows with 2 or 4 cells
-            for (let i = 0; i < cells.length; i += 2) {
-                if (cells[i]?.innerText.trim().toLowerCase() === label.toLowerCase()) {
-                    return cells[i + 1]?.innerText.trim() || '';
-                }
-            }
-            return '';
-        };
-
-        infoData['Roll No'] = extractData('roll no');
-        infoData['Name'] = extractData('name');
-        infoData["Father's Name"] = extractData("father's name");
-        infoData["Mother's Name"] = extractData("mother's name");
-        infoData['Group'] = extractData('group');
-        infoData['Reg. NO'] = extractData('reg. no');
-        infoData['Board'] = extractData('board');
-        infoData['Institute'] = extractData('institute');
-        infoData['Result'] = extractData('result');
-        infoData['DATE OF BIRTH'] = extractData('date of birth');
-        infoData['Session'] = extractData('session');
-
-
-        const gpaText = infoData['Result']?.split('=')[1] || '0';
-        const gpa = parseFloat(gpaText);
-
-        const gradesTable = root.querySelector('.tftable2');
-        const gradeRows = gradesTable?.querySelectorAll('tr') || [];
-        const grades: GradeInfo[] = [];
-
-        for (let i = 1; i < gradeRows.length; i++) { // Skip header row
-            const cells = gradeRows[i].querySelectorAll('td');
-            if (cells.length === 3) {
-                 const subject = cells[1].innerText.trim();
-                 if (subject.toLowerCase().includes('result of ca')) continue;
-
-                 const gradeText = cells[2].innerText.trim();
-                 const gradeMatch = gradeText.match(/\((.*?)\)/);
-                 const marksMatch = gradeText.match(/^(\d+)/);
-
-                 const grade = gradeMatch ? gradeMatch[1].trim() : gradeText;
-                 const marks = marksMatch ? marksMatch[1].trim() : '';
-
-                grades.push({
-                    code: cells[0].innerText.trim(),
-                    subject: subject,
-                    grade: grade,
-                    marks: marks,
-                });
-            }
-        }
-        
-        const result: ExamResult = {
-            roll: infoData['Roll No'] || '',
-            reg: infoData['Reg. NO'] || '',
-            board: infoData['Board'] || '',
-            year: values.year,
-            exam: values.exam.toUpperCase(),
-            gpa: gpa,
-            status: gpa > 0 ? 'Pass' : 'Fail',
-            
-            studentInfo: {
-                name: infoData['Name'] || '',
-                fatherName: infoData["Father's Name"] || '',
-                motherName: infoData["Mother's Name"] || '',
-                group: infoData['Group'] || '',
-                dob: infoData['DATE OF BIRTH'] || '',
-                institute: infoData['Institute'] || '',
-                session: infoData['Session'] || '',
-            },
-            grades: grades.filter(g => g.subject && g.code),
-        };
-
-        return result;
-
-    } catch (error) {
-        console.error("2025 Result fetch failed:", error);
-        if (error instanceof Error) {
-             throw new Error(error.message);
-        }
-        throw new Error('An unknown error occurred while fetching the 2025 result.');
-    }
 }
 
 
@@ -228,6 +96,7 @@ async function searchResultLegacy(
         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
         "X-Requested-With": "XMLHttpRequest",
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
+        "Origin": "https://eboardresults.com",
         "Referer": "https://eboardresults.com/v2/home",
         "Cookie": values.cookies,
       },
@@ -237,12 +106,12 @@ async function searchResultLegacy(
     if (!res.ok) {
       throw new Error(`Result server responded with status: ${res.status}`);
     }
-
-    const text = await res.text();
+    
     let data;
     try {
-        data = JSON.parse(text);
+        data = await res.json();
     } catch (e) {
+        const text = await res.text();
         console.error("Failed to parse JSON:", text);
         throw new Error("The result server returned an invalid response. Please try again later.");
     }

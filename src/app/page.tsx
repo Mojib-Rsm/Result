@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 
 import { searchResultAction, getCaptchaAction } from '@/lib/actions';
-import { ExamForm, formSchema, formSchemaWithoutReg, formSchema2025 } from '@/components/exam-form';
+import { ExamForm, formSchema } from '@/components/exam-form';
 import ResultsDisplay from '@/components/results-display';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -33,23 +33,9 @@ export default function Home() {
   const [isFetchingCaptcha, setIsFetchingCaptcha] = useState(true);
   
   const { addHistoryItem } = useHistory();
-  const [isRegRequired, setIsRegRequired] = useState(true);
-  const [isCaptchaRequired, setIsCaptchaRequired] = useState(true);
 
   const form = useForm<z.infer<typeof formSchema>>({
-    resolver: (data, context, options) => {
-        let schema;
-        const is2025Ctg = data.year === '2025' && data.board === 'chittagong';
-
-        if (is2025Ctg) {
-          schema = formSchema2025;
-        } else if (isRegRequired) {
-          schema = formSchema;
-        } else {
-          schema = formSchemaWithoutReg;
-        }
-        return zodResolver(schema)(data, context, options);
-    },
+    resolver: zodResolver(formSchema),
     defaultValues: {
       roll: '',
       reg: '',
@@ -82,36 +68,8 @@ export default function Home() {
   }, [form]);
 
   useEffect(() => {
-    if (isCaptchaRequired) {
-      fetchNewCaptcha();
-    } else {
-      setCaptchaChallenge(null);
-      setIsFetchingCaptcha(false);
-    }
-  }, [isCaptchaRequired, fetchNewCaptcha]);
-
-
-  const selectedYear = form.watch('year');
-  const selectedBoard = form.watch('board');
-
-  useEffect(() => {
-    const yearNumber = parseInt(selectedYear, 10);
-    const is2025Ctg = yearNumber === 2025 && selectedBoard === 'chittagong';
-
-    const newIsCaptchaRequired = !is2025Ctg;
-    
-    setIsRegRequired(!is2025Ctg);
-
-    if (newIsCaptchaRequired !== isCaptchaRequired) {
-      setIsCaptchaRequired(newIsCaptchaRequired);
-    }
-
-    if (is2025Ctg) {
-      form.setValue('reg', '');
-      form.setValue('captcha', '');
-    }
-
-  }, [selectedYear, selectedBoard, form, isCaptchaRequired]);
+    fetchNewCaptcha();
+  }, [fetchNewCaptcha]);
 
 
   const handleSearch = async (values: z.infer<typeof formSchema>) => {
@@ -120,7 +78,7 @@ export default function Home() {
     setState({ isLoading: true, error: null, result: null });
     
     try {
-      if (isCaptchaRequired && !captchaChallenge) {
+      if (!captchaChallenge) {
         throw new Error("Security code not loaded. Please wait or refresh.");
       }
       
@@ -143,7 +101,7 @@ export default function Home() {
         result: null,
       });
       
-      if (isCaptchaRequired && (errorMessage.toLowerCase().includes('security key') || errorMessage.toLowerCase().includes('captcha'))) {
+      if (errorMessage.toLowerCase().includes('security key') || errorMessage.toLowerCase().includes('captcha')) {
          fetchNewCaptcha();
       }
     }
@@ -163,7 +121,7 @@ export default function Home() {
       error: null,
       result: null,
     });
-    if(isCaptchaRequired) fetchNewCaptcha();
+    fetchNewCaptcha();
   };
   
   return (
@@ -193,8 +151,8 @@ export default function Home() {
               form={form} 
               onSubmit={handleSearch} 
               isSubmitting={state.isLoading}
-              isRegRequired={isRegRequired}
-              isCaptchaRequired={isCaptchaRequired}
+              isRegRequired={true}
+              isCaptchaRequired={true}
               captchaImage={captchaChallenge?.image}
               isFetchingCaptcha={isFetchingCaptcha}
               onRefreshCaptcha={fetchNewCaptcha}

@@ -20,11 +20,6 @@ export const formSchema = z.object({
   captcha: z.string().min(1, 'সিক্রেট কোড আবশ্যক।'),
 });
 
-export const formSchemaWithoutReg = formSchema.omit({ reg: true });
-
-export const formSchema2025 = formSchema.omit({ reg: true, captcha: true });
-
-
 const boards = [
     { value: 'barisal', label: 'বরিশাল' },
     { value: 'chittagong', label: 'চট্টগ্রাম' },
