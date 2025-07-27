@@ -86,7 +86,7 @@ async function searchResultLegacy(
 ): Promise<ExamResult> {
   const apiUrl = "https://eboardresults.com/v2/getres";
 
-  const body = `exam=${values.exam}&year=${values.year}&board=${values.board}&roll=${values.roll}&reg=${values.reg}&captcha=${values.captcha}&result_type=1&eiin=&dcode=&ccode=`;
+  const body = `exam=${values.exam}&year=${values.year}&board=${values.board}&roll=${values.roll || ''}&reg=${values.reg || ''}&captcha=${values.captcha}&result_type=${values.result_type}&eiin=&dcode=&ccode=`;
 
   try {
     const res = await fetch(apiUrl, {
@@ -109,16 +109,31 @@ async function searchResultLegacy(
     
     let data;
     try {
-        data = await res.json();
-    } catch (e) {
         const text = await res.text();
-        console.error("Failed to parse JSON:", text);
-        throw new Error("The result server returned an invalid response. Please try again later.");
+        // Check for non-JSON error messages from the server
+        if (text.trim().startsWith('<') || !text.trim().startsWith('{')) {
+            const root = parse(text);
+            const errorMessage = root.querySelector('.alert-danger')?.innerText.trim();
+            if (errorMessage) {
+                if (errorMessage.toLowerCase().includes('captcha') || errorMessage.toLowerCase().includes('security key')) {
+                    throw new Error('The Security Key is incorrect. Please try again.');
+                }
+                throw new Error(errorMessage);
+            }
+            throw new Error("The result server returned an invalid response.");
+        }
+        data = JSON.parse(text);
+    } catch (e) {
+        if (e instanceof Error) {
+            throw e; // re-throw errors from the try block
+        }
+        console.error("Failed to parse JSON:", e);
+        throw new Error("The result server returned an unreadable response. Please try again later.");
     }
     
     if (data.status === '1' && data.data) {
         const apiResult = data.data;
-        const subjectDetails: Record<string, string> = data.sub_details.reduce((acc: Record<string, string>, sub: {SUB_CODE: string, SUB_NAME: string}) => {
+        const subjectDetails: Record<string, string> = (data.sub_details || []).reduce((acc: Record<string, string>, sub: {SUB_CODE: string, SUB_NAME: string}) => {
             acc[sub.SUB_CODE] = sub.SUB_NAME;
             return acc;
         }, {});
@@ -131,7 +146,7 @@ async function searchResultLegacy(
             '136+137': 'ENGLISH-I AND ENGLISH-II',
         };
 
-        let rawGrades: GradeInfo[] = apiResult.gpa_details.split(',').map((item: string) => {
+        let rawGrades: GradeInfo[] = (apiResult.gpa_details || '').split(',').filter(Boolean).map((item: string) => {
             const [code, grade] = item.split(':').map((s: string) => s.trim());
             return {
                 code,
@@ -140,7 +155,7 @@ async function searchResultLegacy(
             };
         });
 
-        if (values.board === 'madrasah') {
+        if (values.board === 'madrasah' && rawGrades.length > 0) {
             const finalGrades: GradeInfo[] = [];
             const processedCodes = new Set<string>();
 
@@ -199,6 +214,8 @@ async function searchResultLegacy(
                 session: apiResult.session || '',
             },
             grades: rawGrades,
+            // Handle non-individual results which might be pure HTML
+            rawHtml: data.html || undefined,
         };
 
         return result;

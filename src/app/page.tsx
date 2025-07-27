@@ -42,6 +42,7 @@ export default function Home() {
       board: 'chittagong',
       year: new Date().getFullYear().toString(),
       exam: 'ssc',
+      result_type: '1',
       captcha: '',
     },
   });
@@ -87,8 +88,10 @@ export default function Home() {
         cookies: captchaChallenge?.cookies || '',
       });
       
-      const historyEntry: Omit<HistoryItem, 'timestamp'> = { ...values, result: examResult };
-      addHistoryItem(historyEntry); 
+      if (values.result_type === '1') {
+        const historyEntry: Omit<HistoryItem, 'timestamp'> = { ...values, result: examResult };
+        addHistoryItem(historyEntry);
+      }
 
       setState({ result: examResult, isLoading: false, error: null });
 
@@ -114,6 +117,7 @@ export default function Home() {
       board: 'chittagong',
       year: new Date().getFullYear().toString(),
       exam: 'ssc',
+      result_type: '1',
       captcha: ''
     });
     setState({
@@ -151,7 +155,7 @@ export default function Home() {
               form={form} 
               onSubmit={handleSearch} 
               isSubmitting={state.isLoading}
-              isRegRequired={true}
+              isRegRequired={true} // This is now controlled inside the component
               isCaptchaRequired={true}
               captchaImage={captchaChallenge?.image}
               isFetchingCaptcha={isFetchingCaptcha}

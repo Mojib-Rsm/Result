@@ -10,13 +10,15 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Loader2, RefreshCw } from 'lucide-react';
 import { Skeleton } from './ui/skeleton';
+import { useEffect } from 'react';
 
 export const formSchema = z.object({
-  roll: z.string().min(6, 'রোল নম্বর কমপক্ষে ৬ সংখ্যার হতে হবে।').regex(/^\d+$/, 'রোল নম্বর অবশ্যই একটি সংখ্যা হতে হবে।'),
-  reg: z.string().min(1, 'রেজিস্ট্রেশন নম্বর আবশ্যক।').regex(/^\d+$/, 'রেজিস্ট্রেশন নম্বর অবশ্যই একটি সংখ্যা হতে হবে।'),
+  roll: z.string().min(1, 'রোল নম্বর আবশ্যক।').regex(/^\d+$/, 'রোল নম্বর অবশ্যই একটি সংখ্যা হতে হবে।').optional(),
+  reg: z.string().min(1, 'রেজিস্ট্রেশন নম্বর আবশ্যক।').regex(/^\d+$/, 'রেজিস্ট্রেশন নম্বর অবশ্যই একটি সংখ্যা হতে হবে।').optional(),
   board: z.string(),
   year: z.string(),
   exam: z.string(),
+  result_type: z.string(),
   captcha: z.string().min(1, 'সিক্রেট কোড আবশ্যক।'),
 });
 
@@ -50,6 +52,17 @@ const exams = [
     { value: 'hsc_dba', label: 'ডিপ্লোমা ইন বিজনেস স্টাডিজ'},
 ];
 
+const resultTypes = [
+    { value: '1', label: 'ব্যক্তিগত / বিস্তারিত ফলাফল' },
+    { value: '2', label: 'প্রতিষ্ঠানের ফলাফল' },
+    { value: '3', label: 'কেন্দ্রের ফলাফল' },
+    { value: '4', label: 'জেলা ভিত্তিক ফলাফল' },
+    { value: '5', label: 'প্রতিষ্ঠান বিশ্লেষণ' },
+    { value: '6', label: 'বোর্ড বিশ্লেষণ' },
+    { value: '7', label: 'ব্যক্তিগত / বিস্তারিত পুনঃনিরীক্ষণ ফলাফল' },
+];
+
+
 interface ExamFormProps {
   form: ReturnType<typeof useForm<z.infer<typeof formSchema>>>;
   onSubmit: (values: z.infer<typeof formSchema>) => void;
@@ -61,7 +74,21 @@ interface ExamFormProps {
   onRefreshCaptcha: () => void;
 }
 
-export function ExamForm({ form, onSubmit, isSubmitting, isRegRequired, isCaptchaRequired, captchaImage, isFetchingCaptcha, onRefreshCaptcha }: ExamFormProps) {
+export function ExamForm({ form, onSubmit, isSubmitting, captchaImage, isFetchingCaptcha, onRefreshCaptcha }: ExamFormProps) {
+  const resultType = form.watch('result_type');
+  const isIndividualResult = resultType === '1';
+
+   useEffect(() => {
+    if (!isIndividualResult) {
+      form.setValue('roll', '000000'); // Provide a dummy value
+      form.setValue('reg', '0000000000');
+    } else {
+       if (form.getValues('roll') === '000000') form.setValue('roll', '');
+       if (form.getValues('reg') === '0000000000') form.setValue('reg', '');
+    }
+  }, [isIndividualResult, form]);
+
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
@@ -120,33 +147,53 @@ export function ExamForm({ form, onSubmit, isSubmitting, isRegRequired, isCaptch
               </FormItem>
             )}
           />
-           <FormField
-            control={form.control}
-            name="roll"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>রোল নম্বর</FormLabel>
-                <FormControl><Input placeholder="যেমন: 123456" {...field} /></FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
 
-          {isRegRequired && (
-            <FormField
+          <FormField
               control={form.control}
-              name="reg"
+              name="result_type"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>রেজিস্ট্রেশন নম্বর</FormLabel>
-                  <FormControl><Input placeholder="যেমন: 1234567890" {...field} /></FormControl>
+                  <FormLabel>ফলাফলের ধরন</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger><SelectValue placeholder="ফলাফলের ধরন নির্বাচন করুন" /></SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {resultTypes.map(rt => <SelectItem key={rt.value} value={rt.value}>{rt.label}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
             />
+
+          {isIndividualResult && (
+            <>
+              <FormField
+                control={form.control}
+                name="roll"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>রোল নম্বর</FormLabel>
+                    <FormControl><Input placeholder="যেমন: 123456" {...field} /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="reg"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>রেজিস্ট্রেশন নম্বর</FormLabel>
+                    <FormControl><Input placeholder="যেমন: 1234567890" {...field} /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </>
           )}
 
-          {isCaptchaRequired && (
             <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
               <div className='flex flex-col gap-2'>
                 <div className='flex items-center gap-2'>
@@ -196,7 +243,6 @@ export function ExamForm({ form, onSubmit, isSubmitting, isRegRequired, isCaptch
                 )}
               />
             </div>
-          )}
         </div>
         <div className="flex justify-end pt-4">
           <Button type="submit" disabled={isSubmitting || isFetchingCaptcha} className="w-full md:w-auto">

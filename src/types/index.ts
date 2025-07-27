@@ -25,6 +25,7 @@ export interface ExamResult {
   status: 'Pass' | 'Fail';
   studentInfo: StudentInfo;
   grades: GradeInfo[];
+  rawHtml?: string;
 }
 
 
@@ -34,6 +35,7 @@ export interface HistoryItem {
     board: string;
     year: string;
     exam: string;
+    result_type: string;
     result: ExamResult;
     timestamp: number;
 }
