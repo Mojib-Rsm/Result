@@ -218,17 +218,7 @@ async function searchResultLegacy(
 ): Promise<ExamResult> {
   const apiUrl = "https://eboardresults.com/v2/getres";
 
-  const params = new URLSearchParams();
-  params.append('exam', values.exam);
-  params.append('year', values.year);
-  params.append('board', values.board);
-  params.append('roll', values.roll);
-  params.append('reg', values.reg);
-  params.append('captcha', values.captcha);
-  params.append('result_type', '1');
-  params.append('eiin', '');
-  params.append('dcode', '');
-  params.append('ccode', '');
+  const body = `exam=${values.exam}&year=${values.year}&board=${values.board}&roll=${values.roll}&reg=${values.reg}&captcha=${values.captcha}&result_type=1&eiin=&dcode=&ccode=`;
 
   try {
     const res = await fetch(apiUrl, {
@@ -241,14 +231,21 @@ async function searchResultLegacy(
         "Referer": "https://eboardresults.com/v2/home",
         "Cookie": values.cookies,
       },
-      body: params.toString(),
+      body: body,
     });
 
     if (!res.ok) {
       throw new Error(`Result server responded with status: ${res.status}`);
     }
 
-    const data = await res.json();
+    const text = await res.text();
+    let data;
+    try {
+        data = JSON.parse(text);
+    } catch (e) {
+        console.error("Failed to parse JSON:", text);
+        throw new Error("The result server returned an invalid response. Please try again later.");
+    }
     
     if (data.status === '1' && data.data) {
         const apiResult = data.data;
