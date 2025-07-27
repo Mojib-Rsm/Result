@@ -19,6 +19,8 @@ export async function getCaptchaAction(): Promise<CaptchaChallenge> {
     const homeRes = await fetch('https://eboardresults.com/v2/home', {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36',
+        "Referer": "https://eboardresults.com/v2/home",
+        "Accept": "application/json, text/javascript, */*; q=0.01",
       },
     });
 
@@ -167,14 +169,16 @@ async function searchResultLegacy(
             };
         });
 
+        const gpa = parseFloat(apiResult.gpa) || 0;
+
         const result: ExamResult = {
             roll: apiResult.roll,
             reg: values.reg || apiResult.reg_no || 'N/A', // Use registration from input, fallback to API or N/A
             board: apiResult.board,
             year: apiResult.year,
             exam: apiResult.exam,
-            gpa: parseFloat(apiResult.gpa) || 0,
-            status: parseFloat(apiResult.gpa) > 0 ? 'Pass' : 'Fail',
+            gpa: gpa,
+            status: gpa > 0 ? 'Pass' : 'Fail',
             studentInfo: {
                 name: apiResult.name,
                 fatherName: apiResult.fname,
