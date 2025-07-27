@@ -13,14 +13,26 @@ export type CaptchaChallenge = {
   text: string; // AI-read text from captcha
 };
 
+const commonHeaders = {
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36',
+    'Referer': 'https://eboardresults.com/v2/home',
+    'sec-ch-ua': '"Not)A;Brand";v="8", "Chromium";v="138", "Google Chrome";v="138"',
+    'sec-ch-ua-mobile': '?0',
+    'sec-ch-ua-platform': '"Windows"',
+    'sec-fetch-dest': 'empty',
+    'sec-fetch-mode': 'cors',
+    'sec-fetch-site': 'same-origin',
+    'accept-language': 'en-GB,en-US;q=0.9,en;q=0.8,ne;q=0.7',
+};
+
+
 // Action 1: Fetch the initial page and the captcha image
 export async function getCaptchaAction(): Promise<CaptchaChallenge> {
   try {
     const homeRes = await fetch('https://eboardresults.com/v2/home', {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36',
-        "Referer": "https://eboardresults.com/v2/home",
-        "Accept": "application/json, text/javascript, */*; q=0.01",
+        ...commonHeaders,
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
       },
     });
 
@@ -33,8 +45,8 @@ export async function getCaptchaAction(): Promise<CaptchaChallenge> {
     // Now fetch the captcha image using the session cookie
     const captchaRes = await fetch(`https://eboardresults.com/v2/captcha?t=${Date.now()}`, {
         headers: {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
-            "Referer": "https://eboardresults.com/v2/home",
+            ...commonHeaders,
+            "Accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
             "Cookie": cookies,
         }
     });
@@ -94,12 +106,11 @@ async function searchResultLegacy(
     const res = await fetch(apiUrl, {
       method: 'POST',
       headers: {
+        ...commonHeaders,
         "Accept": "application/json, text/javascript, */*; q=0.01",
         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
         "X-Requested-With": "XMLHttpRequest",
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/138.0.0.0 Safari/537.36",
         "Origin": "https://eboardresults.com",
-        "Referer": "https://eboardresults.com/v2/home",
         "Cookie": values.cookies,
       },
       body: body,
