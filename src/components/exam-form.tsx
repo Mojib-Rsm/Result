@@ -20,6 +20,8 @@ export const formSchema = z.object({
   result_type: z.string().min(1, 'ফলাফলের ধরন আবশ্যক।'),
   captcha: z.string().min(1, 'সিক্রেট কোড আবশ্যক।'),
   eiin: z.string().regex(/^\d*$/, 'EIIN অবশ্যই একটি সংখ্যা হতে হবে।').optional(),
+  dcode: z.string().optional(),
+  ccode: z.string().optional(),
 }).refine(data => {
     if ((data.result_type === '1' || data.result_type === '7') && (!data.roll || data.roll.length === 0)) {
         return false;
@@ -44,6 +46,22 @@ export const formSchema = z.object({
 }, {
     message: 'EIIN নম্বর আবশ্যক।',
     path: ['eiin'],
+}).refine(data => {
+    if ((data.result_type === '4' || data.result_type === '5') && (!data.dcode || data.dcode.length === 0)) {
+        return false;
+    }
+    return true;
+}, {
+    message: 'জেলার নাম আবশ্যক।',
+    path: ['dcode'],
+}).refine(data => {
+    if ((data.result_type === '4') && (!data.ccode || data.ccode.length === 0)) {
+        return false;
+    }
+    return true;
+}, {
+    message: 'কেন্দ্রের নাম আবশ্যক।',
+    path: ['ccode'],
 });
 
 
@@ -103,6 +121,8 @@ export function ExamForm({ form, onSubmit, isSubmitting, captchaImage, isFetchin
   const resultType = form.watch('result_type');
   const isRollRegRequired = resultType === '1' || resultType === '7';
   const isEiinRequired = resultType === '2' || resultType === '6';
+  const isDistrictRequired = resultType === '4' || resultType === '5';
+  const isCenterRequired = resultType === '4';
   
   return (
     <Form {...form}>
@@ -222,6 +242,34 @@ export function ExamForm({ form, onSubmit, isSubmitting, captchaImage, isFetchin
                 )}
               />
           )}
+
+          {isDistrictRequired && (
+               <FormField
+                control={form.control}
+                name="dcode"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>জেলার নাম</FormLabel>
+                     <FormControl><Input placeholder="জেলার কোড লিখুন" {...field} value={field.value || ''} /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+          )}
+           
+           {isCenterRequired && (
+              <FormField
+                control={form.control}
+                name="ccode"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>কেন্দ্রের নাম</FormLabel>
+                    <FormControl><Input placeholder="কেন্দ্রের কোড লিখুন" {...field} value={field.value || ''} /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+           )}
 
 
             <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 items-end">

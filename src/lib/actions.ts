@@ -100,7 +100,7 @@ async function searchResultLegacy(
 ): Promise<ExamResult> {
   const apiUrl = "https://eboardresults.com/v2/getres";
 
-  const body = `exam=${values.exam}&year=${values.year}&board=${values.board}&roll=${values.roll || ''}&reg=${values.reg || ''}&captcha=${values.captcha}&result_type=${values.result_type}&eiin=${values.eiin || ''}&dcode=&ccode=`;
+  const body = `exam=${values.exam}&year=${values.year}&board=${values.board}&roll=${values.roll || ''}&reg=${values.reg || ''}&captcha=${values.captcha}&result_type=${values.result_type}&eiin=${values.eiin || ''}&dcode=${values.dcode || ''}&ccode=${values.ccode || ''}`;
 
   try {
     const res = await fetch(apiUrl, {
@@ -141,7 +141,8 @@ async function searchResultLegacy(
         data = JSON.parse(text);
     } catch (e) {
         if (e instanceof Error) {
-            throw e; // re-throw errors from the try block
+            // Re-throwing the error from the server response parsing
+             throw new Error(e.message);
         }
         console.error("Failed to parse JSON:", e);
         throw new Error("The result server returned an unreadable response. Please try again later.");
@@ -214,7 +215,6 @@ async function searchResultLegacy(
     }
 
   } catch (error) {
-     console.error("Result fetch failed:", error);
      if (error instanceof Error) {
         if (error.message.includes('fetch failed')) {
             throw new Error('A network error occurred. Please check your internet connection and if the result server is accessible.');
