@@ -41,7 +41,7 @@ export const formSchema = z.object({
     message: 'রোল এবং রেজিস্ট্রেশন নম্বর আবশ্যক।',
     path: ['reg'],
 }).refine((data) => {
-    if ((data.result_type === '2' || data.result_type === '6') && !data.eiin) {
+    if ((data.result_type === '2' || data.result_type === '5' || data.result_type === '6') && !data.eiin) {
         return false;
     }
     return true;
@@ -59,12 +59,12 @@ export const formSchema = z.object({
     path: ['dcode']
 })
 .refine(data => {
-    if (data.result_type === '4' && !data.ccode) {
+    if (data.result_type === '3' && !data.ccode) {
         return false;
     }
     return true;
 }, {
-    message: 'কেন্দ্রের নাম আবশ্যক।',
+    message: 'কেন্দ্রের কোড আবশ্যক।',
     path: ['ccode']
 });
 
@@ -402,3 +402,4 @@ export function ExamForm({ form, onSubmit, isSubmitting }: ExamFormProps) {
     
 
     
+
