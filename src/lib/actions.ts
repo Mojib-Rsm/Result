@@ -40,7 +40,7 @@ async function getCaptchaAction() {
 
     } catch (error) {
         console.error("Captcha fetch failed", error);
-        throw new Error("Could not load captcha. Please check your internet connection.");
+        throw new Error("ক্যাপচা লোড করা যায়নি। অনুগ্রহ করে আপনার ইন্টারনেট সংযোগ পরীক্ষা করুন।");
     }
 }
 
@@ -73,7 +73,7 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
     });
 
     if (!response.ok) {
-        throw new Error('Network response was not ok');
+        throw new Error('নেটওয়ার্ক প্রতিক্রিয়া ঠিক ছিল না।');
     }
 
     const data = await response.json();
@@ -124,17 +124,20 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
                 if (parts.length < 2) return null;
                 
                 const code = parts[0].trim();
-                let grade = parts[1].trim();
+                let gradeInfo = parts.slice(1).join(':').trim();
+                let grade;
                 let marks;
 
-                if (grade.includes('=')) {
-                    const gradeParts = grade.split('=');
+                if (gradeInfo.includes('=')) {
+                    const gradeParts = gradeInfo.split('=');
                     marks = gradeParts[0];
                     grade = gradeParts[1];
+                } else {
+                    grade = gradeInfo;
                 }
 
                 const subDetail = data.sub_details?.find((s: any) => s.SUB_CODE === code);
-                const subject = subDetail ? subDetail.SUB_NAME : "Loading...";
+                const subject = subDetail ? subDetail.SUB_NAME : "বিষয় লোড হচ্ছে...";
 
                 return { code, subject, grade, marks };
              }).filter((g): g is GradeInfo => g !== null);
@@ -163,10 +166,13 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
         };
     } else { // Error from API
          if(data.message && data.message.toLowerCase().includes("not found")) {
-             throw new Error("Result not found. Please check your roll, registration, board, and year and try again.");
+             throw new Error("ফলাফল খুঁজে পাওয়া যায়নি। অনুগ্রহ করে আপনার রোল, রেজিস্ট্রেশন, বোর্ড এবং বছর পরীক্ষা করে আবার চেষ্টা করুন।");
+        }
+        if(data.message && (data.message.toLowerCase().includes("captcha") || data.message.toLowerCase().includes("security key"))) {
+            throw new Error("ভুল ক্যাপচা বা নিরাপত্তা কোড। অনুগ্রহ করে আবার চেষ্টা করুন।");
         }
         // For any other error, throw the message from the API
-        throw new Error(data.message || 'An unknown error occurred while fetching the result.');
+        throw new Error(data.message || 'ফলাফল আনার সময় একটি অজানা ত্রুটি ঘটেছে।');
     }
 
   } catch (error) {
@@ -174,7 +180,7 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
     if (error instanceof Error) {
         throw error;
     }
-    throw new Error('An unknown error occurred. Please try again later.');
+    throw new Error('একটি অজানা ত্রুটি ঘটেছে। অনুগ্রহ করে পরে আবার চেষ্টা করুন।');
   }
 }
 
