@@ -178,6 +178,9 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
   } catch (error) {
     console.error("Error in searchResultLegacy:", error);
     if (error instanceof Error) {
+        if (error.message.toLowerCase().includes("captcha") || error.message.toLowerCase().includes("security key")) {
+            throw new Error("ভুল ক্যাপচা বা নিরাপত্তা কোড। অনুগ্রহ করে আবার চেষ্টা করুন।");
+        }
         throw error;
     }
     throw new Error('একটি অজানা ত্রুটি ঘটেছে। অনুগ্রহ করে পরে আবার চেষ্টা করুন বা ভুল ক্যাপচা!');

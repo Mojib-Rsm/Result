@@ -118,9 +118,9 @@ interface ExamFormProps {
 export function ExamForm({ form, onSubmit, isSubmitting }: ExamFormProps) {
   const resultType = form.watch('result_type');
   const isRollRegRequired = resultType === '1';
-  const isEiinRequired = resultType === '2' || resultType === '6';
-  const isDistrictRequired = resultType === '4' || resultType === '5';
-  const isCenterRequired = resultType === '4';
+  const isEiinRequired = resultType === '2' || resultType === '5' || resultType === '6';
+  const isDistrictRequired = resultType === '4';
+  const isCenterRequired = resultType === '3' || resultType === '4';
 
   const [captchaImage, setCaptchaImage] = useState<string | null>(null);
   const [isCaptchaLoading, setIsCaptchaLoading] = useState(false);
@@ -335,7 +335,7 @@ export function ExamForm({ form, onSubmit, isSubmitting }: ExamFormProps) {
                 name="ccode"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>কেন্দ্রের নাম</FormLabel>
+                    <FormLabel>কেন্দ্রের কোড</FormLabel>
                     <FormControl><Input placeholder="কেন্দ্রের কোড লিখুন" {...field} value={field.value || ''} /></FormControl>
                     <FormDescription>This is a demo. This field is not functional.</FormDescription>
                     <FormMessage />
