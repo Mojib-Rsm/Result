@@ -26,6 +26,7 @@ export interface ExamResult {
   studentInfo: StudentInfo;
   grades: GradeInfo[];
   rawHtml?: string;
+  pdfName?: string;
 }
 
 

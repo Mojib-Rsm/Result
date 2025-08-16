@@ -104,6 +104,7 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
                 },
                 grades: [],
                 rawHtml: data.extra.content,
+                pdfName: data.extra.pdfname
             };
         }
 

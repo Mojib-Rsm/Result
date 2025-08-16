@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Download, Loader2, Search } from 'lucide-react';
+import { Download, Loader2, Search, FileDown } from 'lucide-react';
 import type { ExamResult } from '@/types';
 import { Separator } from './ui/separator';
 import { cn } from '@/lib/utils';
@@ -132,23 +132,36 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
 
   const isIndividualResult = !result.rawHtml;
 
+  const downloadUrl = result.pdfName ? `https://www.eboardresults.com/v2/pdf_get/${result.pdfName}` : '#';
+
   return (
     <div className={containerClasses}>
        <div className={cn("flex justify-end gap-2", !isDialog && "no-print")}>
           {!isDialog && onReset && (
-              <Button variant="outline" onClick={onReset} disabled={isDownloading} size="icon">
-                  <Search className="h-4 w-4" />
-                  <span className="sr-only">আবার খুঁজুন</span>
+              <Button variant="outline" onClick={onReset} disabled={isDownloading} size={isIndividualResult ? "icon" : "default"}>
+                  <Search className={cn(isIndividualResult ? "h-4 w-4" : "mr-2 h-4 w-4")} />
+                  {isIndividualResult ? <span className="sr-only">আবার খুঁজুন</span> : 'অন্য ফলাফল খুঁজুন'}
               </Button>
           )}
-          <Button onClick={handleDownloadPdf} disabled={isDownloading}>
-              {isDownloading ? (
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              ) : (
-                <Download className="mr-2 h-4 w-4" />
-              )}
-              ডাউনলোড পিডিএফ
-          </Button>
+
+          {isIndividualResult ? (
+            <Button onClick={handleDownloadPdf} disabled={isDownloading}>
+                {isDownloading ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <Download className="mr-2 h-4 w-4" />
+                )}
+                ডাউনলোড পিডিএফ
+            </Button>
+          ) : (
+            <Button asChild>
+                <a href={downloadUrl} target="_blank" rel="noopener noreferrer" download>
+                    <FileDown className="mr-2 h-4 w-4" />
+                    সম্পূর্ণ ফলাফল ডাউনলোড করুন
+                </a>
+            </Button>
+          )}
+
       </div>
 
       <div id="pdf-container">
@@ -231,7 +244,7 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
         </Card>
       </div>
       
-      {!isDialog && (
+      {!isDialog && isIndividualResult && (
          <CardFooter className="flex justify-end gap-2 no-print">
             {onReset && (
                 <Button variant="outline" onClick={onReset} disabled={isDownloading}>
