@@ -1,7 +1,7 @@
 
 'use server';
 
-import type { ExamResult, HistoryItem } from '@/types';
+import type { ExamResult, GradeInfo } from '@/types';
 import { z } from 'zod';
 import { formSchema } from '@/components/exam-form';
 import { JSDOM } from 'jsdom';
@@ -81,7 +81,7 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
     if (data.status === "0" || data.status === 0) { // Success
         const apiResult = data.res;
 
-        if(result_type !== '1' && result_type !== '7' && apiResult.content) {
+        if(result_type !== '1' && apiResult.content) {
             const dom = new JSDOM(apiResult.content);
             const titleElement = dom.window.document.querySelector('h3');
             const title = titleElement ? titleElement.textContent : 'Result';
@@ -111,36 +111,26 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
         const gpa = parseFloat(apiResult.gpa) || 0;
         const status = gpa > 0 ? 'Pass' : 'Fail';
         
-        const grades = (apiResult.gpa_details || '').split(',').map((g: string) => {
-            const parts = g.split(':');
-            if (parts.length < 2) return null;
-            
-            const code = parts[0].trim();
-            const gradeDetails = parts.slice(1).join(':').trim();
-            
-            let grade: string;
-            let marks: string | undefined;
+        let grades: GradeInfo[] = [];
 
-            const gradeParts = gradeDetails.split('=');
-            if (gradeParts.length > 1) { // Format is "MARKS=GRADE"
-                marks = gradeParts[0].trim();
-                grade = gradeParts[1].trim();
-            } else { // Format is just "GRADE"
-                grade = gradeDetails;
-            }
-
-            const subject = "Loading..."; // Placeholder
-            return { code, subject, grade, marks };
-         }).filter((g): g is { code: string; subject: string; grade: string; marks: string | undefined; } => g !== null);
+        const mainSubjects = apiResult.display_details || '';
+        const optionalSubjects = apiResult.display_details_ca || '';
         
-         // Add subject names from sub_details
-         if (data.sub_details) {
-            grades.forEach((g: any) => {
-                const subDetail = data.sub_details.find((s: any) => s.SUB_CODE === g.code);
-                if (subDetail) {
-                    g.subject = subDetail.SUB_NAME;
-                }
-            });
+        const allSubjectsString = [mainSubjects, optionalSubjects].filter(Boolean).join(',');
+
+        if (allSubjectsString) {
+             grades = allSubjectsString.split(',').map((g: string) => {
+                const parts = g.trim().split(':');
+                if (parts.length < 2) return null;
+                
+                const code = parts[0].trim();
+                const grade = parts[1].trim();
+
+                const subDetail = data.sub_details?.find((s: any) => s.SUB_CODE === code);
+                const subject = subDetail ? subDetail.SUB_NAME : "Loading...";
+
+                return { code, subject, grade };
+             }).filter((g): g is GradeInfo => g !== null);
         }
 
         return {
