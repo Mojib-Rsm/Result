@@ -79,10 +79,9 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
     const data = await response.json();
 
     if (data.status === "0" || data.status === 0) { // Success
-        const apiResult = data.res;
-
-        if(result_type !== '1' && apiResult.content) {
-            const dom = new JSDOM(apiResult.content);
+        
+        if(result_type !== '1' && data.extra && data.extra.content) {
+            const dom = new JSDOM(data.extra.content);
             const titleElement = dom.window.document.querySelector('h3');
             const title = titleElement ? titleElement.textContent : 'Result';
 
@@ -104,10 +103,11 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
                     session: '',
                 },
                 grades: [],
-                rawHtml: apiResult.content,
+                rawHtml: data.extra.content,
             };
         }
 
+        const apiResult = data.res;
         const gpa = parseFloat(apiResult.gpa) || 0;
         const status = apiResult.result === 'P' ? 'Pass' : 'Fail';
         
