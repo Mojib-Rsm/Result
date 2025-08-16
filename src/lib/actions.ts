@@ -6,10 +6,10 @@ import { z } from 'zod';
 import { formSchema } from '@/components/exam-form';
 import { JSDOM } from 'jsdom';
 
-// Store cookies globally
+// Store cookies globally per request scope, not globally for the server instance.
 let cookieJar = '';
 
-async function getCaptchaAction() {
+async function getCaptchaAction(establishSession = false) {
     try {
         const response = await fetch('https://www.eboardresults.com/v2/captcha?t=' + Date.now(), {
             method: 'GET',
@@ -30,7 +30,11 @@ async function getCaptchaAction() {
 
         const newCookies = response.headers.get('set-cookie');
         if (newCookies) {
-            cookieJar = newCookies.split(';')[0];
+            const sessionCookie = newCookies.split(';')[0];
+            if (establishSession) {
+                // Set the cookieJar for the subsequent request in searchResultLegacy
+                cookieJar = sessionCookie;
+            }
         }
 
         const buffer = await response.arrayBuffer();
@@ -46,6 +50,9 @@ async function getCaptchaAction() {
 
 
 async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<ExamResult> {
+  // IMPORTANT: Establish a new session for EVERY request to avoid serving stale PDF downloads.
+  await getCaptchaAction(true);
+    
   const { exam, year, board, result_type, roll, reg, eiin, dcode, ccode, captcha } = values;
 
   const formData = `exam=${exam}&year=${year}&board=${board}&result_type=${result_type}&roll=${roll || ''}&reg=${reg || ''}&eiin=${eiin || ''}&dcode=${dcode || ''}&ccode=${ccode || ''}&captcha=${captcha || ''}`;
