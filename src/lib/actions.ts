@@ -109,7 +109,7 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
         }
 
         const gpa = parseFloat(apiResult.gpa) || 0;
-        const status = gpa > 0 ? 'Pass' : 'Fail';
+        const status = apiResult.result === 'P' ? 'Pass' : 'Fail';
         
         let grades: GradeInfo[] = [];
 
@@ -124,18 +124,27 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
                 if (parts.length < 2) return null;
                 
                 const code = parts[0].trim();
-                const grade = parts[1].trim();
+                let grade = parts[1].trim();
+                let marks;
+
+                if (grade.includes('=')) {
+                    const gradeParts = grade.split('=');
+                    marks = gradeParts[0];
+                    grade = gradeParts[1];
+                }
 
                 const subDetail = data.sub_details?.find((s: any) => s.SUB_CODE === code);
                 const subject = subDetail ? subDetail.SUB_NAME : "Loading...";
 
-                return { code, subject, grade };
+                return { code, subject, grade, marks };
              }).filter((g): g is GradeInfo => g !== null);
         }
 
+        const registrationNumber = apiResult.regno === '[NOT SHOWN]' ? values.reg : apiResult.regno;
+
         return {
             roll: apiResult.roll_no || values.roll,
-            reg: apiResult.regno || values.reg,
+            reg: registrationNumber || '',
             board: apiResult.board_name ? apiResult.board_name.toLowerCase() : values.board,
             year: values.year,
             exam: values.exam,
