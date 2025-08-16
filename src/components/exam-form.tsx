@@ -25,7 +25,7 @@ export const formSchema = z.object({
   ccode: z.string().optional(),
   captcha: z.string().min(1, 'ক্যাপচা আবশ্যক।'),
 }).refine((data) => {
-    if ((data.result_type === '1' || data.result_type === '7') && (!data.roll || !data.reg)) {
+    if ((data.result_type === '1') && (!data.roll || !data.reg)) {
         return false;
     }
     return true;
@@ -33,7 +33,7 @@ export const formSchema = z.object({
     message: 'রোল এবং রেজিস্ট্রেশন নম্বর আবশ্যক।',
     path: ['roll'],
 }).refine((data) => {
-    if ((data.result_type === '1' || data.result_type === '7') && (!data.roll || !data.reg)) {
+    if ((data.result_type === '1') && (!data.roll || !data.reg)) {
         return false;
     }
     return true;
@@ -106,7 +106,6 @@ const resultTypes = [
     { value: '4', label: 'জেলা ভিত্তিক ফলাফল' },
     { value: '5', label: 'প্রতিষ্ঠান বিশ্লেষণ' },
     { value: '6', label: 'বোর্ড বিশ্লেষণ' },
-    { value: '7', label: 'ব্যক্তিগত / বিস্তারিত পুনঃনিরীক্ষণ ফলাফল' },
 ];
 
 
@@ -118,7 +117,7 @@ interface ExamFormProps {
 
 export function ExamForm({ form, onSubmit, isSubmitting }: ExamFormProps) {
   const resultType = form.watch('result_type');
-  const isRollRegRequired = resultType === '1' || resultType === '7';
+  const isRollRegRequired = resultType === '1';
   const isEiinRequired = resultType === '2' || resultType === '6';
   const isDistrictRequired = resultType === '4' || resultType === '5';
   const isCenterRequired = resultType === '4';
@@ -318,6 +317,7 @@ export function ExamForm({ form, onSubmit, isSubmitting }: ExamFormProps) {
                   <FormItem>
                     <FormLabel>নিরাপত্তা কোড</FormLabel>
                     <FormControl><Input placeholder="ছবিতে দেখানো সংখ্যাটি লিখুন" {...field} value={field.value || ''} autoComplete="off" /></FormControl>
+                     <FormDescription>অনুগ্রহ করে সব ইনপুট ইংরেজিতে দিন।</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}

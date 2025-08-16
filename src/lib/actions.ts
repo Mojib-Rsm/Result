@@ -172,7 +172,7 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
             throw new Error("ভুল ক্যাপচা বা নিরাপত্তা কোড। অনুগ্রহ করে আবার চেষ্টা করুন।");
         }
         // For any other error, throw the message from the API
-        throw new Error(data.message || 'ফলাফল আনার সময় একটি অজানা ত্রুটি ঘটেছে।');
+        throw new Error(data.message || 'ফলাফল আনার সময় একটি অজানা ত্রুটি ঘটেছে বা ভুল ক্যাপচা!');
     }
 
   } catch (error) {
@@ -180,7 +180,7 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
     if (error instanceof Error) {
         throw error;
     }
-    throw new Error('একটি অজানা ত্রুটি ঘটেছে। অনুগ্রহ করে পরে আবার চেষ্টা করুন।');
+    throw new Error('একটি অজানা ত্রুটি ঘটেছে। অনুগ্রহ করে পরে আবার চেষ্টা করুন বা ভুল ক্যাপচা!');
   }
 }
 
