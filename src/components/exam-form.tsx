@@ -120,7 +120,7 @@ export function ExamForm({ form, onSubmit, isSubmitting }: ExamFormProps) {
   const isRollRegRequired = resultType === '1';
   const isEiinRequired = resultType === '2' || resultType === '5' || resultType === '6';
   const isDistrictRequired = resultType === '4';
-  const isCenterRequired = resultType === '3' || resultType === '4';
+  const isCenterRequired = resultType === '3';
 
   const [captchaImage, setCaptchaImage] = useState<string | null>(null);
   const [isCaptchaLoading, setIsCaptchaLoading] = useState(false);
@@ -402,4 +402,5 @@ export function ExamForm({ form, onSubmit, isSubmitting }: ExamFormProps) {
     
 
     
+
 
