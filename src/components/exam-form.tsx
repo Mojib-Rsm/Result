@@ -245,7 +245,19 @@ export function ExamForm({ form, onSubmit, isSubmitting }: ExamFormProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>রোল নম্বর</FormLabel>
-                    <FormControl><Input placeholder="যেমন: 123456" {...field} value={field.value || ''} /></FormControl>
+                    <FormControl>
+                        <Input 
+                            placeholder="যেমন: 123456" 
+                            {...field} 
+                            value={field.value || ''} 
+                            onChange={(e) => {
+                                const value = e.target.value;
+                                if (/^\d*$/.test(value)) {
+                                    field.onChange(value);
+                                }
+                            }}
+                        />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -256,7 +268,19 @@ export function ExamForm({ form, onSubmit, isSubmitting }: ExamFormProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>রেজিস্ট্রেশন নম্বর</FormLabel>
-                    <FormControl><Input placeholder="যেমন: 1234567890" {...field} value={field.value || ''} /></FormControl>
+                    <FormControl>
+                        <Input 
+                            placeholder="যেমন: 1234567890" 
+                            {...field} 
+                            value={field.value || ''}
+                            onChange={(e) => {
+                                const value = e.target.value;
+                                if (/^\d*$/.test(value)) {
+                                    field.onChange(value);
+                                }
+                            }}
+                        />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -271,7 +295,19 @@ export function ExamForm({ form, onSubmit, isSubmitting }: ExamFormProps) {
                 render={({ field }) => (
                   <FormItem className="md:col-span-2">
                     <FormLabel>প্রতিষ্ঠানের EIIN নম্বর</FormLabel>
-                    <FormControl><Input placeholder="আপনার প্রতিষ্ঠানের EIIN নম্বর লিখুন" {...field} value={field.value || ''} /></FormControl>
+                    <FormControl>
+                        <Input 
+                            placeholder="আপনার প্রতিষ্ঠানের EIIN নম্বর লিখুন" 
+                            {...field} 
+                            value={field.value || ''}
+                             onChange={(e) => {
+                                const value = e.target.value;
+                                if (/^\d*$/.test(value)) {
+                                    field.onChange(value);
+                                }
+                            }}
+                        />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -316,7 +352,20 @@ export function ExamForm({ form, onSubmit, isSubmitting }: ExamFormProps) {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>নিরাপত্তা কোড</FormLabel>
-                    <FormControl><Input placeholder="ছবিতে দেখানো সংখ্যাটি লিখুন" {...field} value={field.value || ''} autoComplete="off" /></FormControl>
+                    <FormControl>
+                        <Input 
+                            placeholder="ছবিতে দেখানো সংখ্যাটি লিখুন" 
+                            {...field} 
+                            value={field.value || ''} 
+                            autoComplete="off" 
+                             onChange={(e) => {
+                                const value = e.target.value;
+                                if (/^\d*$/.test(value)) {
+                                    field.onChange(value);
+                                }
+                            }}
+                        />
+                    </FormControl>
                      <FormDescription>অনুগ্রহ করে সব ইনপুট ইংরেজিতে দিন।</FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -349,5 +398,7 @@ export function ExamForm({ form, onSubmit, isSubmitting }: ExamFormProps) {
     </Form>
   );
 }
+
+    
 
     
