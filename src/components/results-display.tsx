@@ -132,7 +132,7 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
 
   const isIndividualResult = !result.rawHtml;
 
-  const downloadUrl = result.pdfName ? `https://www.eboardresults.com/v2/pdf_get/${result.pdfName}` : '#';
+  const downloadUrl = result.pdfName ? `https://www.eboardresults.com/v2/pdl` : '#';
 
   return (
     <div className={containerClasses}>
