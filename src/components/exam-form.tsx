@@ -3,65 +3,23 @@
 
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, RefreshCw } from 'lucide-react';
-import { Skeleton } from './ui/skeleton';
+import { Loader2 } from 'lucide-react';
 
 export const formSchema = z.object({
   exam: z.string().min(1, 'পরীক্ষা নির্বাচন আবশ্যক।'),
   year: z.string().min(1, 'বছর নির্বাচন আবশ্যক।'),
   board: z.string().min(1, 'বোর্ড নির্বাচন আবশ্যক।'),
-  roll: z.string().regex(/^\d*$/, 'রোল নম্বর অবশ্যই একটি সংখ্যা হতে হবে।').optional(),
-  reg: z.string().regex(/^\d*$/, 'রেজিস্ট্রেশন নম্বর অবশ্যই একটি সংখ্যা হতে হবে।').optional(),
+  roll: z.string().optional(),
+  reg: z.string().optional(),
   result_type: z.string().min(1, 'ফলাফলের ধরন আবশ্যক।'),
-  captcha: z.string().min(1, 'সিক্রেট কোড আবশ্যক।'),
-  eiin: z.string().regex(/^\d*$/, 'EIIN অবশ্যই একটি সংখ্যা হতে হবে।').optional(),
+  eiin: z.string().optional(),
   dcode: z.string().optional(),
   ccode: z.string().optional(),
-}).refine(data => {
-    if ((data.result_type === '1' || data.result_type === '7') && (!data.roll || data.roll.length === 0)) {
-        return false;
-    }
-    return true;
-}, {
-    message: 'রোল নম্বর আবশ্যক।',
-    path: ['roll'],
-}).refine(data => {
-    if ((data.result_type === '1' || data.result_type === '7') && (!data.reg || data.reg.length === 0)) {
-        return false;
-    }
-    return true;
-}, {
-    message: 'রেজিস্ট্রেশন নম্বর আবশ্যক।',
-    path: ['reg'],
-}).refine(data => {
-    if ((data.result_type === '2' || data.result_type === '6') && (!data.eiin || data.eiin.length === 0)) {
-        return false;
-    }
-    return true;
-}, {
-    message: 'EIIN নম্বর আবশ্যক।',
-    path: ['eiin'],
-}).refine(data => {
-    if ((data.result_type === '4' || data.result_type === '5') && (!data.dcode || data.dcode.length === 0)) {
-        return false;
-    }
-    return true;
-}, {
-    message: 'জেলার নাম আবশ্যক।',
-    path: ['dcode'],
-}).refine(data => {
-    if ((data.result_type === '4') && (!data.ccode || data.ccode.length === 0)) {
-        return false;
-    }
-    return true;
-}, {
-    message: 'কেন্দ্রের নাম আবশ্যক।',
-    path: ['ccode'],
+  captcha: z.string().optional(),
 });
 
 
@@ -110,14 +68,9 @@ interface ExamFormProps {
   form: ReturnType<typeof useForm<z.infer<typeof formSchema>>>;
   onSubmit: (values: z.infer<typeof formSchema>) => void;
   isSubmitting: boolean;
-  isRegRequired: boolean;
-  isCaptchaRequired: boolean;
-  captchaImage?: string;
-  isFetchingCaptcha: boolean;
-  onRefreshCaptcha: () => void;
 }
 
-export function ExamForm({ form, onSubmit, isSubmitting, captchaImage, isFetchingCaptcha, onRefreshCaptcha }: ExamFormProps) {
+export function ExamForm({ form, onSubmit, isSubmitting }: ExamFormProps) {
   const resultType = form.watch('result_type');
   const isRollRegRequired = resultType === '1' || resultType === '7';
   const isEiinRequired = resultType === '2' || resultType === '6';
@@ -251,6 +204,7 @@ export function ExamForm({ form, onSubmit, isSubmitting, captchaImage, isFetchin
                   <FormItem>
                     <FormLabel>জেলার নাম</FormLabel>
                      <FormControl><Input placeholder="জেলার কোড লিখুন" {...field} value={field.value || ''} /></FormControl>
+                     <FormDescription>This is a demo. This field is not functional.</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -265,66 +219,16 @@ export function ExamForm({ form, onSubmit, isSubmitting, captchaImage, isFetchin
                   <FormItem>
                     <FormLabel>কেন্দ্রের নাম</FormLabel>
                     <FormControl><Input placeholder="কেন্দ্রের কোড লিখুন" {...field} value={field.value || ''} /></FormControl>
+                    <FormDescription>This is a demo. This field is not functional.</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
            )}
-
-
-            <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
-              <div className='flex flex-col gap-2'>
-                <div className='flex items-center gap-2'>
-                  {isFetchingCaptcha ? (
-                     <Skeleton className="h-[50px] w-[180px] rounded-md" />
-                  ) : captchaImage ? (
-                    <Image
-                      src={captchaImage}
-                      alt="সিক্রেট কোড"
-                      width={180}
-                      height={50}
-                      className="rounded-md border p-1 bg-white"
-                      unoptimized
-                    />
-                  ) : <div className="h-[50px] w-[180px] border rounded-md flex items-center justify-center bg-muted text-muted-foreground text-xs">কোড লোড হচ্ছে...</div>}
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="icon"
-                    onClick={onRefreshCaptcha}
-                    disabled={isFetchingCaptcha || isSubmitting}
-                    aria-label="রিফ্রেশ সিক্রেট কোড"
-                  >
-                    <RefreshCw className={`h-5 w-5 ${isFetchingCaptcha ? 'animate-spin' : ''}`} />
-                  </Button>
-                </div>
-                 <FormDescription>
-                    ছবিতে দেখানো সংখ্যাগুলো লিখুন
-                </FormDescription>
-              </div>
-
-               <FormField
-                control={form.control}
-                name="captcha"
-                render={({ field }) => (
-                  <FormItem>
-                     <FormLabel>সিক্রেট কোড</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="সিক্রেট কোড লিখুন"
-                        {...field}
-                        disabled={isFetchingCaptcha || isSubmitting}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
         </div>
         <div className="flex justify-end pt-4">
-          <Button type="submit" disabled={isSubmitting || isFetchingCaptcha} className="w-full md:w-auto">
-            {(isSubmitting || isFetchingCaptcha) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          <Button type="submit" disabled={isSubmitting} className="w-full md:w-auto">
+            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             ফলাফল দেখুন
           </Button>
         </div>
