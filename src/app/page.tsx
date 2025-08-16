@@ -44,7 +44,7 @@ export default function Home() {
     try {
       const searchResult = await searchResultLegacy(values);
       setResult(searchResult);
-       if (values.result_type === '1' || values.result_type === '8') {
+       if (values.result_type === '1') {
          addHistoryItem({
             roll: values.roll!,
             reg: values.reg,
@@ -64,7 +64,7 @@ export default function Home() {
         variant: "destructive"
        });
         // Auto-refresh captcha if it's a captcha error
-       if (e.message && (e.message.includes("captcha") || e.message.includes("security key"))) {
+       if (e.message && (e.message.toLowerCase().includes("captcha") || e.message.toLowerCase().includes("security key"))) {
             const formComponent = document.getElementById('exam-form-component');
             if (formComponent) {
                 const event = new CustomEvent('refreshcaptcha');

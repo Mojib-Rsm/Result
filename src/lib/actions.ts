@@ -162,10 +162,10 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
             grades: grades,
         };
     } else { // Error from API
-         if(data.message && data.message.includes("not found")) {
+         if(data.message && data.message.toLowerCase().includes("not found")) {
              throw new Error("Result not found. Please check your roll, registration, board, and year and try again.");
         }
-        if(data.message && (data.message.includes("captcha") || data.message.includes("security key"))) {
+        if(data.message && (data.message.toLowerCase().includes("captcha") || data.message.toLowerCase().includes("security key"))) {
             throw new Error("Incorrect captcha or security key. A new captcha has been loaded. Please try again.");
         }
         throw new Error(data.message || 'An unknown error occurred while fetching the result.');
