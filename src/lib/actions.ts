@@ -25,7 +25,6 @@ async function getCaptchaAction() {
                 "sec-fetch-site": "same-origin",
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
                 "Referer": "https://www.eboardresults.com/v2/home",
-                ...(cookieJar && { 'Cookie': cookieJar }),
             }
         });
 
@@ -109,20 +108,30 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
             };
         }
 
-
         const gpa = parseFloat(apiResult.gpa) || 0;
         const status = gpa > 0 ? 'Pass' : 'Fail';
         
         const grades = (apiResult.gpa_details || '').split(',').map((g: string) => {
-             const parts = g.split(':');
-             if (parts.length < 2) return null;
-             const code = parts[0].trim();
-             const gradeParts = parts[1].split('=');
-             const grade = gradeParts[gradeParts.length - 1].trim();
-             const marks = gradeParts.length > 1 ? gradeParts[0].trim() : undefined;
-             const subject = "Loading..."; // Placeholder
-             return { code, subject, grade, marks };
-         }).filter(Boolean);
+            const parts = g.split(':');
+            if (parts.length < 2) return null;
+            
+            const code = parts[0].trim();
+            const gradeDetails = parts.slice(1).join(':').trim();
+            
+            let grade: string;
+            let marks: string | undefined;
+
+            const gradeParts = gradeDetails.split('=');
+            if (gradeParts.length > 1) { // Format is "MARKS=GRADE"
+                marks = gradeParts[0].trim();
+                grade = gradeParts[1].trim();
+            } else { // Format is just "GRADE"
+                grade = gradeDetails;
+            }
+
+            const subject = "Loading..."; // Placeholder
+            return { code, subject, grade, marks };
+         }).filter((g): g is { code: string; subject: string; grade: string; marks: string | undefined; } => g !== null);
         
          // Add subject names from sub_details
          if (data.sub_details) {
@@ -133,7 +142,6 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
                 }
             });
         }
-
 
         return {
             roll: apiResult.roll_no || values.roll,
