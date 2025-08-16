@@ -165,9 +165,7 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
          if(data.message && data.message.toLowerCase().includes("not found")) {
              throw new Error("Result not found. Please check your roll, registration, board, and year and try again.");
         }
-        if(data.message && (data.message.toLowerCase().includes("captcha") || data.message.toLowerCase().includes("security key"))) {
-            throw new Error("Incorrect captcha or security key. A new captcha has been loaded. Please try again.");
-        }
+        // For any other error, throw the message from the API
         throw new Error(data.message || 'An unknown error occurred while fetching the result.');
     }
 
