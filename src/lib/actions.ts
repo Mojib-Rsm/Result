@@ -6,8 +6,8 @@ import { z } from 'zod';
 import { formSchema } from '@/components/exam-form';
 import { JSDOM } from 'jsdom';
 
-// Store cookies globally per request scope, not globally for the server instance.
-let cookieJar = '';
+// Store cookies locally per request, not globally.
+// let cookieJar = ''; // This was causing issues with concurrent requests.
 
 async function getCaptchaAction(establishSession = false) {
     try {
@@ -29,18 +29,21 @@ async function getCaptchaAction(establishSession = false) {
         });
 
         const newCookies = response.headers.get('set-cookie');
+        let sessionCookie = '';
         if (newCookies) {
-            const sessionCookie = newCookies.split(';')[0];
-            if (establishSession) {
-                // Set the cookieJar for the subsequent request in searchResultLegacy
-                cookieJar = sessionCookie;
-            }
+            sessionCookie = newCookies.split(';')[0];
         }
 
         const buffer = await response.arrayBuffer();
         const imageBase64 = Buffer.from(buffer).toString('base64');
         
-        return `data:image/jpeg;base64,${imageBase64}`;
+        const captchaData = `data:image/jpeg;base64,${imageBase64}`;
+
+        if (establishSession) {
+            return { captchaImage: captchaData, cookie: sessionCookie };
+        }
+        
+        return captchaData;
 
     } catch (error) {
         console.error("Captcha fetch failed", error);
@@ -51,7 +54,7 @@ async function getCaptchaAction(establishSession = false) {
 
 async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<ExamResult> {
   // IMPORTANT: Establish a new session for EVERY request to avoid serving stale PDF downloads.
-  await getCaptchaAction(true);
+  const { cookie: cookieJar } = await getCaptchaAction(true) as { cookie: string, captchaImage: string };
     
   const { exam, year, board, result_type, roll, reg, eiin, dcode, ccode, captcha } = values;
 

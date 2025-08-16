@@ -128,7 +128,7 @@ export function ExamForm({ form, onSubmit, isSubmitting }: ExamFormProps) {
   const refreshCaptcha = async () => {
       setIsCaptchaLoading(true);
       try {
-          const image = await getCaptchaAction();
+          const image = await getCaptchaAction() as string;
           setCaptchaImage(image);
       } catch (error) {
           console.error(error);
@@ -398,12 +398,3 @@ export function ExamForm({ form, onSubmit, isSubmitting }: ExamFormProps) {
     </Form>
   );
 }
-
-    
-
-    
-
-
-
-
-    
