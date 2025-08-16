@@ -2,8 +2,12 @@
 'use client';
 
 import { useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { ExamForm, formSchema } from '@/components/exam-form';
 import ResultsDisplay from '@/components/results-display';
 import type { ExamResult } from '@/types';
+import { z } from 'zod';
 
 // Static demo result data
 const demoResult: ExamResult = {
@@ -35,24 +39,60 @@ const demoResult: ExamResult = {
 };
 
 export default function Home() {
-  const [result, setResult] = useState<ExamResult | null>(demoResult);
+  const [result, setResult] = useState<ExamResult | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      exam: '',
+      year: '',
+      board: '',
+      result_type: '1',
+      roll: '',
+      reg: '',
+      eiin: '',
+      dcode: '',
+      ccode: '',
+    },
+  });
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    setIsSubmitting(true);
+    setError(null);
+    
+    // This is a demo, so we'll just simulate a delay and show a static result.
+    await new Promise(resolve => setTimeout(resolve, 1000));
+
+    // You can add logic here to show different demo results based on input
+    // For now, we just show the same demo result.
+    setResult(demoResult);
+    setIsSubmitting(false);
+  };
 
   const resetSearch = () => {
-    setResult(demoResult);
+    setResult(null);
+    setError(null);
+    form.reset();
   };
-  
+
   return (
     <div className="container mx-auto max-w-4xl px-4 py-8 md:py-12" id="main-content">
-      <div className="flex flex-col items-center text-center mb-12 no-print">
+       <div className="flex flex-col items-center text-center mb-12 no-print">
         <h1 className="text-4xl md:text-5xl font-bold tracking-tight bg-gradient-to-br from-primary to-accent bg-clip-text text-transparent">
           আপনার ফলাফল দেখুন
         </h1>
         <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
-          এটি ফলাফল প্রদর্শনের একটি ডেমো।
+           যেকোনো শিক্ষাবোর্ডের ফলাফল দেখুন খুব সহজে।
         </p>
       </div>
 
-      {result && (
+      {!result ? (
+        <div className="rounded-xl border bg-card text-card-foreground shadow p-4 md:p-8">
+            <ExamForm form={form} onSubmit={onSubmit} isSubmitting={isSubmitting} />
+        </div>
+      ) : (
         <>
           <ResultsDisplay 
             result={result} 
