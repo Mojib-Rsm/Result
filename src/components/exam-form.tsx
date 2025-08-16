@@ -25,20 +25,20 @@ export const formSchema = z.object({
   ccode: z.string().optional(),
   captcha: z.string().min(1, 'ক্যাপচা আবশ্যক।'),
 }).refine((data) => {
-    if ((data.result_type === '1') && (!data.roll || !data.reg)) {
+    if (data.result_type === '1' && !data.roll) {
         return false;
     }
     return true;
 }, {
-    message: 'রোল এবং রেজিস্ট্রেশন নম্বর আবশ্যক।',
+    message: 'রোল নম্বর আবশ্যক।',
     path: ['roll'],
 }).refine((data) => {
-    if ((data.result_type === '1') && (!data.roll || !data.reg)) {
+    if (data.result_type === '1' && !data.reg) {
         return false;
     }
     return true;
 }, {
-    message: 'রোল এবং রেজিস্ট্রেশন নম্বর আবশ্যক।',
+    message: 'রেজিস্ট্রেশন নম্বর আবশ্যক।',
     path: ['reg'],
 }).refine((data) => {
     if ((data.result_type === '2' || data.result_type === '5' || data.result_type === '6') && !data.eiin) {
@@ -404,3 +404,6 @@ export function ExamForm({ form, onSubmit, isSubmitting }: ExamFormProps) {
     
 
 
+
+
+    
