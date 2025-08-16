@@ -174,7 +174,7 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
     if (error instanceof Error) {
         throw error;
     }
-    throw new Error('An unknown error occurred. Please try again later.');
+    throw error;
   }
 }
 
