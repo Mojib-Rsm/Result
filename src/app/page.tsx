@@ -8,40 +8,17 @@ import { ExamForm, formSchema } from '@/components/exam-form';
 import ResultsDisplay from '@/components/results-display';
 import type { ExamResult } from '@/types';
 import { z } from 'zod';
-
-// Static demo result data
-const demoResult: ExamResult = {
-  roll: '123456',
-  reg: '1234567890',
-  board: 'dhaka',
-  year: '2023',
-  exam: 'hsc',
-  gpa: 5.0,
-  status: 'Pass',
-  studentInfo: {
-    name: 'Firstname Lastname',
-    fatherName: "Father's Name",
-    motherName: "Mother's Name",
-    group: 'Science',
-    dob: '01-01-2005',
-    institute: 'Some College Name',
-    session: '2021-2022',
-  },
-  grades: [
-    { code: '101', subject: 'BANGLA', grade: 'A+' },
-    { code: '107', subject: 'ENGLISH', grade: 'A+' },
-    { code: '265', subject: 'INFORMATION AND COMMUNICATION TECHNOLOGY', grade: 'A+' },
-    { code: '174', subject: 'PHYSICS', grade: 'A+' },
-    { code: '176', subject: 'CHEMISTRY', grade: 'A+' },
-    { code: '269', subject: 'HIGHER MATHEMATICS', grade: 'A+' },
-    { code: '178', subject: 'BIOLOGY', grade: 'A+' },
-  ],
-};
+import { searchResultLegacy } from '@/lib/actions';
+import { useToast } from '@/hooks/use-toast';
+import { useHistory } from '@/hooks/use-history';
 
 export default function Home() {
   const [result, setResult] = useState<ExamResult | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { toast } = useToast();
+  const { addHistoryItem } = useHistory();
+
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -55,20 +32,48 @@ export default function Home() {
       eiin: '',
       dcode: '',
       ccode: '',
+      captcha: ''
     },
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
     setError(null);
-    
-    // This is a demo, so we'll just simulate a delay and show a static result.
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    setResult(null);
 
-    // You can add logic here to show different demo results based on input
-    // For now, we just show the same demo result.
-    setResult(demoResult);
-    setIsSubmitting(false);
+    try {
+      const searchResult = await searchResultLegacy(values);
+      setResult(searchResult);
+       if (values.result_type === '1' || values.result_type === '8') {
+         addHistoryItem({
+            roll: values.roll!,
+            reg: values.reg,
+            board: values.board,
+            year: values.year,
+            exam: values.exam,
+            result_type: values.result_type,
+            result: searchResult,
+            eiin: values.eiin
+        });
+       }
+    } catch (e: any) {
+       setError(e.message);
+       toast({
+        title: "Error",
+        description: e.message,
+        variant: "destructive"
+       });
+        // Auto-refresh captcha if it's a captcha error
+       if (e.message && (e.message.includes("captcha") || e.message.includes("security key"))) {
+            const formComponent = document.getElementById('exam-form-component');
+            if (formComponent) {
+                const event = new CustomEvent('refreshcaptcha');
+                formComponent.dispatchEvent(event);
+            }
+       }
+    } finally {
+        setIsSubmitting(false);
+    }
   };
 
   const resetSearch = () => {

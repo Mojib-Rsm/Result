@@ -7,7 +7,10 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2 } from 'lucide-react';
+import { Loader2, RefreshCw } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { getCaptchaAction } from '@/lib/actions';
+import Image from 'next/image';
 
 export const formSchema = z.object({
   exam: z.string().min(1, 'পরীক্ষা নির্বাচন আবশ্যক।'),
@@ -19,7 +22,49 @@ export const formSchema = z.object({
   eiin: z.string().optional(),
   dcode: z.string().optional(),
   ccode: z.string().optional(),
-  captcha: z.string().optional(),
+  captcha: z.string().min(1, 'ক্যাপচা আবশ্যক।'),
+}).refine((data) => {
+    if ((data.result_type === '1' || data.result_type === '7') && (!data.roll || !data.reg)) {
+        return false;
+    }
+    return true;
+}, {
+    message: 'রোল এবং রেজিস্ট্রেশন নম্বর আবশ্যক।',
+    path: ['roll'],
+}).refine((data) => {
+    if ((data.result_type === '1' || data.result_type === '7') && (!data.roll || !data.reg)) {
+        return false;
+    }
+    return true;
+}, {
+    message: 'রোল এবং রেজিস্ট্রেশন নম্বর আবশ্যক।',
+    path: ['reg'],
+}).refine((data) => {
+    if ((data.result_type === '2' || data.result_type === '6') && !data.eiin) {
+        return false;
+    }
+    return true;
+}, {
+    message: 'EIIN নম্বর আবশ্যক।',
+    path: ['eiin'],
+})
+.refine(data => {
+    if (data.result_type === '4' && !data.dcode) {
+        return false;
+    }
+    return true;
+}, {
+    message: 'জেলার নাম আবশ্যক।',
+    path: ['dcode']
+})
+.refine(data => {
+    if (data.result_type === '4' && !data.ccode) {
+        return false;
+    }
+    return true;
+}, {
+    message: 'কেন্দ্রের নাম আবশ্যক।',
+    path: ['ccode']
 });
 
 
@@ -76,10 +121,47 @@ export function ExamForm({ form, onSubmit, isSubmitting }: ExamFormProps) {
   const isEiinRequired = resultType === '2' || resultType === '6';
   const isDistrictRequired = resultType === '4' || resultType === '5';
   const isCenterRequired = resultType === '4';
+
+  const [captchaImage, setCaptchaImage] = useState<string | null>(null);
+  const [isCaptchaLoading, setIsCaptchaLoading] = useState(false);
+
+  const refreshCaptcha = async () => {
+      setIsCaptchaLoading(true);
+      try {
+          const image = await getCaptchaAction();
+          setCaptchaImage(image);
+      } catch (error) {
+          console.error(error);
+          setCaptchaImage(null);
+      } finally {
+          setIsCaptchaLoading(false);
+      }
+  };
+
+  useEffect(() => {
+      refreshCaptcha();
+  }, []);
+
+  useEffect(() => {
+    const handleRefreshCaptcha = () => refreshCaptcha();
+    const formComponent = document.getElementById('exam-form-component');
+    
+    if (formComponent) {
+      formComponent.addEventListener('refreshcaptcha', handleRefreshCaptcha);
+    }
+    
+    return () => {
+      if (formComponent) {
+        formComponent.removeEventListener('refreshcaptcha', handleRefreshCaptcha);
+      }
+    };
+  }, []);
+
+
   
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" id="exam-form-component">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormField
             control={form.control}
@@ -226,6 +308,36 @@ export function ExamForm({ form, onSubmit, isSubmitting }: ExamFormProps) {
               />
            )}
         </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+            <FormField
+                control={form.control}
+                name="captcha"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>নিরাপত্তা কোড</FormLabel>
+                    <FormControl><Input placeholder="ছবিতে দেখানো সংখ্যাটি লিখুন" {...field} value={field.value || ''} autoComplete="off" /></FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="flex items-center gap-2 mt-2 md:mt-7">
+                  {isCaptchaLoading ? (
+                      <div className="h-12 w-32 flex items-center justify-center bg-muted rounded-md">
+                          <Loader2 className="h-6 w-6 animate-spin"/>
+                      </div>
+                  ) : captchaImage ? (
+                      <Image src={captchaImage} alt="Captcha Image" width={128} height={48} className="rounded-md border" />
+                  ) : (
+                      <div className="h-12 w-32 flex items-center justify-center bg-muted rounded-md text-xs text-muted-foreground">ক্যাপচা লোড করা যায়নি</div>
+                  )}
+                  <Button type="button" variant="outline" size="icon" onClick={refreshCaptcha} disabled={isCaptchaLoading}>
+                      <RefreshCw className={cn("h-4 w-4", isCaptchaLoading && "animate-spin")} />
+                  </Button>
+              </div>
+        </div>
+
+
         <div className="flex justify-end pt-4">
           <Button type="submit" disabled={isSubmitting} className="w-full md:w-auto">
             {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
