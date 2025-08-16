@@ -64,19 +64,19 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
     if (!element) return;
     setIsDownloading(true);
 
-    const tempContainer = document.createElement('div');
-    tempContainer.style.position = 'absolute';
-    tempContainer.style.left = '-9999px';
-    const clonedElement = element.cloneNode(true) as HTMLElement;
-    clonedElement.style.width = '800px'; 
-    tempContainer.appendChild(clonedElement);
-    document.body.appendChild(tempContainer);
-
     try {
-        const canvas = await html2canvas(clonedElement, {
-            scale: 2,
+        const canvas = await html2canvas(element, {
+            scale: 3, // Increased scale for better resolution
             useCORS: true,
             logging: false,
+            onclone: (document) => {
+              // Remove shadows from the cloned document to improve PDF clarity
+              const clonedElement = document.getElementById('printable-area');
+              if(clonedElement) {
+                clonedElement.style.boxShadow = 'none';
+                clonedElement.style.border = 'none';
+              }
+            }
         });
 
         const imgData = canvas.toDataURL('image/png');
@@ -104,7 +104,6 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
     } catch(error) {
         console.error("Error generating PDF:", error);
     } finally {
-        document.body.removeChild(tempContainer);
         setIsDownloading(false);
     }
   };
