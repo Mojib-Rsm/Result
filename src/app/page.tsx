@@ -63,13 +63,11 @@ export default function Home() {
         description: e.message,
         variant: "destructive"
        });
-        // Auto-refresh captcha if it's a captcha error
-       if (e.message && (e.message.toLowerCase().includes("captcha") || e.message.toLowerCase().includes("security key"))) {
-            const formComponent = document.getElementById('exam-form-component');
-            if (formComponent) {
-                const event = new CustomEvent('refreshcaptcha');
-                formComponent.dispatchEvent(event);
-            }
+        // Auto-refresh captcha on any error
+       const formComponent = document.getElementById('exam-form-component');
+       if (formComponent) {
+           const event = new CustomEvent('refreshcaptcha');
+           formComponent.dispatchEvent(event);
        }
     } finally {
         setIsSubmitting(false);
