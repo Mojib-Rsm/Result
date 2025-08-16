@@ -14,18 +14,18 @@ async function getCaptchaAction() {
         const response = await fetch('https://www.eboardresults.com/v2/captcha?t=' + Date.now(), {
             method: 'GET',
             headers: {
+                "accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
+                "accept-language": "en-GB,en-US;q=0.9,en;q=0.8,ne;q=0.7,bn;q=0.6",
+                "priority": "u=1, i",
+                "sec-ch-ua": "\"Not;A=Brand\";v=\"99\", \"Google Chrome\";v=\"139\", \"Chromium\";v=\"139\"",
+                "sec-ch-ua-mobile": "?0",
+                "sec-ch-ua-platform": "\"Windows\"",
+                "sec-fetch-dest": "image",
+                "sec-fetch-mode": "no-cors",
+                "sec-fetch-site": "same-origin",
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
-                "Accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
-                "Accept-Language": "en-GB,en-US;q=0.9,en;q=0.8,ne;q=0.7",
                 "Referer": "https://www.eboardresults.com/v2/home",
-                "Priority": "i",
-                "Sec-Ch-Ua": "\"Not)A;Brand\";v=\"8\", \"Chromium\";v=\"138\", \"Google Chrome\";v=\"138\"",
-                "Sec-Ch-Ua-Mobile": "?0",
-                "Sec-Ch-Ua-Platform": "\"Windows\"",
-                "Sec-Fetch-Dest": "image",
-                "Sec-Fetch-Mode": "no-cors",
-                "Sec-Fetch-Site": "same-origin",
-                 ...(cookieJar && { 'Cookie': cookieJar }),
+                ...(cookieJar && { 'Cookie': cookieJar }),
             }
         });
 
@@ -66,19 +66,19 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
     const response = await fetch("https://www.eboardresults.com/v2/getres", {
         method: 'POST',
         headers: {
-             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
-            "Accept": "application/json, text/javascript, */*; q=0.01",
-            "Accept-Language": "en-GB,en-US;q=0.9,en;q=0.8,ne;q=0.7,bn;q=0.6",
-            "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-            "X-Requested-With": "XMLHttpRequest",
+            "accept": "application/json, text/javascript, */*; q=0.01",
+            "accept-language": "en-GB,en-US;q=0.9,en;q=0.8,ne;q=0.7,bn;q=0.6",
+            "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
+            "priority": "u=1, i",
+            "sec-ch-ua": "\"Not;A=Brand\";v=\"99\", \"Google Chrome\";v=\"139\", \"Chromium\";v=\"139\"",
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": "\"Windows\"",
+            "sec-fetch-dest": "empty",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-site": "same-origin",
+            "x-requested-with": "XMLHttpRequest",
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
             "Referer": "https://www.eboardresults.com/v2/home",
-            "Priority": "u=1, i",
-            "Sec-Ch-Ua": "\"Not;A=Brand\";v=\"99\", \"Google Chrome\";v=\"139\", \"Chromium\";v=\"139\"",
-            "Sec-Ch-Ua-Mobile": "?0",
-            "Sec-Ch-Ua-Platform": "\"Windows\"",
-            "Sec-Fetch-Dest": "empty",
-            "Sec-Fetch-Mode": "cors",
-            "Sec-Fetch-Site": "same-origin",
             ...(cookieJar && { 'Cookie': cookieJar }),
         },
         body: formData.toString()
@@ -90,10 +90,10 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
 
     const data = await response.json();
 
-    if (data.status === 0) { // Success
+    if (data.status === "0" || data.status === 0) { // Success
         const apiResult = data.res;
 
-        if(result_type !== '1' && result_type !== '8' && apiResult.content) {
+        if(result_type !== '1' && result_type !== '7' && apiResult.content) {
             const dom = new JSDOM(apiResult.content);
             const titleElement = dom.window.document.querySelector('h3');
             const title = titleElement ? titleElement.textContent : 'Result';
