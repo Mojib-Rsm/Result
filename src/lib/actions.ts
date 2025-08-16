@@ -49,18 +49,7 @@ async function getCaptchaAction() {
 async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<ExamResult> {
   const { exam, year, board, result_type, roll, reg, eiin, dcode, ccode, captcha } = values;
 
-  const formData = new URLSearchParams({
-    exam,
-    year,
-    board,
-    result_type,
-    roll: roll || '',
-    reg: reg || '',
-    eiin: eiin || '',
-    dcode: dcode || '',
-    ccode: ccode || '',
-    captcha: captcha || ''
-  });
+  const formData = `exam=${exam}&year=${year}&board=${board}&result_type=${result_type}&roll=${roll || ''}&reg=${reg || ''}&eiin=${eiin || ''}&dcode=${dcode || ''}&ccode=${ccode || ''}&captcha=${captcha || ''}`;
 
   try {
     const response = await fetch("https://www.eboardresults.com/v2/getres", {
@@ -81,7 +70,7 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
             "Referer": "https://www.eboardresults.com/v2/home",
             ...(cookieJar && { 'Cookie': cookieJar }),
         },
-        body: formData.toString()
+        body: formData
     });
 
     if (!response.ok) {
@@ -176,6 +165,7 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
     }
 
   } catch (error) {
+    console.error("Error in searchResultLegacy:", error);
     if (error instanceof Error) {
         // Re-throw specific, user-friendly messages
         throw error;
