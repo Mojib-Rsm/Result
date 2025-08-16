@@ -34,7 +34,7 @@ export default function Header({ className }: { className?: string }) {
             height={32}
             className="h-8 w-8 rounded-full"
           />
-          <span className="font-bold sm:inline-block">BD Results</span>
+          <span className="font-bold sm:inline-block">BD Result Hub</span>
         </Link>
         <nav className="flex flex-1 items-center gap-2 text-sm">
           {navLinks.map((link) => (

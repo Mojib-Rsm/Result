@@ -1,4 +1,4 @@
-# Firebase Studio
+# BD Result Hub
 
 This is a NextJS starter in Firebase Studio.
 
