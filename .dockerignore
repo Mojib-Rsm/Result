@@ -1,0 +1,25 @@
+# Docker ignore file
+
+# Git
+.git
+.gitignore
+
+# Docker
+Dockerfile
+.dockerignore
+
+# Node modules
+node_modules
+
+# Next.js build output
+.next
+
+# Local environment variables
+.env.local
+
+# Log files
+*.log
+
+# Temporary files
+.DS_Store
+*.tmp
