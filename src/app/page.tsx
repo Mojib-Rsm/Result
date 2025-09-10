@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ExamForm, formSchema } from '@/components/exam-form';
@@ -11,6 +11,9 @@ import { z } from 'zod';
 import { searchResultLegacy } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
 import { useHistory } from '@/hooks/use-history';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 export default function Home() {
   const [result, setResult] = useState<ExamResult | null>(null);
@@ -18,6 +21,15 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
   const { addHistoryItem } = useHistory();
+  const [showNotice, setShowNotice] = useState(false);
+
+  useEffect(() => {
+    const noticeSeen = sessionStorage.getItem('noticeSeen');
+    if (!noticeSeen) {
+      setShowNotice(true);
+      sessionStorage.setItem('noticeSeen', 'true');
+    }
+  }, []);
 
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -82,6 +94,33 @@ export default function Home() {
 
   return (
     <div className="container mx-auto max-w-4xl px-4 py-8 md:py-12" id="main-content">
+      <Dialog open={showNotice} onOpenChange={setShowNotice}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>BD Result Hub-এ স্বাগতম!</DialogTitle>
+            <DialogDescription>
+              এই ওয়েবসাইটটি শুধুমাত্র শিক্ষামূলক উদ্দেশ্যে এবং একটি ডেমো প্রকল্প হিসেবে তৈরি করা হয়েছে। 
+              এখানে প্রদর্শিত সকল তথ্য সরাসরি শিক্ষা বোর্ডের অফিসিয়াল সার্ভার থেকে আনা হয়।
+            </DialogDescription>
+          </DialogHeader>
+          <div className="prose prose-sm dark:prose-invert">
+              <p>
+                আমরা কোনো তথ্য সংরক্ষণ করি না। আপনার অনুসন্ধানের ইতিহাস শুধুমাত্র আপনার ব্রাউজারেই সংরক্ষিত থাকে।
+              </p>
+              <p>
+                এই প্রকল্পটি সম্পর্কে আরও জানতে বা আপনার মতামত জানাতে চাইলে ডেভেলপারকে ইমেইল করতে পারেন: 
+                <a href="mailto:mojibrsm@gmail.com" className="text-primary">mojibrsm@gmail.com</a>
+              </p>
+               <p>
+                আমাদের মূল নিউজ পোর্টাল ভিজিট করুন: <Link href="https://www.bartanow.com" target="_blank" className="text-primary font-semibold">www.bartanow.com</Link>
+              </p>
+          </div>
+          <DialogFooter>
+            <Button onClick={() => setShowNotice(false)}>বুঝেছি</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
        <div className="flex flex-col items-center text-center mb-12 no-print">
         <h1 className="text-4xl md:text-5xl font-bold tracking-tight bg-gradient-to-br from-primary to-accent bg-clip-text text-transparent">
           আপনার ফলাফল দেখুন
