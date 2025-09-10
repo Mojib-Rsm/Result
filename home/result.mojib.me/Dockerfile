@@ -1,7 +1,7 @@
-# Dockerfile
+# Dockerfile for a Next.js application
 
-# Stage 1: Builder
-# This stage installs dependencies, builds the source code, and runs tests.
+# ---- Builder Stage ----
+# This stage builds the Next.js application.
 FROM node:20-alpine AS builder
 
 # Set the working directory
@@ -13,32 +13,25 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install
 
-# Copy the rest of the application source code
+# Copy the rest of the application's code
 COPY . .
 
-# Build the application
+# Build the Next.js application for production
 RUN npm run build
 
-# Stage 2: Runner
-# This stage creates a lightweight, production-ready image.
+# ---- Runner Stage ----
+# This stage creates the final, smaller image for production.
 FROM node:20-alpine AS runner
 
 WORKDIR /app
 
-# Set NODE_ENV to production
-ENV NODE_ENV=production
-
-# Copy the built app from the builder stage
+# Copy only the necessary files from the builder stage
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
 
-# Copy public folder if it exists
-# The wildcard `*` makes this command succeed even if the public directory doesn't exist
-COPY --from=builder /app/public* ./public
-
 # Expose the port the app runs on
 EXPOSE 3000
 
-# The command to start the app
+# The command to start the application
 CMD ["npm", "start"]
