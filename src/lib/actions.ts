@@ -97,7 +97,13 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
         throw new Error('নেটওয়ার্ক প্রতিক্রিয়া ঠিক ছিল না।');
     }
 
-    const data = await response.json();
+    const responseText = await response.text();
+    if (!responseText) {
+        throw new Error("ফলাফল বোর্ড সার্ভার থেকে কোনো সাড়া পাওয়া যায়নি। অনুগ্রহ করে কিছুক্ষণ পর আবার চেষ্টা করুন।");
+    }
+
+    const data = JSON.parse(responseText);
+
 
     if (data.status === "0" || data.status === 0) { // Success
         
@@ -202,6 +208,9 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
     if (error instanceof Error) {
         if (error.message.toLowerCase().includes("captcha") || error.message.toLowerCase().includes("security key")) {
             throw new Error("ভুল ক্যাপচা বা নিরাপত্তা কোড। অনুগ্রহ করে আবার চেষ্টা করুন।");
+        }
+        if (error.message.includes("Unexpected end of JSON input")){
+             throw new Error("ফলাফল বোর্ড সার্ভার থেকে কোনো সাড়া পাওয়া যায়নি। অনুগ্রহ করে কিছুক্ষণ পর আবার চেষ্টা করুন।");
         }
         throw error;
     }
