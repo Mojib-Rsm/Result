@@ -7,7 +7,7 @@ import { formSchema } from '@/components/exam-form';
 import { JSDOM } from 'jsdom';
 import { cookies } from 'next/headers';
 
-async function getCaptchaAction(establishSession = false) {
+async function getCaptchaAction() {
     const cookieStore = cookies();
     const ss = cookieStore.get('session_cookie')?.value || '';
 
@@ -21,9 +21,8 @@ async function getCaptchaAction(establishSession = false) {
         });
 
         const newCookies = response.headers.get('set-cookie');
-        let sessionCookie = ss;
         if (newCookies) {
-            sessionCookie = newCookies.split(';')[0].split('=')[1];
+            const sessionCookie = newCookies.split(';')[0].split('=')[1];
             cookieStore.set('session_cookie', sessionCookie, { httpOnly: true });
         }
         
@@ -39,7 +38,7 @@ async function getCaptchaAction(establishSession = false) {
         
         const captchaString = captchaField.textContent.trim();
         
-        return { captchaText: captchaString, cookie: sessionCookie };
+        return { captchaText: captchaString };
 
     } catch (error) {
         console.error("Captcha fetch failed", error);
@@ -93,24 +92,26 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
         }
 
         const dom = new JSDOM(responseText);
-        const resultTable = dom.window.document.querySelector('.black12');
+        const resultTables = dom.window.document.querySelectorAll('table.black12');
         
-        if (!resultTable) {
+        if (resultTables.length === 0) {
              throw new Error("ফলাফল খুঁজে পাওয়া যায়নি। অনুগ্রহ করে আপনার রোল, রেজিস্ট্রেশন, বোর্ড এবং বছর পরীক্ষা করে আবার চেষ্টা করুন।");
         }
 
-        const infoRows = resultTable.querySelectorAll('tr');
+        const infoTable = resultTables[0];
+        const gradeSheetTable = resultTables[resultTables.length - 1];
 
-        const getCellText = (rowIndex: number, cellIndex: number) => infoRows[rowIndex]?.cells[cellIndex]?.textContent?.trim() || 'N/A';
-        
-        const gpaText = getCellText(5, 1);
+        const getCellText = (table: Element, rowIndex: number, cellIndex: number) => {
+             const row = table.querySelectorAll('tr')[rowIndex];
+             return row?.cells[cellIndex]?.textContent?.trim() || 'N/A';
+        }
+
+        const gpaText = getCellText(infoTable, 5, 1);
         const gpa = parseFloat(gpaText.match(/(\d+\.\d+)/)?.[0] || '0');
-        const status = getCellText(4, 1) === "PASSED" ? 'Pass' : 'Fail';
+        const status = getCellText(infoTable, 4, 1) === "PASSED" ? 'Pass' : 'Fail';
         
         const grades: GradeInfo[] = [];
-        const gradeSheetTable = dom.window.document.querySelectorAll('.black12')[1];
-
-        if(gradeSheetTable) {
+        if(gradeSheetTable && gradeSheetTable !== infoTable) {
             const gradeRows = gradeSheetTable.querySelectorAll('tr');
             for(let i = 1; i < gradeRows.length; i++) {
                 const cells = gradeRows[i].querySelectorAll('td');
@@ -125,20 +126,20 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
         }
         
         return {
-            roll: getCellText(0, 1),
-            reg: getCellText(0, 3),
+            roll: roll,
+            reg: reg,
             board: board.charAt(0).toUpperCase() + board.slice(1),
             year: year,
             exam: exam,
             gpa: gpa,
             status: status,
             studentInfo: {
-                name: getCellText(1, 1),
-                fatherName: getCellText(2, 1),
-                motherName: getCellText(2, 3),
-                group: getCellText(3, 1),
-                dob: getCellText(3, 3),
-                institute: getCellText(4, 3),
+                name: getCellText(infoTable, 1, 1),
+                fatherName: getCellText(infoTable, 2, 1),
+                motherName: getCellText(infoTable, 2, 3),
+                group: getCellText(infoTable, 3, 1),
+                dob: getCellText(infoTable, 3, 3),
+                institute: getCellText(infoTable, 4, 3),
                 session: '' // Not available from this source
             },
             grades: grades,
@@ -147,6 +148,9 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
     } catch (error) {
         console.error("Error in searchResultLegacy:", error);
         if (error instanceof Error) {
+            if(error.message.toLowerCase().includes("wrong information")){
+                throw new Error("ভুল তথ্য। অনুগ্রহ করে আপনার রোল, রেজিস্ট্রেশন, বোর্ড এবং বছর পরীক্ষা করে আবার চেষ্টা করুন।");
+            }
             throw error;
         }
         throw new Error('একটি অজানা ত্রুটি ঘটেছে। অনুগ্রহ করে পরে আবার চেষ্টা করুন।');

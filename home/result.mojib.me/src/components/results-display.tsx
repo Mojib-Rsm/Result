@@ -6,13 +6,11 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Download, Loader2, Search, FileDown, Printer } from 'lucide-react';
+import { Loader2, Search, Printer } from 'lucide-react';
 import type { ExamResult } from '@/types';
 import { Separator } from './ui/separator';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 
 interface ResultsDisplayProps {
   result: ExamResult;
@@ -21,7 +19,7 @@ interface ResultsDisplayProps {
 }
 
 const getGpaGrade = (gpa: number): string => {
-    if (gpa === 5) return 'A+';
+    if (gpa >= 5) return 'A+';
     if (gpa >= 4) return 'A';
     if (gpa >= 3.5) return 'A-';
     if (gpa >= 3) return 'B';
@@ -60,12 +58,15 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
   const [isPrinting, setIsPrinting] = useState(false);
   
   const handlePrint = () => {
-    window.print();
+    setIsPrinting(true);
+    setTimeout(() => {
+        window.print();
+        setIsPrinting(false);
+    }, 100);
   }
 
   const gpa = result.gpa?.toFixed(2);
   const isPass = result.status === 'Pass';
-  const gpaGrade = getGpaGrade(result.gpa);
   const showMarks = result.grades.some(g => g.marks);
   
   const InfoItem = ({ label, value }: { label: string, value: string | undefined}) => (
@@ -96,7 +97,7 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
           )}
 
           <Button onClick={handlePrint} disabled={isPrinting}>
-              <Printer className="mr-2 h-4 w-4" />
+              {isPrinting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Printer className="mr-2 h-4 w-4" />}
               প্রিন্ট করুন
           </Button>
       </div>
@@ -118,7 +119,7 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
 
                       <div className="absolute top-0 right-0 text-right font-bold text-xl min-w-[120px]">
                           <p className={isPass ? 'text-green-600' : 'text-destructive'}>Status: {result.status}</p>
-                          {isPass && <p>GPA: {gpa}</p>}
+                          {isPass && gpa && <p>GPA: {gpa}</p>}
                       </div>
                   </div>
                    <CardDescription className="text-center">{result.exam.toUpperCase()} Examination - {result.year}</CardDescription>
@@ -126,16 +127,14 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
               <CardContent>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
                   <InfoItem label="Roll No" value={result.roll} />
-                  <InfoItem label="Reg No" value={result.reg} />
                   <InfoItem label="Board" value={result.board} />
                   <InfoItem label="Name" value={result.studentInfo.name} />
                   <InfoItem label="Father's Name" value={result.studentInfo.fatherName} />
                   <InfoItem label="Mother's Name" value={result.studentInfo.motherName} />
                   <InfoItem label="Group" value={result.studentInfo.group} />
                   <InfoItem label="Date of Birth" value={result.studentInfo.dob} />
-                  {result.studentInfo.session && <InfoItem label="Session" value={result.studentInfo.session} />}
-                  <div className="col-span-2 md:col-span-3">
-                  <InfoItem label="Institute" value={result.studentInfo.institute} />
+                  <div className="col-span-full">
+                    <InfoItem label="Institute" value={result.studentInfo.institute} />
                   </div>
               </div>
 
@@ -153,7 +152,7 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
                   </TableHeader>
                   <TableBody>
                   {result.grades.map((g, index) => (
-                      <TableRow key={g.code} className={cn(index % 2 !== 0 && 'bg-muted/50')}>
+                      <TableRow key={g.code + index} className={cn(index % 2 !== 0 && 'bg-muted/50')}>
                       <TableCell>{g.code}</TableCell>
                       <TableCell className="font-medium">{g.subject}</TableCell>
                       {showMarks && <TableCell className="text-right font-bold">{g.marks}</TableCell>}
@@ -181,7 +180,7 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
                 </Button>
             )}
             <Button onClick={handlePrint} disabled={isPrinting}>
-                <Printer className="mr-2 h-4 w-4" />
+               {isPrinting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Printer className="mr-2 h-4 w-4" />}
                 প্রিন্ট করুন
             </Button>
         </CardFooter>

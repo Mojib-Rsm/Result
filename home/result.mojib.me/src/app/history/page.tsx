@@ -192,7 +192,7 @@ export default function HistoryPage() {
                 <CardContent className="space-y-2">
                     <p><strong>পরীক্ষা:</strong> <span className="uppercase">{item.exam}</span>, {item.year}</p>
                     <p><strong>বোর্ড:</strong> <span className="capitalize">{item.board}</span></p>
-                    {item.result.status === 'Pass' && <p><strong>GPA:</strong> {item.result.gpa.toFixed(2)}</p>}
+                    {item.result.status === 'Pass' && item.result.gpa > 0 && <p><strong>GPA:</strong> {item.result.gpa.toFixed(2)}</p>}
                      <div className="flex items-start pt-1">
                         <School className="h-4 w-4 mr-2 mt-1 text-muted-foreground flex-shrink-0" />
                         <p className="text-sm text-muted-foreground flex-1">

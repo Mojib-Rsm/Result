@@ -52,7 +52,7 @@ export default function Home() {
       const searchResult = await searchResultLegacy(values);
       setResult(searchResult);
       addHistoryItem({
-          roll: values.roll!,
+          roll: values.roll,
           reg: values.reg,
           board: values.board,
           year: values.year,
@@ -80,6 +80,7 @@ export default function Home() {
   const resetSearch = () => {
     setResult(null);
     form.reset();
+    // Manually trigger captcha refresh on form reset
     const formComponent = document.getElementById('exam-form-component');
     if (formComponent) {
         const event = new CustomEvent('refreshcaptcha');
@@ -95,7 +96,7 @@ export default function Home() {
             <DialogTitle>BD Edu Result-এ স্বাগতম!</DialogTitle>
             <DialogDescription>
               এই ওয়েবসাইটটি শুধুমাত্র শিক্ষামূলক উদ্দেশ্যে এবং একটি ডেমো প্রকল্প হিসেবে তৈরি করা হয়েছে। 
-              এখানে প্রদর্শিত সকল তথ্য সরাসরি শিক্ষা বোর্ডের অফিসিয়াল সার্ভার থেকে আনা হয়।
+              এখানে প্রদর্শিত সকল তথ্য مباشرة শিক্ষা বোর্ডের অফিসিয়াল সার্ভার থেকে আনা হয়।
             </DialogDescription>
           </DialogHeader>
           <div className="prose prose-sm dark:prose-invert">

@@ -18,7 +18,7 @@ export const formSchema = z.object({
   board: z.string().min(1, 'বোর্ড নির্বাচন আবশ্যক।'),
   roll: z.string().min(1, 'রোল নম্বর আবশ্যক।'),
   reg: z.string().min(1, 'রেজিস্ট্রেশন নম্বর আবশ্যক।'),
-  result_type: z.string(), // This is not used by the new backend, but kept for consistency
+  result_type: z.string(), // This is not used by this backend, but kept for consistency
   captcha: z.string().min(1, 'ক্যাপচা আবশ্যক।'),
 });
 
@@ -31,7 +31,7 @@ const boards = [
     { value: 'jessore', label: 'Jessore' },
     { value: 'mymensingh', label: 'Mymensingh' },
     { value: 'rajshahi', label: 'Rajshahi' },
-    { value: 'sylhet', label: 'Sylhet' }, // Corrected from Shylet
+    { value: 'sylhet', label: 'Sylhet' },
     { value: 'madrasah', label: 'Madrasah' },
     { value: 'tec', label: 'Technical' },
     { value: 'dibs', label: 'DIBS(Dhaka)' },
@@ -43,13 +43,13 @@ const years = Array.from({ length: currentYear - 1995 }, (_, i) => currentYear -
 
 const exams = [
     { value: 'jsc', label: 'JSC/JDC' },
+    { value: 'ssc_voc', label: 'SSC(Vocational)' },
     { value: 'ssc', label: 'SSC/Dakhil' },
     { value: 'hsc', label: 'HSC/Alim/Equivalent' },
-    { value: 'ssc_voc', label: 'SSC(Vocational)'},
-    { value: 'hsc_voc', label: 'HSC(Vocational)'},
-    { value: 'hsc_hbm', label: 'HSC(BM)'},
-    { value: 'hsc_dic', label: 'Diploma in Commerce'},
-    { value: 'hsc_dba', label: 'Diploma in Business Studies'},
+    { value: 'hsc_voc', label: 'HSC(Vocational)' },
+    { value: 'hsc_hbm', label: 'HSC(BM)' },
+    { value: 'hsc_dic', label: 'Diploma in Commerce' },
+    { value: 'hsc_dba', label: 'Diploma in Business Studies' },
 ];
 
 
@@ -99,7 +99,7 @@ export function ExamForm({ form, onSubmit, isSubmitting }: ExamFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" id="exam-form-component">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <FormField
             control={form.control}
             name="exam"
@@ -154,7 +154,8 @@ export function ExamForm({ form, onSubmit, isSubmitting }: ExamFormProps) {
               </FormItem>
             )}
           />
-          
+          </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
               control={form.control}
               name="roll"
