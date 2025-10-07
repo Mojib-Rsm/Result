@@ -1,49 +1,27 @@
 
 'use server';
 
-import type { ExamResult, GradeInfo } from '@/types';
+import type { ExamResult, GradeInfo, StudentInfo } from '@/types';
 import { z } from 'zod';
 import { formSchema } from '@/components/exam-form';
 import { JSDOM } from 'jsdom';
 
-// Store cookies locally per request, not globally.
-// let cookieJar = ''; // This was causing issues with concurrent requests.
-
-async function getCaptchaAction(establishSession = false) {
+// This function now fetches and returns the mathematical captcha string
+async function getCaptchaAction() {
     try {
-        const response = await fetch('https://www.eboardresults.com/v2/captcha?t=' + Date.now(), {
-            method: 'GET',
+        const response = await fetch('http://www.educationboardresults.gov.bd/index.php', {
             headers: {
-                "accept": "image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8",
-                "accept-language": "en-GB,en-US;q=0.9,en;q=0.8,ne;q=0.7,bn;q=0.6",
-                "priority": "u=1, i",
-                "sec-ch-ua": "\"Not;A=Brand\";v=\"99\", \"Google Chrome\";v=\"139\", \"Chromium\";v=\"139\"",
-                "sec-ch-ua-mobile": "?0",
-                "sec-ch-ua-platform": "\"Windows\"",
-                "sec-fetch-dest": "image",
-                "sec-fetch-mode": "no-cors",
-                "sec-fetch-site": "same-origin",
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
-                "Referer": "https://www.eboardresults.com/v2/home",
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36",
             }
         });
+        const html = await response.text();
+        const dom = new JSDOM(html);
+        const captchaText = dom.window.document.querySelector("body fieldset > table > tr:nth-child(7) > td:nth-child(2)")?.textContent?.trim();
 
-        const newCookies = response.headers.get('set-cookie');
-        let sessionCookie = '';
-        if (newCookies) {
-            sessionCookie = newCookies.split(';')[0];
+        if (!captchaText) {
+            throw new Error("Captcha string not found in the page.");
         }
-
-        const buffer = await response.arrayBuffer();
-        const imageBase64 = Buffer.from(buffer).toString('base64');
-        
-        const captchaData = `data:image/jpeg;base64,${imageBase64}`;
-
-        if (establishSession) {
-            return { captchaImage: captchaData, cookie: sessionCookie };
-        }
-        
-        return captchaData;
+        return captchaText;
 
     } catch (error) {
         console.error("Captcha fetch failed", error);
@@ -53,169 +31,119 @@ async function getCaptchaAction(establishSession = false) {
 
 
 async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<ExamResult> {
-  // IMPORTANT: Establish a new session for EVERY request to avoid serving stale PDF downloads.
-  const { cookie: cookieJar } = await getCaptchaAction(true) as { cookie: string, captchaImage: string };
-    
-  const { exam, year, board, result_type, roll, reg, eiin, dcode, ccode, captcha } = values;
+    const { exam, year, board, roll, reg, captcha } = values;
 
-  const formData = new URLSearchParams();
-    formData.append('exam', exam);
-    formData.append('year', year);
-    formData.append('board', board);
-    formData.append('result_type', result_type);
-    formData.append('roll', roll || '');
-    formData.append('reg', reg || '');
-    formData.append('eiin', eiin || '');
-    formData.append('dcode', dcode || '');
-    formData.append('ccode', ccode || '');
-    formData.append('captcha', captcha || '');
+    const ss = new req.Session();
 
-
-  try {
-    const response = await fetch("https://www.eboardresults.com/v2/getres", {
-        method: 'POST',
-        headers: {
-            "accept": "application/json, text/javascript, */*; q=0.01",
-            "accept-language": "en-GB,en-US;q=0.9,en;q=0.8,ne;q=0.7,bn;q=0.6",
-            "content-type": "application/x-www-form-urlencoded; charset=UTF-8",
-            "priority": "u=1, i",
-            "sec-ch-ua": "\"Not;A=Brand\";v=\"99\", \"Google Chrome\";v=\"139\", \"Chromium\";v=\"139\"",
-            "sec-ch-ua-mobile": "?0",
-            "sec-ch-ua-platform": "\"Windows\"",
-            "sec-fetch-dest": "empty",
-            "sec-fetch-mode": "cors",
-            "sec-fetch-site": "same-origin",
-            "x-requested-with": "XMLHttpRequest",
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
-            "Referer": "https://www.eboardresults.com/v2/home",
-            ...(cookieJar && { 'Cookie': cookieJar }),
-        },
-        body: formData.toString()
-    });
-
-    if (!response.ok) {
-        throw new Error('নেটওয়ার্ক প্রতিক্রিয়া ঠিক ছিল না।');
-    }
-
-    const responseText = await response.text();
-    if (!responseText) {
-        throw new Error("ফলাফল বোর্ড সার্ভার থেকে কোনো সাড়া পাওয়া যায়নি। অনুগ্রহ করে কিছুক্ষণ পর আবার চেষ্টা করুন।");
-    }
-
-    const data = JSON.parse(responseText);
-
-
-    if (data.status === "0" || data.status === 0) { // Success
+    try {
+        const indexPage = await fetch("http://www.educationboardresults.gov.bd/index.php");
+        const soup = new JSDOM(await indexPage.text()).window.document;
+        const captchaString = soup.querySelector("body fieldset > table > tr:nth-child(7) > td:nth-child(2)")?.textContent || '';
         
-        if((result_type !== '1' && result_type !== '8') && data.extra && data.extra.content) {
-            const dom = new JSDOM(data.extra.content);
-            const titleElement = dom.window.document.querySelector('h3');
-            const title = titleElement ? titleElement.textContent : 'Result';
-
-            return {
-                roll: roll || '',
-                reg: reg || '',
-                board: board,
-                year: year,
-                exam: exam,
-                gpa: 0,
-                status: 'Pass', 
-                studentInfo: {
-                    name: title || 'Institution/Center Result',
-                    fatherName: '',
-                    motherName: '',
-                    group: '',
-                    dob: '',
-                    institute: '',
-                    session: '',
-                },
-                grades: [],
-                rawHtml: data.extra.content,
-                pdfName: data.extra.pdfname
-            };
+        let captchaSolved;
+        try {
+            captchaSolved = eval(captchaString);
+        } catch (e) {
+            throw new Error("গাণিতিক ক্যাপচা সমাধান করা যায়নি।");
+        }
+        
+        if (String(captchaSolved) !== captcha) {
+            throw new Error("ভুল ক্যাপচা বা নিরাপত্তা কোড। অনুগ্রহ করে আবার চেষ্টা করুন।");
         }
 
-        const apiResult = data.res;
-        const gpa = parseFloat(apiResult.gpa) || 0;
-        const status = apiResult.result === 'P' ? 'Pass' : 'Fail';
-        
-        let grades: GradeInfo[] = [];
+        const formData = new URLSearchParams();
+        formData.append('sr', '3');
+        formData.append('et', '2');
+        formData.append('exam', exam);
+        formData.append('year', year);
+        formData.append('board', board);
+        formData.append('roll', roll);
+        formData.append('reg', reg);
+        formData.append('value_s', captcha);
+        formData.append('button2', 'Submit');
 
-        const mainSubjects = apiResult.display_details || '';
-        const optionalSubjects = apiResult.display_details_ca || '';
-        
-        const allSubjectsString = [mainSubjects, optionalSubjects].filter(Boolean).join(',');
-
-        if (allSubjectsString) {
-             grades = allSubjectsString.split(',').map((g: string) => {
-                const parts = g.trim().split(':');
-                if (parts.length < 2) return null;
-                
-                const code = parts[0].trim();
-                let gradeInfo = parts.slice(1).join(':').trim();
-                let grade;
-                let marks;
-
-                if (gradeInfo.includes('=')) {
-                    const gradeParts = gradeInfo.split('=');
-                    marks = gradeParts[0];
-                    grade = gradeParts[1];
-                } else {
-                    grade = gradeInfo;
-                }
-
-                const subDetail = data.sub_details?.find((s: any) => s.SUB_CODE === code);
-                const subject = subDetail ? subDetail.SUB_NAME : "বিষয় লোড হচ্ছে...";
-
-                return { code, subject, grade, marks };
-             }).filter((g): g is GradeInfo => g !== null);
-        }
-
-        const registrationNumber = apiResult.regno === '[NOT SHOWN]' ? values.reg : apiResult.regno;
-
-        return {
-            roll: apiResult.roll_no || values.roll,
-            reg: registrationNumber || '',
-            board: apiResult.board_name ? apiResult.board_name.toLowerCase() : values.board,
-            year: values.year,
-            exam: values.exam,
-            gpa: gpa,
-            status: status,
-            studentInfo: {
-                name: apiResult.name || 'N/A',
-                fatherName: apiResult.fname || 'N/A',
-                motherName: apiResult.mname || 'N/A',
-                group: apiResult.stud_group || 'N/A',
-                dob: apiResult.dob || 'N/A',
-                institute: apiResult.inst_name || 'N/A',
-                session: apiResult.session || 'N/A',
+        const resultPage = await fetch('http://www.educationboardresults.gov.bd/result.php', {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36",
+                "Referer": "http://www.educationboardresults.gov.bd/index.php"
             },
-            grades: grades,
-        };
-    } else { // Error from API
-         if(data.message && data.message.toLowerCase().includes("not found")) {
-             throw new Error("ফলাফল খুঁজে পাওয়া যায়নি। অনুগ্রহ করে আপনার রোল, রেজিস্ট্রেশন, বোর্ড এবং বছর পরীক্ষা করে আবার চেষ্টা করুন।");
-        }
-        if(data.message && (data.message.toLowerCase().includes("captcha") || data.message.toLowerCase().includes("security key"))) {
-            throw new Error("ভুল ক্যাপচা বা নিরাপত্তা কোড। অনুগ্রহ করে আবার চেষ্টা করুন।");
-        }
-        // For any other error, throw the message from the API
-        throw new Error(data.message || 'ফলাফল আনার সময় একটি অজানা ত্রুটি ঘটেছে বা ভুল ক্যাপচা!');
-    }
+            body: formData.toString()
+        });
 
-  } catch (error) {
-    console.error("Error in searchResultLegacy:", error);
-    if (error instanceof Error) {
-        if (error.message.toLowerCase().includes("captcha") || error.message.toLowerCase().includes("security key")) {
-            throw new Error("ভুল ক্যাপচা বা নিরাপত্তা কোড। অনুগ্রহ করে আবার চেষ্টা করুন।");
+        const resultHtml = await resultPage.text();
+        const resultSoup = new JSDOM(resultHtml).window.document;
+        
+        const allInfoTable = resultSoup.querySelectorAll('table.black12');
+        
+        if (allInfoTable.length === 0) {
+            throw new Error("ফলাফল খুঁজে পাওয়া যায়নি। অনুগ্রহ করে আপনার রোল, রেজিস্ট্রেশন, বোর্ড এবং বছর পরীক্ষা করে আবার চেষ্টা করুন।");
         }
-        if (error.message.includes("Unexpected end of JSON input")){
-             throw new Error("ফলাফল বোর্ড সার্ভার থেকে কোনো সাড়া পাওয়া যায়নি। অনুগ্রহ করে কিছুক্ষণ পর আবার চেষ্টা করুন।");
+
+        const infoTable = allInfoTable[0];
+        const gradeSheet = allInfoTable[allInfoTable.length - 1];
+
+        const studentInfo: StudentInfo = {
+            name: infoTable.querySelector("tr:nth-child(1) > td:nth-child(4)")?.textContent?.trim() || 'N/A',
+            fatherName: infoTable.querySelector("tr:nth-child(2) > td:nth-child(4)")?.textContent?.trim() || 'N/A',
+            motherName: infoTable.querySelector("tr:nth-child(3) > td:nth-child(4)")?.textContent?.trim() || 'N/A',
+            group: infoTable.querySelector("tr:nth-child(3) > td:nth-child(2)")?.textContent?.trim() || 'N/A',
+            dob: infoTable.querySelector("tr:nth-child(4) > td:nth-child(4)")?.textContent?.trim() || 'N/A',
+            institute: infoTable.querySelector("tr:nth-child(5) > td:nth-child(4)")?.textContent?.trim() || 'N/A',
+            session: '', // Not available from this source
+        };
+        
+        const resultText = infoTable.querySelector("tr:nth-child(5) > td:nth-child(2)")?.textContent?.trim() || 'Fail';
+        const status: 'Pass' | 'Fail' = resultText.toUpperCase().includes('PASS') ? 'Pass' : 'Fail';
+        
+        const gpaText = infoTable.querySelector("tr:nth-child(6) > td:nth-child(2)")?.textContent?.trim() || '0';
+        const gpa = parseFloat(gpaText) || 0;
+
+        const grades: GradeInfo[] = [];
+        const gradeRows = gradeSheet.querySelectorAll("tr");
+        for (let i = 1; i < gradeRows.length; i++) {
+            const row = gradeRows[i];
+            const cells = row.querySelectorAll('td');
+            if(cells.length === 3) {
+                 grades.push({
+                    code: cells[0].textContent?.trim() || '',
+                    subject: cells[1].textContent?.trim() || '',
+                    grade: cells[2].textContent?.trim() || ''
+                });
+            }
         }
-        throw error;
+        
+        const finalResult: ExamResult = {
+            roll,
+            reg,
+            board: board.charAt(0).toUpperCase() + board.slice(1),
+            year,
+            exam,
+            gpa,
+            status,
+            studentInfo,
+            grades,
+            rawHtml: resultSoup.querySelector('.main-wrapper-content-container')?.innerHTML,
+        };
+
+        return finalResult;
+
+    } catch (error) {
+        console.error("Error in searchResultLegacy:", error);
+        if (error instanceof Error) {
+            throw error;
+        }
+        throw new Error('একটি অজানা ত্রুটি ঘটেছে।');
     }
-    throw new Error('একটি অজানা ত্রুটি ঘটেছে। অনুগ্রহ করে পরে আবার চেষ্টা করুন বা ভুল ক্যাপচা!');
-  }
+}
+
+// Dummy req.Session for compatibility with the new logic, not actually used.
+const req = {
+    Session: class {
+        get() {}
+        post() {}
+    }
 }
 
 export { getCaptchaAction, searchResultLegacy };

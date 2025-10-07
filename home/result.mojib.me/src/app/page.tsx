@@ -38,12 +38,8 @@ export default function Home() {
       exam: '',
       year: '',
       board: '',
-      result_type: '1',
       roll: '',
       reg: '',
-      eiin: '',
-      dcode: '',
-      ccode: '',
       captcha: ''
     },
   });
@@ -56,18 +52,15 @@ export default function Home() {
     try {
       const searchResult = await searchResultLegacy(values);
       setResult(searchResult);
-       if (values.result_type === '1') {
-         addHistoryItem({
-            roll: values.roll!,
-            reg: values.reg,
-            board: values.board,
-            year: values.year,
-            exam: values.exam,
-            result_type: values.result_type,
-            result: searchResult,
-            eiin: values.eiin
-        });
-       }
+       addHistoryItem({
+          roll: values.roll!,
+          reg: values.reg,
+          board: values.board,
+          year: values.year,
+          exam: values.exam,
+          result_type: 'individual', // The new source only supports individual
+          result: searchResult,
+      });
     } catch (e: any) {
        setError(e.message);
        toast({
