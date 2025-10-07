@@ -205,12 +205,13 @@ export function ExamForm({ form, onSubmit, isSubmitting }: ExamFormProps) {
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center pt-4">
             <div className="flex items-center gap-2">
+                <label htmlFor="captcha_q" className="text-sm font-medium">নিরাপত্তা প্রশ্ন:</label>
                 {isCaptchaLoading ? (
                     <div className="h-10 flex items-center justify-center bg-muted rounded-md px-4">
                         <Loader2 className="h-6 w-6 animate-spin"/>
                     </div>
                 ) : captchaText ? (
-                    <div className="h-10 flex items-center justify-center bg-muted rounded-md px-4 font-mono text-lg">
+                    <div id="captcha_q" className="h-10 flex items-center justify-center bg-muted rounded-md px-4 font-mono text-lg">
                       {captchaText}
                     </div>
                 ) : (
@@ -225,7 +226,7 @@ export function ExamForm({ form, onSubmit, isSubmitting }: ExamFormProps) {
                 name="captcha"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>নিরাপত্তা কোডের উত্তর</FormLabel>
+                    <FormLabel>নিরাপত্তা কোডের উত্তর দিন</FormLabel>
                     <FormControl>
                         <Input 
                             placeholder="উপরের গণিতের উত্তর লিখুন" 
@@ -257,4 +258,3 @@ export function ExamForm({ form, onSubmit, isSubmitting }: ExamFormProps) {
     </Form>
   );
 }
-

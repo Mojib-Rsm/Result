@@ -39,7 +39,7 @@ async function getCaptchaAction(establishSession = false) {
         
         const captchaString = captchaField.textContent.trim();
         
-        return { captchaText: `Solve: ${captchaString}`, cookie: sessionCookie };
+        return { captchaText: captchaString, cookie: sessionCookie };
 
     } catch (error) {
         console.error("Captcha fetch failed", error);
