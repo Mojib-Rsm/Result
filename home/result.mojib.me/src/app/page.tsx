@@ -18,7 +18,6 @@ import Link from 'next/link';
 export default function Home() {
   const [result, setResult] = useState<ExamResult | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
   const { addHistoryItem } = useHistory();
   const [showNotice, setShowNotice] = useState(false);
@@ -38,44 +37,36 @@ export default function Home() {
       exam: '',
       year: '',
       board: '',
-      result_type: '1',
       roll: '',
       reg: '',
-      eiin: '',
-      dcode: '',
-      ccode: '',
+      result_type: '1', // Default to individual result
       captcha: ''
     },
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
-    setError(null);
     setResult(null);
 
     try {
       const searchResult = await searchResultLegacy(values);
       setResult(searchResult);
-       if (values.result_type === '1' || values.result_type === '8') {
-         addHistoryItem({
-            roll: values.roll!,
-            reg: values.reg,
-            board: values.board,
-            year: values.year,
-            exam: values.exam,
-            result_type: values.result_type,
-            result: searchResult,
-            eiin: values.eiin
-        });
-       }
+      addHistoryItem({
+          roll: values.roll!,
+          reg: values.reg,
+          board: values.board,
+          year: values.year,
+          exam: values.exam,
+          result_type: values.result_type,
+          result: searchResult,
+      });
     } catch (e: any) {
-       setError(e.message);
        toast({
-        title: "Error",
+        title: "ত্রুটি",
         description: e.message,
         variant: "destructive"
        });
-        // Auto-refresh captcha on any error
+       // Auto-refresh captcha on any error
        const formComponent = document.getElementById('exam-form-component');
        if (formComponent) {
            const event = new CustomEvent('refreshcaptcha');
@@ -88,8 +79,12 @@ export default function Home() {
 
   const resetSearch = () => {
     setResult(null);
-    setError(null);
     form.reset();
+    const formComponent = document.getElementById('exam-form-component');
+    if (formComponent) {
+        const event = new CustomEvent('refreshcaptcha');
+        formComponent.dispatchEvent(event);
+    }
   };
 
   return (

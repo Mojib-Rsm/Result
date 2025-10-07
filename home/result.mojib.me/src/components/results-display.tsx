@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Download, Loader2, Search, FileDown } from 'lucide-react';
+import { Download, Loader2, Search, FileDown, Printer } from 'lucide-react';
 import type { ExamResult } from '@/types';
 import { Separator } from './ui/separator';
 import { cn } from '@/lib/utils';
@@ -57,61 +57,16 @@ const FooterContent = () => (
 
 
 export default function ResultsDisplay({ result, onReset, isDialog = false }: ResultsDisplayProps) {
-  const [isDownloading, setIsDownloading] = useState(false);
+  const [isPrinting, setIsPrinting] = useState(false);
   
-  const handleDownloadPdf = async () => {
-    const element = document.getElementById('printable-area');
-    if (!element) return;
-    setIsDownloading(true);
-
-    try {
-        const canvas = await html2canvas(element, {
-            scale: 3, // Increased scale for better resolution
-            useCORS: true,
-            logging: false,
-            onclone: (document) => {
-              // Remove shadows from the cloned document to improve PDF clarity
-              const clonedElement = document.getElementById('printable-area');
-              if(clonedElement) {
-                clonedElement.style.boxShadow = 'none';
-                clonedElement.style.border = 'none';
-              }
-            }
-        });
-
-        const imgData = canvas.toDataURL('image/png');
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = pdf.internal.pageSize.getHeight();
-        const imgWidth = canvas.width;
-        const imgHeight = canvas.height;
-        const ratio = imgWidth / imgHeight;
-        let newImgWidth = pdfWidth - 20; // with margin
-        let newImgHeight = newImgWidth / ratio;
-        
-        if (newImgHeight > pdfHeight - 20) {
-            newImgHeight = pdfHeight - 20;
-            newImgWidth = newImgHeight * ratio;
-        }
-
-        const x = (pdfWidth - newImgWidth) / 2;
-        const y = 10; // top margin
-        
-        pdf.addImage(imgData, 'PNG', x, y, newImgWidth, newImgHeight);
-        
-        const fileName = `${result.studentInfo?.name?.replace(/\s+/g, '_') || 'result'}-${result.roll || ''}-bdedu.me.pdf`;
-        pdf.save(fileName);
-    } catch(error) {
-        console.error("Error generating PDF:", error);
-    } finally {
-        setIsDownloading(false);
-    }
-  };
+  const handlePrint = () => {
+    window.print();
+  }
 
   const gpa = result.gpa?.toFixed(2);
   const isPass = result.status === 'Pass';
   const gpaGrade = getGpaGrade(result.gpa);
-  const showMarks = result.year === '2025' && result.grades.some(g => g.marks);
+  const showMarks = result.grades.some(g => g.marks);
   
   const InfoItem = ({ label, value }: { label: string, value: string | undefined}) => (
     <div className="flex flex-col p-2 bg-muted/30 rounded-md">
@@ -130,44 +85,24 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
       isDialog && "shadow-none border-none"
   );
 
-  const isIndividualResult = !result.rawHtml;
-
-  const downloadUrl = result.pdfName ? `https://www.eboardresults.com/v2/pdl` : '#';
-
   return (
     <div className={containerClasses}>
        <div className={cn("flex justify-end gap-2", !isDialog && "no-print")}>
           {!isDialog && onReset && (
-              <Button variant="outline" onClick={onReset} disabled={isDownloading}>
+              <Button variant="outline" onClick={onReset} disabled={isPrinting}>
                   <Search className="mr-2 h-4 w-4" />
                   অন্য ফলাফল খুঁজুন
               </Button>
           )}
 
-          {isIndividualResult ? (
-            <Button onClick={handleDownloadPdf} disabled={isDownloading}>
-                {isDownloading ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <Download className="mr-2 h-4 w-4" />
-                )}
-                ডাউনলোড পিডিএফ
-            </Button>
-          ) : (
-            <Button asChild>
-                <a href={downloadUrl} target="_blank" rel="noopener noreferrer" download>
-                    <FileDown className="mr-2 h-4 w-4" />
-                    সম্পূর্ণ ফলাফল ডাউনলোড করুন
-                </a>
-            </Button>
-          )}
-
+          <Button onClick={handlePrint} disabled={isPrinting}>
+              <Printer className="mr-2 h-4 w-4" />
+              প্রিন্ট করুন
+          </Button>
       </div>
 
       <div id="pdf-container">
         <Card className={cardClasses} id="printable-area">
-          {isIndividualResult ? (
-            <>
               <CardHeader>
                    <div className="relative text-center">
                       <div className="flex justify-center">
@@ -184,7 +119,6 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
                       <div className="absolute top-0 right-0 text-right font-bold text-xl min-w-[120px]">
                           <p className={isPass ? 'text-green-600' : 'text-destructive'}>Status: {result.status}</p>
                           {isPass && <p>GPA: {gpa}</p>}
-                          {isPass && <p>Grade: {gpaGrade}</p>}
                       </div>
                   </div>
                    <CardDescription className="text-center">{result.exam.toUpperCase()} Examination - {result.year}</CardDescription>
@@ -199,7 +133,7 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
                   <InfoItem label="Mother's Name" value={result.studentInfo.motherName} />
                   <InfoItem label="Group" value={result.studentInfo.group} />
                   <InfoItem label="Date of Birth" value={result.studentInfo.dob} />
-                  <InfoItem label="Session" value={result.studentInfo.session} />
+                  {result.studentInfo.session && <InfoItem label="Session" value={result.studentInfo.session} />}
                   <div className="col-span-2 md:col-span-3">
                   <InfoItem label="Institute" value={result.studentInfo.institute} />
                   </div>
@@ -229,13 +163,7 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
                   </TableBody>
               </Table>
               </CardContent>
-            </>
-          ) : (
-            <CardContent className="pt-6">
-               <div dangerouslySetInnerHTML={{ __html: result.rawHtml || '' }} />
-            </CardContent>
-          )}
-
+            
             <Separator className="my-6" />
             
             <div className="px-6 pb-6">
@@ -244,21 +172,17 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
         </Card>
       </div>
       
-      {!isDialog && isIndividualResult && (
+      {!isDialog && (
          <CardFooter className="flex justify-end gap-2 no-print">
             {onReset && (
-                <Button variant="outline" onClick={onReset} disabled={isDownloading}>
+                <Button variant="outline" onClick={onReset} disabled={isPrinting}>
                     <Search className="mr-2 h-4 w-4" />
                     অন্য ফলাফল খুঁজুন
                 </Button>
             )}
-            <Button onClick={handleDownloadPdf} disabled={isDownloading}>
-                {isDownloading ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <Download className="mr-2 h-4 w-4" />
-                )}
-                ডাউনলোড পিডিএফ
+            <Button onClick={handlePrint} disabled={isPrinting}>
+                <Printer className="mr-2 h-4 w-4" />
+                প্রিন্ট করুন
             </Button>
         </CardFooter>
       )}
