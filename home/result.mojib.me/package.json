@@ -1,6 +1,7 @@
 {
-  "name": "bd-edu-result",
-  "version": "0.1.0",
+  "name": "bd-edu-result-vercel",
+  "version": "1.0.0",
+  "description": "A web application to check Bangladesh Education Board results, designed for Vercel deployment.",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack -p 9002",
