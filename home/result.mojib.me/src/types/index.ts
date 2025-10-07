@@ -1,3 +1,4 @@
+
 export interface GradeInfo {
   code: string;
   subject: string;
@@ -12,7 +13,7 @@ export interface StudentInfo {
   group: string;
   dob: string;
   institute: string;
-  session?: string;
+  session: string;
 }
 
 export interface ExamResult {

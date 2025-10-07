@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Download, Loader2, Search } from 'lucide-react';
+import { Download, Loader2, Search, FileDown } from 'lucide-react';
 import type { ExamResult } from '@/types';
 import { Separator } from './ui/separator';
 import { cn } from '@/lib/utils';
@@ -111,6 +111,7 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
   const gpa = result.gpa?.toFixed(2);
   const isPass = result.status === 'Pass';
   const gpaGrade = getGpaGrade(result.gpa);
+  const showMarks = result.year === '2025' && result.grades.some(g => g.marks);
   
   const InfoItem = ({ label, value }: { label: string, value: string | undefined}) => (
     <div className="flex flex-col p-2 bg-muted/30 rounded-md">
@@ -129,7 +130,9 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
       isDialog && "shadow-none border-none"
   );
 
-  const isIndividualResult = result.grades && result.grades.length > 0;
+  const isIndividualResult = !result.rawHtml;
+
+  const downloadUrl = result.pdfName ? `https://www.eboardresults.com/v2/pdl` : '#';
 
   return (
     <div className={containerClasses}>
@@ -141,7 +144,7 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
               </Button>
           )}
 
-          {isIndividualResult && (
+          {isIndividualResult ? (
             <Button onClick={handleDownloadPdf} disabled={isDownloading}>
                 {isDownloading ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -150,7 +153,15 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
                 )}
                 ডাউনলোড পিডিএফ
             </Button>
+          ) : (
+            <Button asChild>
+                <a href={downloadUrl} target="_blank" rel="noopener noreferrer" download>
+                    <FileDown className="mr-2 h-4 w-4" />
+                    সম্পূর্ণ ফলাফল ডাউনলোড করুন
+                </a>
+            </Button>
           )}
+
       </div>
 
       <div id="pdf-container">
@@ -188,7 +199,7 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
                   <InfoItem label="Mother's Name" value={result.studentInfo.motherName} />
                   <InfoItem label="Group" value={result.studentInfo.group} />
                   <InfoItem label="Date of Birth" value={result.studentInfo.dob} />
-                  {result.studentInfo.session && <InfoItem label="Session" value={result.studentInfo.session} />}
+                  <InfoItem label="Session" value={result.studentInfo.session} />
                   <div className="col-span-2 md:col-span-3">
                   <InfoItem label="Institute" value={result.studentInfo.institute} />
                   </div>
@@ -202,6 +213,7 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
                   <TableRow>
                       <TableHead>Code</TableHead>
                       <TableHead>Subject Name</TableHead>
+                      {showMarks && <TableHead className="text-right">Marks</TableHead>}
                       <TableHead className="text-right">Letter Grade</TableHead>
                   </TableRow>
                   </TableHeader>
@@ -210,6 +222,7 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
                       <TableRow key={g.code} className={cn(index % 2 !== 0 && 'bg-muted/50')}>
                       <TableCell>{g.code}</TableCell>
                       <TableCell className="font-medium">{g.subject}</TableCell>
+                      {showMarks && <TableCell className="text-right font-bold">{g.marks}</TableCell>}
                       <TableCell className="text-right font-bold">{g.grade}</TableCell>
                       </TableRow>
                   ))}
@@ -219,7 +232,7 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
             </>
           ) : (
             <CardContent className="pt-6">
-               <div dangerouslySetInnerHTML={{ __html: result.rawHtml || 'ফলাফল পাওয়া যায়নি।' }} />
+               <div dangerouslySetInnerHTML={{ __html: result.rawHtml || '' }} />
             </CardContent>
           )}
 
