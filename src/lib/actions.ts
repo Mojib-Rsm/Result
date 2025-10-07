@@ -58,7 +58,18 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
     
   const { exam, year, board, result_type, roll, reg, eiin, dcode, ccode, captcha } = values;
 
-  const formData = `exam=${exam}&year=${year}&board=${board}&result_type=${result_type}&roll=${roll || ''}&reg=${reg || ''}&eiin=${eiin || ''}&dcode=${dcode || ''}&ccode=${ccode || ''}&captcha=${captcha || ''}`;
+  const formData = new URLSearchParams();
+    formData.append('exam', exam);
+    formData.append('year', year);
+    formData.append('board', board);
+    formData.append('result_type', result_type);
+    formData.append('roll', roll || '');
+    formData.append('reg', reg || '');
+    formData.append('eiin', eiin || '');
+    formData.append('dcode', dcode || '');
+    formData.append('ccode', ccode || '');
+    formData.append('captcha', captcha || '');
+
 
   try {
     const response = await fetch("https://www.eboardresults.com/v2/getres", {
@@ -79,7 +90,7 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
             "Referer": "https://www.eboardresults.com/v2/home",
             ...(cookieJar && { 'Cookie': cookieJar }),
         },
-        body: formData
+        body: formData.toString()
     });
 
     if (!response.ok) {
@@ -90,7 +101,7 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
 
     if (data.status === "0" || data.status === 0) { // Success
         
-        if(result_type !== '1' && data.extra && data.extra.content) {
+        if((result_type !== '1' && result_type !== '8') && data.extra && data.extra.content) {
             const dom = new JSDOM(data.extra.content);
             const titleElement = dom.window.document.querySelector('h3');
             const title = titleElement ? titleElement.textContent : 'Result';

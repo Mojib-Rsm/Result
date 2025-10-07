@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useForm } from 'react-hook-form';
@@ -25,7 +24,7 @@ export const formSchema = z.object({
   ccode: z.string().optional(),
   captcha: z.string().min(1, 'ক্যাপচা আবশ্যক।'),
 }).refine((data) => {
-    if (data.result_type === '1' && !data.roll) {
+    if ((data.result_type === '1' || data.result_type === '8') && !data.roll) {
         return false;
     }
     return true;
@@ -33,7 +32,7 @@ export const formSchema = z.object({
     message: 'রোল নম্বর আবশ্যক।',
     path: ['roll'],
 }).refine((data) => {
-    if (data.result_type === '1' && !data.reg) {
+    if ((data.result_type === '1' || data.result_type === '8') && !data.reg) {
         return false;
     }
     return true;
@@ -41,7 +40,7 @@ export const formSchema = z.object({
     message: 'রেজিস্ট্রেশন নম্বর আবশ্যক।',
     path: ['reg'],
 }).refine((data) => {
-    if ((data.result_type === '2' || data.result_type === '5' || data.result_type === '6') && !data.eiin) {
+    if ((data.result_type === '2' || data.result_type === '6') && !data.eiin) {
         return false;
     }
     return true;
@@ -50,7 +49,7 @@ export const formSchema = z.object({
     path: ['eiin'],
 })
 .refine(data => {
-    if (data.result_type === '4' && !data.dcode) {
+    if (data.result_type === '5' && !data.dcode) {
         return false;
     }
     return true;
@@ -59,7 +58,7 @@ export const formSchema = z.object({
     path: ['dcode']
 })
 .refine(data => {
-    if (data.result_type === '3' && !data.ccode) {
+    if (data.result_type === '4' && !data.ccode) {
         return false;
     }
     return true;
@@ -70,18 +69,17 @@ export const formSchema = z.object({
 
 
 const boards = [
-    { value: 'barisal', label: 'বরিশাল' },
-    { value: 'chittagong', label: 'চট্টগ্রাম' },
-    { value: 'comilla', label: 'কুমিল্লা' },
-    { value: 'dhaka', label: 'ঢাকা' },
-    { value: 'dinajpur', label: 'দিনাজপুর' },
-    { value: 'jessore', label: 'যশোর' },
-    { value: 'mymensingh', label: 'ময়মনসিংহ' },
-    { value: 'rajshahi', label: 'রাজশাহী' },
-    { value: 'sylhet', label: 'সিলেট' },
-    { value: 'madrasah', label: 'মাদ্রাসা' },
-    { value: 'tec', label: 'কারিগরি' },
-    { value: 'dibs', label: 'ডিপ্লোমা ইন বিজনেস স্টাডিজ (DIBS)' },
+    { value: 'barisal', label: 'Barisal' },
+    { value: 'chittagong', label: 'Chittagong' },
+    { value: 'comilla', label: 'Comilla' },
+    { value: 'dhaka', label: 'Dhaka' },
+    { value: 'dinajpur', label: 'Dinajpur' },
+    { value: 'jessore', label: 'Jessore' },
+    { value: 'madrasah', label: 'Madrasah' },
+    { value: 'mymensingh', label: 'Mymensingh' },
+    { value: 'rajshahi', label: 'Rajshahi' },
+    { value: 'sylhet', label: 'Sylhet' },
+    { value: 'tec', label: 'Technical' },
 ];
 
 const currentYear = new Date().getFullYear();
@@ -89,23 +87,20 @@ const years = Array.from({ length: currentYear - 1996 + 1 }, (_, i) => currentYe
 
 
 const exams = [
-    { value: 'ssc', label: 'এসএসসি/দাখিল/সমমান' },
-    { value: 'hsc', label: 'এইচএসসি/আলিম/সমমান' },
-    { value: 'jsc', label: 'জেএসসি/জেডিসি' },
-    { value: 'ssc_voc', label: 'এসএসসি (ভোকেশনাল)'},
-    { value: 'hsc_voc', label: 'এইচএসসি (ভোকেশনাল)'},
-    { value: 'hsc_hbm', label: 'এইচএসসি (বিএম)'},
-    { value: 'hsc_dic', label: 'ডিপ্লোমা ইন কমার্স'},
-    { value: 'hsc_dba', label: 'ডিপ্লোমা ইন বিজনেস স্টাডিজ'},
+    { value: 'jsc', label: 'JSC/JDC' },
+    { value: 'ssc', label: 'SSC/Dakhil/Equivalent' },
+    { value: 'hsc', label: 'HSC/Alim/Equivalent' },
+    { value: 'dibs', label: 'DIBS (Diploma in Business Studies)' },
 ];
 
 const resultTypes = [
-    { value: '1', label: 'ব্যক্তিগত / বিস্তারিত ফলাফল' },
-    { value: '2', label: 'প্রতিষ্ঠানের ফলাফল' },
-    { value: '3', label: 'কেন্দ্রের ফলাফল' },
-    { value: '4', label: 'জেলা ভিত্তিক ফলাফল' },
-    { value: '5', label: 'প্রতিষ্ঠান বিশ্লেষণ' },
-    { value: '6', label: 'বোর্ড বিশ্লেষণ' },
+    { value: '1', label: 'Individual/Detailed Result' },
+    { value: '2', label: 'Institution Result' },
+    { value: '4', label: 'Center Result' },
+    { value: '5', label: 'District Result' },
+    { value: '6', label: 'Institution Analytics' },
+    { value: '7', label: 'Board Analytics' },
+    { value: '8', label: 'Individual/Detailed Re-scrutiny/Others Result' }
 ];
 
 
@@ -117,10 +112,10 @@ interface ExamFormProps {
 
 export function ExamForm({ form, onSubmit, isSubmitting }: ExamFormProps) {
   const resultType = form.watch('result_type');
-  const isRollRegRequired = resultType === '1';
-  const isEiinRequired = resultType === '2' || resultType === '5' || resultType === '6';
-  const isDistrictRequired = resultType === '4';
-  const isCenterRequired = resultType === '3';
+  const isRollRegRequired = resultType === '1' || resultType === '8';
+  const isEiinRequired = resultType === '2' || resultType === '6';
+  const isDistrictRequired = resultType === '5';
+  const isCenterRequired = resultType === '4';
 
   const [captchaImage, setCaptchaImage] = useState<string | null>(null);
   const [isCaptchaLoading, setIsCaptchaLoading] = useState(false);
@@ -308,6 +303,7 @@ export function ExamForm({ form, onSubmit, isSubmitting }: ExamFormProps) {
                             }}
                         />
                     </FormControl>
+                     <FormDescription>EIIN নম্বর খুঁজে পেতে সংশ্লিষ্ট শিক্ষা বোর্ডের ওয়েবসাইট দেখুন।</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}

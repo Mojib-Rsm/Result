@@ -56,7 +56,7 @@ export default function Home() {
     try {
       const searchResult = await searchResultLegacy(values);
       setResult(searchResult);
-       if (values.result_type === '1') {
+       if (values.result_type === '1' || values.result_type === '8') {
          addHistoryItem({
             roll: values.roll!,
             reg: values.reg,
@@ -97,7 +97,7 @@ export default function Home() {
       <Dialog open={showNotice} onOpenChange={setShowNotice}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>BD Result Hub-এ স্বাগতম!</DialogTitle>
+            <DialogTitle>BD Edu Result-এ স্বাগতম!</DialogTitle>
             <DialogDescription>
               এই ওয়েবসাইটটি শুধুমাত্র শিক্ষামূলক উদ্দেশ্যে এবং একটি ডেমো প্রকল্প হিসেবে তৈরি করা হয়েছে। 
               এখানে প্রদর্শিত সকল তথ্য সরাসরি শিক্ষা বোর্ডের অফিসিয়াল সার্ভার থেকে আনা হয়।
@@ -107,12 +107,8 @@ export default function Home() {
               <p>
                 আমরা কোনো তথ্য সংরক্ষণ করি না। আপনার অনুসন্ধানের ইতিহাস শুধুমাত্র আপনার ব্রাউজারেই সংরক্ষিত থাকে।
               </p>
-              <p>
-                এই প্রকল্পটি সম্পর্কে আরও জানতে বা আপনার মতামত জানাতে চাইলে ডেভেলপারকে ইমেইল করতে পারেন: 
-                <a href="mailto:mojibrsm@gmail.com" className="text-primary">mojibrsm@gmail.com</a>
-              </p>
                <p>
-                আমাদের মূল নিউজ পোর্টাল ভিজিট করুন: <Link href="https://www.bartanow.com" target="_blank" className="text-primary font-semibold">www.bartanow.com</Link>
+                আমাদের মূল ওয়েবসাইট ভিজিট করুন: <Link href="https://www.bdedu.me" target="_blank" className="text-primary font-semibold">bdedu.me</Link>
               </p>
           </div>
           <DialogFooter>
