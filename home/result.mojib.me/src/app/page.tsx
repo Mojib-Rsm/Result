@@ -39,7 +39,6 @@ export default function Home() {
       board: '',
       roll: '',
       reg: '',
-      result_type: '1', // Default to individual result
     },
   });
 
@@ -56,7 +55,6 @@ export default function Home() {
           board: values.board,
           year: values.year,
           exam: values.exam,
-          result_type: values.result_type,
           result: searchResult,
       });
     } catch (e: any) {

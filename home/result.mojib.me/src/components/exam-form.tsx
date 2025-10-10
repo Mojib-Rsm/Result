@@ -15,7 +15,6 @@ export const formSchema = z.object({
   board: z.string().min(1, 'বোর্ড নির্বাচন আবশ্যক।'),
   roll: z.string().min(1, 'রোল নম্বর আবশ্যক।'),
   reg: z.string().min(1, 'রেজিস্ট্রেশন নম্বর আবশ্যক।'),
-  result_type: z.string(),
 });
 
 const boards = [

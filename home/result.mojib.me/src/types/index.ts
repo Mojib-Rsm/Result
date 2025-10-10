@@ -37,7 +37,6 @@ export interface HistoryItem {
     board: string;
     year: string;
     exam: string;
-    result_type: string;
     result: ExamResult;
     timestamp: number;
     eiin?: string;
