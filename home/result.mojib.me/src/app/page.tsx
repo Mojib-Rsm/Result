@@ -40,7 +40,6 @@ export default function Home() {
       roll: '',
       reg: '',
       result_type: '1', // Default to individual result
-      captcha: ''
     },
   });
 
@@ -66,12 +65,6 @@ export default function Home() {
         description: e.message,
         variant: "destructive"
        });
-       // Auto-refresh captcha on any error
-       const formComponent = document.getElementById('exam-form-component');
-       if (formComponent) {
-           const event = new CustomEvent('refreshcaptcha');
-           formComponent.dispatchEvent(event);
-       }
     } finally {
         setIsSubmitting(false);
     }
@@ -80,12 +73,6 @@ export default function Home() {
   const resetSearch = () => {
     setResult(null);
     form.reset();
-    // Manually trigger captcha refresh on form reset
-    const formComponent = document.getElementById('exam-form-component');
-    if (formComponent) {
-        const event = new CustomEvent('refreshcaptcha');
-        formComponent.dispatchEvent(event);
-    }
   };
 
   return (

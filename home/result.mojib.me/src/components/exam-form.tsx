@@ -4,13 +4,10 @@
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2, RefreshCw } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { getCaptchaAction } from '@/lib/actions';
-import { cn } from '@/lib/utils';
+import { Loader2 } from 'lucide-react';
 
 export const formSchema = z.object({
   exam: z.string().min(1, 'পরীক্ষা নির্বাচন আবশ্যক।'),
@@ -18,8 +15,7 @@ export const formSchema = z.object({
   board: z.string().min(1, 'বোর্ড নির্বাচন আবশ্যক।'),
   roll: z.string().min(1, 'রোল নম্বর আবশ্যক।'),
   reg: z.string().min(1, 'রেজিস্ট্রেশন নম্বর আবশ্যক।'),
-  result_type: z.string(), // This is not used by this backend, but kept for consistency
-  captcha: z.string().min(1, 'ক্যাপচা আবশ্যক।'),
+  result_type: z.string(),
 });
 
 const boards = [
@@ -60,42 +56,6 @@ interface ExamFormProps {
 }
 
 export function ExamForm({ form, onSubmit, isSubmitting }: ExamFormProps) {
-  const [captchaText, setCaptchaText] = useState<string | null>(null);
-  const [isCaptchaLoading, setIsCaptchaLoading] = useState(false);
-
-  const refreshCaptcha = async () => {
-      setIsCaptchaLoading(true);
-      try {
-          const { captchaText: text } = await getCaptchaAction();
-          setCaptchaText(text);
-      } catch (error) {
-          console.error(error);
-          setCaptchaText("ক্যাপচা লোড করা যায়নি");
-      } finally {
-          setIsCaptchaLoading(false);
-      }
-  };
-
-  useEffect(() => {
-      refreshCaptcha();
-  }, []);
-
-  useEffect(() => {
-    const handleRefreshCaptcha = () => refreshCaptcha();
-    const formComponent = document.getElementById('exam-form-component');
-    
-    if (formComponent) {
-      formComponent.addEventListener('refreshcaptcha', handleRefreshCaptcha);
-    }
-    
-    return () => {
-      if (formComponent) {
-        formComponent.removeEventListener('refreshcaptcha', handleRefreshCaptcha);
-      }
-    };
-  }, []);
-
-  
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" id="exam-form-component">
@@ -203,51 +163,6 @@ export function ExamForm({ form, onSubmit, isSubmitting }: ExamFormProps) {
               )}
             />
         </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center pt-4">
-            <div className="flex items-center gap-2">
-                <label htmlFor="captcha_q" className="text-sm font-medium">নিরাপত্তা প্রশ্ন:</label>
-                {isCaptchaLoading ? (
-                    <div className="h-10 flex items-center justify-center bg-muted rounded-md px-4">
-                        <Loader2 className="h-6 w-6 animate-spin"/>
-                    </div>
-                ) : captchaText ? (
-                    <div id="captcha_q" className="h-10 flex items-center justify-center bg-muted rounded-md px-4 font-mono text-lg">
-                      {captchaText}
-                    </div>
-                ) : (
-                    <div className="h-10 flex items-center justify-center bg-muted rounded-md px-4 text-xs text-muted-foreground">ক্যাপচা লোড করা যায়নি</div>
-                )}
-                <Button type="button" variant="outline" size="icon" onClick={refreshCaptcha} disabled={isCaptchaLoading}>
-                    <RefreshCw className={cn("h-4 w-4", isCaptchaLoading && "animate-spin")} />
-                </Button>
-            </div>
-            <FormField
-                control={form.control}
-                name="captcha"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>নিরাপত্তা কোডের উত্তর দিন</FormLabel>
-                    <FormControl>
-                        <Input 
-                            placeholder="উপরের গণিতের উত্তর লিখুন" 
-                            {...field} 
-                            value={field.value || ''} 
-                            autoComplete="off" 
-                             onChange={(e) => {
-                                const value = e.target.value;
-                                if (/^\d*$/.test(value)) {
-                                    field.onChange(value);
-                                }
-                            }}
-                        />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-        </div>
-
 
         <div className="flex justify-end pt-4">
           <Button type="submit" disabled={isSubmitting} className="w-full md:w-auto">
