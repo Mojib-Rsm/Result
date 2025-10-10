@@ -40,8 +40,6 @@ export default function Home() {
       board: '',
       roll: '',
       reg: '',
-      captcha: '',
-      captcha_answer: '',
     },
   });
 
@@ -50,10 +48,7 @@ export default function Home() {
     setResult(null);
 
     try {
-      const searchResult = await searchResultLegacy({
-        ...values,
-        captcha: values.captcha, // Pass the original captcha string
-      });
+      const searchResult = await searchResultLegacy(values);
       setResult(searchResult);
       addHistoryItem({
           roll: values.roll,
@@ -62,20 +57,13 @@ export default function Home() {
           year: values.year,
           exam: values.exam,
           result: searchResult,
-          // result_type is no longer in the form, so we can hardcode or omit
       });
     } catch (e: any) {
        toast({
         title: "ত্রুটি",
-        description: e.message, // Display the specific error message from the action
+        description: e.message,
         variant: "destructive"
        });
-       // Auto-refresh captcha on any error
-       const formComponent = document.getElementById('exam-form-component');
-       if (formComponent) {
-           const event = new CustomEvent('refreshcaptcha');
-           formComponent.dispatchEvent(event);
-       }
     } finally {
         setIsSubmitting(false);
     }
@@ -84,12 +72,6 @@ export default function Home() {
   const resetSearch = () => {
     setResult(null);
     form.reset();
-    // Manually trigger captcha refresh on form reset
-    const formComponent = document.getElementById('exam-form-component');
-    if (formComponent) {
-        const event = new CustomEvent('refreshcaptcha');
-        formComponent.dispatchEvent(event);
-    }
   };
 
   return (

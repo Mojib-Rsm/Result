@@ -110,9 +110,5 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
     }
 }
 
-// This function is no longer needed as we are not fetching captcha
-const getCaptchaAction = async () => {
-    return { captchaText: '' };
-}
 
-export { getCaptchaAction, searchResultLegacy };
+export { searchResultLegacy };

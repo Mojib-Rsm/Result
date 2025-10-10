@@ -42,7 +42,7 @@ const exams = [
     { value: 'ssc', label: 'SSC/Dakhil' },
     { value: 'hsc', label: 'HSC/Alim/Equivalent' },
     { value: 'hsc_voc', label: 'HSC(Vocational)' },
-    { value: 'hsc_hbm', label: 'HSC(BM)' },
+    { value: 'hsc_bm', label: 'HSC(BM)' },
     { value: 'hsc_dic', label: 'Diploma in Commerce' },
     { value: 'hsc_dba', label: 'Diploma in Business Studies' },
 ];

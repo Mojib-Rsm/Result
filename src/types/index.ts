@@ -1,3 +1,4 @@
+
 export interface GradeInfo {
   code: string;
   subject: string;
@@ -12,7 +13,7 @@ export interface StudentInfo {
   group: string;
   dob: string;
   institute: string;
-  session: string;
+  session?: string;
 }
 
 export interface ExamResult {
@@ -32,11 +33,10 @@ export interface ExamResult {
 
 export interface HistoryItem {
     roll: string;
-    reg?: string;
+    reg: string;
     board: string;
     year: string;
     exam: string;
-    result_type: string;
     result: ExamResult;
     timestamp: number;
     eiin?: string;
