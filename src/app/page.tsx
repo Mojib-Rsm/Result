@@ -18,7 +18,6 @@ import Link from 'next/link';
 export default function Home() {
   const [result, setResult] = useState<ExamResult | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
   const { addHistoryItem } = useHistory();
   const [showNotice, setShowNotice] = useState(false);
@@ -38,44 +37,34 @@ export default function Home() {
       exam: '',
       year: '',
       board: '',
-      result_type: '1',
       roll: '',
       reg: '',
-      eiin: '',
-      dcode: '',
-      ccode: '',
       captcha: ''
     },
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
-    setError(null);
     setResult(null);
 
     try {
       const searchResult = await searchResultLegacy(values);
       setResult(searchResult);
-       if (values.result_type === '1' || values.result_type === '8') {
-         addHistoryItem({
-            roll: values.roll!,
-            reg: values.reg,
-            board: values.board,
-            year: values.year,
-            exam: values.exam,
-            result_type: values.result_type,
-            result: searchResult,
-            eiin: values.eiin
-        });
-       }
+      addHistoryItem({
+          roll: values.roll,
+          reg: values.reg,
+          board: values.board,
+          year: values.year,
+          exam: values.exam,
+          result: searchResult,
+      });
     } catch (e: any) {
-       setError(e.message);
        toast({
-        title: "Error",
+        title: "ত্রুটি",
         description: e.message,
         variant: "destructive"
        });
-        // Auto-refresh captcha on any error
+       // Auto-refresh captcha on any error
        const formComponent = document.getElementById('exam-form-component');
        if (formComponent) {
            const event = new CustomEvent('refreshcaptcha');
@@ -88,8 +77,13 @@ export default function Home() {
 
   const resetSearch = () => {
     setResult(null);
-    setError(null);
     form.reset();
+    // Manually trigger captcha refresh on form reset
+    const formComponent = document.getElementById('exam-form-component');
+    if (formComponent) {
+        const event = new CustomEvent('refreshcaptcha');
+        formComponent.dispatchEvent(event);
+    }
   };
 
   return (
@@ -100,7 +94,7 @@ export default function Home() {
             <DialogTitle>BD Edu Result-এ স্বাগতম!</DialogTitle>
             <DialogDescription>
               এই ওয়েবসাইটটি শুধুমাত্র শিক্ষামূলক উদ্দেশ্যে এবং একটি ডেমো প্রকল্প হিসেবে তৈরি করা হয়েছে। 
-              এখানে প্রদর্শিত সকল তথ্য সরাসরি শিক্ষা বোর্ডের অফিসিয়াল সার্ভার থেকে আনা হয়।
+              এখানে প্রদর্শিত সকল তথ্য مباشرة শিক্ষা বোর্ডের অফিসিয়াল সার্ভার থেকে আনা হয়।
             </DialogDescription>
           </DialogHeader>
           <div className="prose prose-sm dark:prose-invert">
@@ -108,7 +102,7 @@ export default function Home() {
                 আমরা কোনো তথ্য সংরক্ষণ করি না। আপনার অনুসন্ধানের ইতিহাস শুধুমাত্র আপনার ব্রাউজারেই সংরক্ষিত থাকে।
               </p>
                <p>
-                আমাদের মূল ওয়েবসাইট ভিজিট করুন: <Link href="https://www.bdedu.me" target="_blank" className="text-primary font-semibold">bdedu.me</Link>
+                আমাদের ওয়েবসাইট ভিজিট করুন: <Link href="https://www.bdedu.me" target="_blank" className="text-primary font-semibold">bdedu.me</Link>
               </p>
           </div>
           <DialogFooter>

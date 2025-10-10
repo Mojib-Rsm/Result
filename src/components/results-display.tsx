@@ -6,13 +6,11 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Download, Loader2, Search, FileDown } from 'lucide-react';
+import { Loader2, Search, Printer } from 'lucide-react';
 import type { ExamResult } from '@/types';
 import { Separator } from './ui/separator';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 
 interface ResultsDisplayProps {
   result: ExamResult;
@@ -21,7 +19,7 @@ interface ResultsDisplayProps {
 }
 
 const getGpaGrade = (gpa: number): string => {
-    if (gpa === 5) return 'A+';
+    if (gpa >= 5) return 'A+';
     if (gpa >= 4) return 'A';
     if (gpa >= 3.5) return 'A-';
     if (gpa >= 3) return 'B';
@@ -34,21 +32,21 @@ const FooterContent = () => (
     <div className="text-center">
         <div className="flex flex-col items-center justify-center gap-4">
             <div className="text-center">
-                <p className="text-md font-medium text-foreground">Developed & Maintained by: Mojib Rsm</p>
-                <p className="text-sm text-muted-foreground">For any query: mojibrsm@gmail.com</p>
+                <p className="text-md font-medium text-foreground">A Project by BD Edu Result</p>
+                <p className="text-sm text-muted-foreground">All rights reserved.</p>
             </div>
             <div className="flex flex-col items-center gap-2 mt-2">
-                <Link href="https://www.bartanow.com" target="_blank" rel="noopener noreferrer">
+                <Link href="https://www.bdedu.me" target="_blank" rel="noopener noreferrer">
                     <Image 
-                        src="https://www.oftern.com/uploads/logo/favicon_67c1bdb47ee422-18965133.png"
-                        alt="Bartanow Logo"
+                        src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Government_Seal_of_Bangladesh.svg/800px-Government_Seal_of_Bangladesh.svg.png"
+                        alt="BD Edu Result Logo"
                         width={40}
                         height={40}
                         className="h-10 w-10 rounded-full"
                     />
                 </Link>
-                <Link href="https://www.bartanow.com" target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">
-                    www.bartanow.com
+                <Link href="https://www.bdedu.me" target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">
+                    bdedu.me
                 </Link>
             </div>
         </div>
@@ -57,61 +55,19 @@ const FooterContent = () => (
 
 
 export default function ResultsDisplay({ result, onReset, isDialog = false }: ResultsDisplayProps) {
-  const [isDownloading, setIsDownloading] = useState(false);
+  const [isPrinting, setIsPrinting] = useState(false);
   
-  const handleDownloadPdf = async () => {
-    const element = document.getElementById('printable-area');
-    if (!element) return;
-    setIsDownloading(true);
-
-    try {
-        const canvas = await html2canvas(element, {
-            scale: 3, // Increased scale for better resolution
-            useCORS: true,
-            logging: false,
-            onclone: (document) => {
-              // Remove shadows from the cloned document to improve PDF clarity
-              const clonedElement = document.getElementById('printable-area');
-              if(clonedElement) {
-                clonedElement.style.boxShadow = 'none';
-                clonedElement.style.border = 'none';
-              }
-            }
-        });
-
-        const imgData = canvas.toDataURL('image/png');
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const pdfWidth = pdf.internal.pageSize.getWidth();
-        const pdfHeight = pdf.internal.pageSize.getHeight();
-        const imgWidth = canvas.width;
-        const imgHeight = canvas.height;
-        const ratio = imgWidth / imgHeight;
-        let newImgWidth = pdfWidth - 20; // with margin
-        let newImgHeight = newImgWidth / ratio;
-        
-        if (newImgHeight > pdfHeight - 20) {
-            newImgHeight = pdfHeight - 20;
-            newImgWidth = newImgHeight * ratio;
-        }
-
-        const x = (pdfWidth - newImgWidth) / 2;
-        const y = 10; // top margin
-        
-        pdf.addImage(imgData, 'PNG', x, y, newImgWidth, newImgHeight);
-        
-        const fileName = `${result.studentInfo?.name?.replace(/\s+/g, '_') || 'result'}-${result.roll || ''}-oftern.com.pdf`;
-        pdf.save(fileName);
-    } catch(error) {
-        console.error("Error generating PDF:", error);
-    } finally {
-        setIsDownloading(false);
-    }
-  };
+  const handlePrint = () => {
+    setIsPrinting(true);
+    setTimeout(() => {
+        window.print();
+        setIsPrinting(false);
+    }, 100);
+  }
 
   const gpa = result.gpa?.toFixed(2);
   const isPass = result.status === 'Pass';
-  const gpaGrade = getGpaGrade(result.gpa);
-  const showMarks = result.year === '2025' && result.grades.some(g => g.marks);
+  const showMarks = result.grades.some(g => g.marks);
   
   const InfoItem = ({ label, value }: { label: string, value: string | undefined}) => (
     <div className="flex flex-col p-2 bg-muted/30 rounded-md">
@@ -130,44 +86,24 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
       isDialog && "shadow-none border-none"
   );
 
-  const isIndividualResult = !result.rawHtml;
-
-  const downloadUrl = result.pdfName ? `https://www.eboardresults.com/v2/pdl` : '#';
-
   return (
     <div className={containerClasses}>
        <div className={cn("flex justify-end gap-2", !isDialog && "no-print")}>
           {!isDialog && onReset && (
-              <Button variant="outline" onClick={onReset} disabled={isDownloading} size={isIndividualResult ? "icon" : "default"}>
-                  <Search className={cn(isIndividualResult ? "h-4 w-4" : "mr-2 h-4 w-4")} />
-                  {isIndividualResult ? <span className="sr-only">আবার খুঁজুন</span> : 'অন্য ফলাফল খুঁজুন'}
+              <Button variant="outline" onClick={onReset} disabled={isPrinting}>
+                  <Search className="mr-2 h-4 w-4" />
+                  অন্য ফলাফল খুঁজুন
               </Button>
           )}
 
-          {isIndividualResult ? (
-            <Button onClick={handleDownloadPdf} disabled={isDownloading}>
-                {isDownloading ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <Download className="mr-2 h-4 w-4" />
-                )}
-                ডাউনলোড পিডিএফ
-            </Button>
-          ) : (
-            <Button asChild>
-                <a href={downloadUrl} target="_blank" rel="noopener noreferrer" download>
-                    <FileDown className="mr-2 h-4 w-4" />
-                    সম্পূর্ণ ফলাফল ডাউনলোড করুন
-                </a>
-            </Button>
-          )}
-
+          <Button onClick={handlePrint} disabled={isPrinting}>
+              {isPrinting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Printer className="mr-2 h-4 w-4" />}
+              প্রিন্ট করুন
+          </Button>
       </div>
 
       <div id="pdf-container">
         <Card className={cardClasses} id="printable-area">
-          {isIndividualResult ? (
-            <>
               <CardHeader>
                    <div className="relative text-center">
                       <div className="flex justify-center">
@@ -183,8 +119,7 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
 
                       <div className="absolute top-0 right-0 text-right font-bold text-xl min-w-[120px]">
                           <p className={isPass ? 'text-green-600' : 'text-destructive'}>Status: {result.status}</p>
-                          {isPass && <p>GPA: {gpa}</p>}
-                          {isPass && <p>Grade: {gpaGrade}</p>}
+                          {isPass && gpa && <p>GPA: {gpa}</p>}
                       </div>
                   </div>
                    <CardDescription className="text-center">{result.exam.toUpperCase()} Examination - {result.year}</CardDescription>
@@ -192,16 +127,14 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
               <CardContent>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
                   <InfoItem label="Roll No" value={result.roll} />
-                  <InfoItem label="Reg No" value={result.reg} />
                   <InfoItem label="Board" value={result.board} />
                   <InfoItem label="Name" value={result.studentInfo.name} />
                   <InfoItem label="Father's Name" value={result.studentInfo.fatherName} />
                   <InfoItem label="Mother's Name" value={result.studentInfo.motherName} />
                   <InfoItem label="Group" value={result.studentInfo.group} />
                   <InfoItem label="Date of Birth" value={result.studentInfo.dob} />
-                  <InfoItem label="Session" value={result.studentInfo.session} />
-                  <div className="col-span-2 md:col-span-3">
-                  <InfoItem label="Institute" value={result.studentInfo.institute} />
+                  <div className="col-span-full">
+                    <InfoItem label="Institute" value={result.studentInfo.institute} />
                   </div>
               </div>
 
@@ -219,7 +152,7 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
                   </TableHeader>
                   <TableBody>
                   {result.grades.map((g, index) => (
-                      <TableRow key={g.code} className={cn(index % 2 !== 0 && 'bg-muted/50')}>
+                      <TableRow key={g.code + index} className={cn(index % 2 !== 0 && 'bg-muted/50')}>
                       <TableCell>{g.code}</TableCell>
                       <TableCell className="font-medium">{g.subject}</TableCell>
                       {showMarks && <TableCell className="text-right font-bold">{g.marks}</TableCell>}
@@ -229,13 +162,7 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
                   </TableBody>
               </Table>
               </CardContent>
-            </>
-          ) : (
-            <CardContent className="pt-6">
-               <div dangerouslySetInnerHTML={{ __html: result.rawHtml || '' }} />
-            </CardContent>
-          )}
-
+            
             <Separator className="my-6" />
             
             <div className="px-6 pb-6">
@@ -244,21 +171,17 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
         </Card>
       </div>
       
-      {!isDialog && isIndividualResult && (
+      {!isDialog && (
          <CardFooter className="flex justify-end gap-2 no-print">
             {onReset && (
-                <Button variant="outline" onClick={onReset} disabled={isDownloading}>
+                <Button variant="outline" onClick={onReset} disabled={isPrinting}>
                     <Search className="mr-2 h-4 w-4" />
                     অন্য ফলাফল খুঁজুন
                 </Button>
             )}
-            <Button onClick={handleDownloadPdf} disabled={isDownloading}>
-                {isDownloading ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <Download className="mr-2 h-4 w-4" />
-                )}
-                ডাউনলোড পিডিএফ
+            <Button onClick={handlePrint} disabled={isPrinting}>
+               {isPrinting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Printer className="mr-2 h-4 w-4" />}
+                প্রিন্ট করুন
             </Button>
         </CardFooter>
       )}

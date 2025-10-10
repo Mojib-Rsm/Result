@@ -6,7 +6,7 @@ import AppProvider from '@/components/app-provider';
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 export const metadata: Metadata = {
-  title: 'BD Result Hub',
+  title: 'BD Edu Result',
   description: 'Check all your Bangladesh education board exam results in one place.',
 };
 

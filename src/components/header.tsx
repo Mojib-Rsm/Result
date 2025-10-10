@@ -19,7 +19,7 @@ export default function Header({ className }: { className?: string }) {
   return (
     <header className={cn("sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60", className)}>
       <div className="container flex h-14 max-w-screen-2xl items-center">
-        <Link href="https://www.bartanow.com" target="_blank" rel="noopener noreferrer" className="mr-6 flex items-center space-x-2">
+        <Link href="/" className="mr-6 flex items-center space-x-2">
            <Image
             src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Government_Seal_of_Bangladesh.svg/800px-Government_Seal_of_Bangladesh.svg.png"
             alt="Government Seal of Bangladesh"
@@ -27,14 +27,7 @@ export default function Header({ className }: { className?: string }) {
             height={32}
             className="h-8 w-8"
           />
-          <Image 
-            src="https://www.oftern.com/uploads/logo/favicon_67c1bdb47ee422-18965133.png"
-            alt="Bartanow Logo"
-            width={32}
-            height={32}
-            className="h-8 w-8 rounded-full"
-          />
-          <span className="font-bold sm:inline-block">BD Result Hub</span>
+          <span className="font-bold sm:inline-block">BD Edu Result</span>
         </Link>
         <nav className="flex flex-1 items-center gap-2 text-sm">
           {navLinks.map((link) => (

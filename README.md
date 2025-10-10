@@ -1,4 +1,4 @@
-# Result (Bd Result Hub)
+# BD Edu Result
 
 All Bangladesh Education Board Result Archive, with Detailed Marks if available, for JSC, JDC, SSC, DAKHIL, HSC, ALIM, VOCATIONAL exams.
 
@@ -6,7 +6,7 @@ All Bangladesh Education Board Result Archive, with Detailed Marks if available,
 
 ## 📖 Overview
 
-**Result (Bd Result Hub)** is a comprehensive archive of examination results from all education boards in Bangladesh.  
+**BD Edu Result** is a comprehensive archive of examination results from all education boards in Bangladesh.  
 It covers a wide range of public examinations and, wherever possible, provides **detailed subject-wise marks** for enhanced transparency and insight.
 
 ---
