@@ -48,6 +48,13 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
         const resultTables = dom.window.document.querySelectorAll('table.black12');
         
         if (resultTables.length === 0) {
+             const bodyText = dom.window.document.body.textContent || "";
+             if (bodyText.includes("is not published yet")) {
+                 throw new Error("আপনার ফলাফল এখনো প্রকাশিত হয়নি। অনুগ্রহ করে কিছুক্ষণ পর আবার চেষ্টা করুন।");
+             }
+             if (bodyText.includes("Result not found")) {
+                 throw new Error("আপনার দেওয়া তথ্যের জন্য কোনো ফলাফল পাওয়া যায়নি। রোল, রেজিস্ট্রেশন, বোর্ড এবং বছর সঠিক কিনা তা পরীক্ষা করুন।");
+             }
              throw new Error("ফলাফল খুঁজে পাওয়া যায়নি। অনুগ্রহ করে আপনার রোল, রেজিস্ট্রেশন, বোর্ড এবং বছর পরীক্ষা করে আবার চেষ্টা করুন।");
         }
 
