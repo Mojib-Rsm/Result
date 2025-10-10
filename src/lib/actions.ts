@@ -9,14 +9,12 @@ import { cookies } from 'next/headers';
 
 async function getCaptchaAction() {
     const cookieStore = cookies();
-    const ss = cookieStore.get('session_cookie')?.value || '';
-
+    
     try {
         const response = await fetch('http://www.educationboardresults.gov.bd/index.php', {
             method: 'GET',
             headers: {
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36",
-                ...(ss && { 'Cookie': `PHPSESSID=${ss}` })
             }
         });
 
