@@ -23,6 +23,7 @@ export default function Home() {
   const [showNotice, setShowNotice] = useState(false);
 
   useEffect(() => {
+    // This will run only on the client side
     const noticeSeen = sessionStorage.getItem('noticeSeen');
     if (!noticeSeen) {
       setShowNotice(true);
@@ -39,7 +40,8 @@ export default function Home() {
       board: '',
       roll: '',
       reg: '',
-      captcha: ''
+      captcha: '',
+      captcha_answer: '',
     },
   });
 
@@ -48,7 +50,10 @@ export default function Home() {
     setResult(null);
 
     try {
-      const searchResult = await searchResultLegacy(values);
+      const searchResult = await searchResultLegacy({
+        ...values,
+        captcha: values.captcha, // Pass the original captcha string
+      });
       setResult(searchResult);
       addHistoryItem({
           roll: values.roll,
@@ -57,11 +62,12 @@ export default function Home() {
           year: values.year,
           exam: values.exam,
           result: searchResult,
+          // result_type is no longer in the form, so we can hardcode or omit
       });
     } catch (e: any) {
        toast({
         title: "ত্রুটি",
-        description: e.message,
+        description: e.message, // Display the specific error message from the action
         variant: "destructive"
        });
        // Auto-refresh captcha on any error
@@ -102,7 +108,7 @@ export default function Home() {
                 আমরা কোনো তথ্য সংরক্ষণ করি না। আপনার অনুসন্ধানের ইতিহাস শুধুমাত্র আপনার ব্রাউজারেই সংরক্ষিত থাকে।
               </p>
                <p>
-                আমাদের ওয়েবসাইট ভিজিট করুন: <Link href="https://www.bdedu.me" target="_blank" className="text-primary font-semibold">bdedu.me</Link>
+                আমাদের মূল ওয়েবসাইট ভিজিট করুন: <Link href="https://www.bdedu.me" target="_blank" className="text-primary font-semibold">bdedu.me</Link>
               </p>
           </div>
           <DialogFooter>
