@@ -27,12 +27,6 @@ const nextConfig: NextConfig = {
         hostname: 'www.oftern.com',
         port: '',
         pathname: '/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'www.bdedu.me',
-        port: '',
-        pathname: '/**',
       }
     ],
   },
