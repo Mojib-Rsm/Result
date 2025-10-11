@@ -1,3 +1,4 @@
+
 import type { Metadata } from 'next';
 import './globals.css';
 import { Inter } from 'next/font/google';
@@ -74,6 +75,9 @@ export const metadata: Metadata = {
     icon: 'https://www.bdedu.me/favicon.png',
     shortcut: 'https://www.bdedu.me/favicon.png',
     apple: 'https://www.bdedu.me/favicon.png',
+  },
+  verification: {
+    google: 'FOlKCdIBPLnKIty-uFCQb1dJh7EfLFCcshPgHzaaUCI',
   },
 };
 
