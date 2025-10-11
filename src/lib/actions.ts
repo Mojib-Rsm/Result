@@ -20,17 +20,16 @@ async function searchResultLegacy(values: z.infer<typeof formSchemaWithCookie>):
         captcha,
     });
     
-    const headers: HeadersInit = {
-        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-        'Accept': 'application/json, text/javascript, */*; q=0.01',
-        'X-Requested-With': 'XMLHttpRequest',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
-        'Origin': 'https://eboardresults.com',
-        'Referer': 'https://eboardresults.com/v2/home',
-    };
+    const headers = new Headers();
+    headers.append('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
+    headers.append('Accept', 'application/json, text/javascript, */*; q=0.01');
+    headers.append('X-Requested-With', 'XMLHttpRequest');
+    headers.append('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36');
+    headers.append('Origin', 'https://eboardresults.com');
+    headers.append('Referer', 'https://eboardresults.com/v2/home');
 
     if (cookie) {
-        headers['Cookie'] = cookie;
+        headers.append('Cookie', cookie);
     }
 
     try {
