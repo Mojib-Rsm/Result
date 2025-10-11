@@ -10,28 +10,24 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
     const { exam, year, board, roll, reg } = values;
 
     const payload = new URLSearchParams();
-    payload.append('sr', '3');
-    payload.append('et', '2');
     payload.append('exam', exam);
     payload.append('year', year);
     payload.append('board', board);
     payload.append('roll', roll);
-    payload.append('reg', reg || ''); // Reg can be optional sometimes
-    payload.append('button2', 'Submit');
+    payload.append('reg', reg);
     
     const headers = {
         'Content-Type': 'application/x-www-form-urlencoded',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
-        'Origin': 'http://www.educationboardresults.gov.bd',
-        'Referer': 'http://www.educationboardresults.gov.bd/',
+        'Origin': 'https://eboardresults.com',
+        'Referer': 'https://eboardresults.com/v2/home',
     };
 
     try {
-        const response = await fetch("http://www.educationboardresults.gov.bd/result.php", {
+        const response = await fetch("https://eboardresults.com/v2/getres", {
             method: 'POST',
             headers: headers,
             body: payload.toString(),
-            redirect: 'follow',
         });
         
         if (!response.ok) {
@@ -43,59 +39,52 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
         if (!responseText || responseText.includes("Sorry, the server is busy now")) {
             throw new Error("ফলাফল বোর্ড সার্ভার এই মুহূর্তে ব্যস্ত আছে। অনুগ্রহ করে কিছুক্ষণ পর আবার চেষ্টা করুন।");
         }
+
+        if (responseText.includes("Result not found")) {
+            throw new Error("ফলাফল খুঁজে পাওয়া যায়নি। অনুগ্রহ করে আপনার রোল, রেজিস্ট্রেশন, বোর্ড এবং বছর পরীক্ষা করে আবার চেষ্টা করুন।");
+        }
         
         const dom = new JSDOM(responseText);
-        const resultTables = dom.window.document.querySelectorAll('table.black12');
+        const document = dom.window.document;
         
-        if (resultTables.length === 0) {
-             throw new Error("ফলাফল খুঁজে পাওয়া যায়নি। অনুগ্রহ করে আপনার রোল, রেজিস্ট্রেশন, বোর্ড এবং বছর পরীক্ষা করে আবার চেষ্টা করুন।");
-        }
+        const getCellText = (label: string) => {
+            const ths = Array.from(document.querySelectorAll('th'));
+            const th = ths.find(el => el.textContent?.trim() === label);
+            return th?.nextElementSibling?.textContent?.trim() || 'N/A';
+        };
 
-        const infoTable = resultTables[0];
-        const gradeSheetTable = resultTables.length > 1 ? resultTables[resultTables.length - 1] : null;
+        const gpaText = getCellText('GPA');
+        const gpa = parseFloat(gpaText) || 0;
+        const status = gpa > 0 ? 'Pass' : 'Fail';
 
-        const getCellText = (table: Element, rowIndex: number, cellIndex: number) => {
-             const row = table.querySelectorAll('tr')[rowIndex];
-             return row?.cells[cellIndex]?.textContent?.trim() || 'N/A';
-        }
-        
-        const gpaText = getCellText(infoTable, 5, 1);
-        const gpaMatch = gpaText.match(/(\d\.\d+)/);
-        const gpa = gpaMatch ? parseFloat(gpaMatch[0]) : 0;
-        
-        const statusText = getCellText(infoTable, 4, 1);
-        const status = statusText.toUpperCase() === "PASSED" ? 'Pass' : 'Fail';
-        
         const grades: GradeInfo[] = [];
-        if(gradeSheetTable) {
-            const gradeRows = gradeSheetTable.querySelectorAll('tr');
-            for(let i = 1; i < gradeRows.length; i++) {
-                const cells = gradeRows[i].querySelectorAll('td');
-                if (cells.length >= 3) {
-                    grades.push({
-                        code: cells[0].textContent?.trim() || '',
-                        subject: cells[1].textContent?.trim() || '',
-                        grade: cells[2].textContent?.trim() || ''
-                    });
-                }
+        const gradeRows = document.querySelectorAll('table.table-bordered tbody tr');
+        gradeRows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            if (cells.length === 3) {
+                grades.push({
+                    code: cells[0].textContent?.trim() || '',
+                    subject: cells[1].textContent?.trim() || '',
+                    grade: cells[2].textContent?.trim() || ''
+                });
             }
-        }
+        });
         
         return {
-            roll: roll,
-            reg: reg || 'N/A',
-            board: board.charAt(0).toUpperCase() + board.slice(1),
-            year: year,
-            exam: exam,
+            roll: getCellText('Roll No'),
+            reg: getCellText('Registration No'),
+            board: getCellText('Board'),
+            year: getCellText('Year'),
+            exam: getCellText('Examination'),
             gpa: gpa,
             status: status,
             studentInfo: {
-                name: getCellText(infoTable, 0, 3),
-                fatherName: getCellText(infoTable, 1, 3),
-                motherName: getCellText(infoTable, 2, 3),
-                group: getCellText(infoTable, 2, 1),
-                dob: getCellText(infoTable, 3, 3),
-                institute: getCellText(infoTable, 4, 3),
+                name: getCellText('Student Name'),
+                fatherName: getCellText("Father's Name"),
+                motherName: getCellText("Mother's Name"),
+                group: getCellText('Group'),
+                dob: getCellText('Date of Birth'),
+                institute: getCellText('Institute'),
                 session: '' 
             },
             grades: grades,
