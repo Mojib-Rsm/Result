@@ -47,7 +47,7 @@ async function searchResultLegacy(values: z.infer<typeof formSchemaWithCookie>):
 
         const data = await response.json();
 
-        if (data.status === 'error' || data.message === 'Result not found' || data.message?.includes('captcha')) {
+        if (data.status !== 0 || data.message === 'Result not found' || data.message?.includes('captcha') || !data.data) {
              throw new Error("ফলাফল খুঁজে পাওয়া যায়নি। অনুগ্রহ করে আপনার রোল, রেজিস্ট্রেশন, বোর্ড, বছর এবং ক্যাপচা পরীক্ষা করে আবার চেষ্টা করুন।");
         }
 
@@ -72,7 +72,7 @@ async function searchResultLegacy(values: z.infer<typeof formSchemaWithCookie>):
         const studentInfoRows = studentInfoTable.querySelectorAll('tbody tr');
         
         const getRowData = (label: string) => {
-            for (const row of studentInfoRows) {
+            for (const row of Array.from(studentInfoRows)) {
                 const cells = row.querySelectorAll('td');
                 if (cells.length > 1 && cells[0].textContent?.trim().toLowerCase() === label.toLowerCase()) {
                     return cells[1].textContent?.trim() || '';
@@ -84,7 +84,10 @@ async function searchResultLegacy(values: z.infer<typeof formSchemaWithCookie>):
             return '';
         }
         
-        if (!getRowData("Name of Student") || !getRowData('Roll No')) {
+        const studentName = getRowData("Name of Student");
+        const studentRoll = getRowData('Roll No');
+        
+        if (!studentName || !studentRoll) {
              throw new Error("ফলাফল খুঁজে পাওয়া যায়নি। অনুগ্রহ করে আপনার রোল, রেজিস্ট্রেশন, বোর্ড এবং বছর পরীক্ষা করে আবার চেষ্টা করুন।");
         }
 
@@ -95,7 +98,7 @@ async function searchResultLegacy(values: z.infer<typeof formSchemaWithCookie>):
         const status = resultText.toLowerCase().includes('pass') ? 'Pass' : 'Fail';
         
         const studentInfo = {
-            name: getRowData("Name of Student"),
+            name: studentName,
             fatherName: getRowData("Father's Name"),
             motherName: getRowData("Mother's Name"),
             group: getRowData('Group'),
@@ -119,7 +122,7 @@ async function searchResultLegacy(values: z.infer<typeof formSchemaWithCookie>):
         });
 
         return {
-            roll: getRowData('Roll No'),
+            roll: studentRoll,
             reg: getRowData('Registration No'),
             board: getRowData('Board'),
             year: year,
