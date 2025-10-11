@@ -22,7 +22,7 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
     
     const headers = {
         'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-        'Accept': 'application/json, text/javascript, */*; q=0.01',
+        'Accept': '*/*',
         'X-Requested-With': 'XMLHttpRequest',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
         'Origin': 'https://eboardresults.com',
@@ -43,51 +43,96 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
 
         const data = await response.json();
 
-        if (data.error || data.message === 'Result not found') {
+        if (data.status === 'error' || data.message === 'Result not found') {
              throw new Error("ফলাফল খুঁজে পাওয়া যায়নি। অনুগ্রহ করে আপনার রোল, রেজিস্ট্রেশন, বোর্ড এবং বছর পরীক্ষা করে আবার চেষ্টা করুন।");
         }
 
-        // The actual result data is nested inside a 'data' property which is a JSON string.
-        const resultData = JSON.parse(data.data);
+        // The actual result data is inside an HTML string in the 'data' property
+        const html_content = data.data;
+        
+        const dom = new JSDOM(html_content);
+        const document = dom.window.document;
+        
+        const result_div = document.querySelector('#result_display');
+        if (!result_div || result_div.textContent?.includes('Result not found')) {
+            throw new Error("ফলাফল খুঁজে পাওয়া যায়নি। অনুগ্রহ করে আপনার রোল, রেজিস্ট্রেশন, বোর্ড এবং বছর পরীক্ষা করে আবার চেষ্টা করুন।");
+        }
+        
+        const tables = result_div.querySelectorAll('table.table-striped');
+        if (tables.length < 2) {
+             throw new Error("ফলাফলের মার্কশিট পার্স করা যায়নি। ফলাফল কাঠামো পরিবর্তিত হতে পারে।");
+        }
+        
+        const studentInfoTable = tables[0];
+        const gradesTable = tables[1];
 
-        const gpa = parseFloat(resultData.gpa) || 0;
+        const studentInfoRows = studentInfoTable.querySelectorAll('tbody tr');
+        
+        const getRowData = (label: string) => {
+            for (const row of studentInfoRows) {
+                const cells = row.querySelectorAll('td');
+                if (cells.length > 1 && cells[0].textContent?.trim().toLowerCase() === label.toLowerCase()) {
+                    return cells[1].textContent?.trim() || '';
+                }
+                 if (cells.length > 3 && cells[2].textContent?.trim().toLowerCase() === label.toLowerCase()) {
+                    return cells[3].textContent?.trim() || '';
+                }
+            }
+            return '';
+        }
+
+        const resultText = getRowData('Result');
+        const gpaMatch = resultText.match(/GPA\s*=\s*([\d.]+)/);
+        const gpa = gpaMatch ? parseFloat(gpaMatch[1]) : 0;
         const status = gpa > 0 ? 'Pass' : 'Fail';
         
-        const grades: GradeInfo[] = resultData.subject_wise_grade.map((g: any) => ({
-            code: g.code,
-            subject: g.name,
-            grade: g.grade,
-        }));
+        const studentInfo = {
+            name: getRowData("Name of Student"),
+            fatherName: getRowData("Father's Name"),
+            motherName: getRowData("Mother's Name"),
+            group: getRowData('Group'),
+            dob: getRowData('Date of Birth'),
+            institute: document.querySelector('#i_name')?.textContent?.trim() || '',
+            session: getRowData('Session')
+        };
         
+        if (!studentInfo.name || !getRowData('Roll No')) {
+             throw new Error("ফলাফল খুঁজে পাওয়া যায়নি। অনুগ্রহ করে আপনার রোল, রেজিস্ট্রেশন, বোর্ড এবং বছর পরীক্ষা করে আবার চেষ্টা করুন।");
+        }
+        
+
+        const grades: GradeInfo[] = [];
+        const gradeRows = gradesTable.querySelectorAll('tbody tr');
+        gradeRows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            if(cells.length >= 3) {
+                grades.push({
+                    code: cells[0].textContent?.trim() || '',
+                    subject: cells[1].textContent?.trim() || '',
+                    grade: cells[2].textContent?.trim() || ''
+                });
+            }
+        });
+
         return {
-            roll: resultData.roll,
-            reg: resultData.reg,
-            board: resultData.board,
-            year: resultData.year,
-            exam: resultData.exam,
+            roll: getRowData('Roll No'),
+            reg: getRowData('Registration No'),
+            board: getRowData('Board'),
+            year: year,
+            exam: exam,
             gpa: gpa,
             status: status,
-            studentInfo: {
-                name: resultData.name,
-                fatherName: resultData.fname,
-                motherName: resultData.mname,
-                group: resultData.group,
-                dob: resultData.dob,
-                institute: resultData.institute,
-                session: '' 
-            },
+            studentInfo: studentInfo,
             grades: grades,
         };
 
     } catch (error) {
         console.error("Error in searchResultLegacy:", error);
         if (error instanceof Error) {
-            // Re-throw specific, user-friendly messages
-            if (error.message.startsWith('ফলাফল')) {
+            if (error.message.includes('ফলাফল')) {
                  throw error;
             }
         }
-        // Generic fallback for other errors
         throw new Error('ফলাফল আনতে একটি অপ্রত্যাশিত সমস্যা হয়েছে। আপনার ইন্টারনেট সংযোগ পরীক্ষা করুন এবং কিছুক্ষণ পর আবার চেষ্টা করুন।');
     }
 }
