@@ -21,6 +21,12 @@ export default function Home() {
   const { toast } = useToast();
   const { addHistoryItem } = useHistory();
   const [showNotice, setShowNotice] = useState(false);
+  const [captchaUrl, setCaptchaUrl] = useState('');
+  const [captchaValue, setCaptchaValue] = useState('');
+
+  const refreshCaptcha = () => {
+    setCaptchaUrl(`https://eboardresults.com/v2/captcha?t=${Date.now()}`);
+  }
 
   useEffect(() => {
     // This will run only on the client side
@@ -29,6 +35,7 @@ export default function Home() {
       setShowNotice(true);
       sessionStorage.setItem('noticeSeen', 'true');
     }
+    refreshCaptcha();
   }, []);
 
 
@@ -40,6 +47,7 @@ export default function Home() {
       board: '',
       roll: '',
       reg: '',
+      captcha: '',
     },
   });
 
@@ -64,6 +72,7 @@ export default function Home() {
         description: e.message,
         variant: "destructive"
        });
+       refreshCaptcha(); // Refresh captcha on error
     } finally {
         setIsSubmitting(false);
     }
@@ -72,6 +81,7 @@ export default function Home() {
   const resetSearch = () => {
     setResult(null);
     form.reset();
+    refreshCaptcha();
   };
 
   return (
@@ -110,7 +120,13 @@ export default function Home() {
 
       {!result ? (
         <div className="rounded-xl border bg-card text-card-foreground shadow p-4 md:p-8">
-            <ExamForm form={form} onSubmit={onSubmit} isSubmitting={isSubmitting} />
+            <ExamForm 
+              form={form} 
+              onSubmit={onSubmit} 
+              isSubmitting={isSubmitting}
+              captchaUrl={captchaUrl}
+              onCaptchaRefresh={refreshCaptcha}
+            />
         </div>
       ) : (
         <>

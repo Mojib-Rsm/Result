@@ -1,4 +1,5 @@
 
+
 export interface GradeInfo {
   code: string;
   subject: string;
@@ -40,4 +41,9 @@ export interface HistoryItem {
     result: ExamResult;
     timestamp: number;
     eiin?: string;
+}
+
+export interface CaptchaResponse {
+    img: string;
+    key: string;
 }

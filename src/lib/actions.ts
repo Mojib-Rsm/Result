@@ -7,22 +7,21 @@ import { formSchema } from '@/components/exam-form';
 import { JSDOM } from 'jsdom';
 
 async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<ExamResult> {
-    const { exam, year, board, roll, reg } = values;
+    const { exam, year, board, roll, reg, captcha } = values;
 
-    // The captcha and result_type are seemingly static values for this endpoint.
     const payload = new URLSearchParams({
         exam,
         year,
         board,
         roll,
         reg,
-        result_type: '1', // For individual result
-        captcha: '1054' // This seems to be a static check
+        result_type: '1',
+        captcha,
     });
     
     const headers = {
         'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-        'Accept': '*/*',
+        'Accept': 'application/json, text/javascript, */*; q=0.01',
         'X-Requested-With': 'XMLHttpRequest',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
         'Origin': 'https://eboardresults.com',
@@ -43,11 +42,10 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
 
         const data = await response.json();
 
-        if (data.status === 'error' || data.message === 'Result not found') {
-             throw new Error("ফলাফল খুঁজে পাওয়া যায়নি। অনুগ্রহ করে আপনার রোল, রেজিস্ট্রেশন, বোর্ড এবং বছর পরীক্ষা করে আবার চেষ্টা করুন।");
+        if (data.status === 'error' || data.message === 'Result not found' || data.message?.includes('captcha')) {
+             throw new Error("ফলাফল খুঁজে পাওয়া যায়নি। অনুগ্রহ করে আপনার রোল, রেজিস্ট্রেশন, বোর্ড, বছর এবং ক্যাপচা পরীক্ষা করে আবার চেষ্টা করুন।");
         }
 
-        // The actual result data is inside an HTML string in the 'data' property
         const html_content = data.data;
         
         const dom = new JSDOM(html_content);
@@ -82,9 +80,9 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
         }
 
         const resultText = getRowData('Result');
-        const gpaMatch = resultText.match(/GPA\s*=\s*([\d.]+)/);
+        const gpaMatch = resultText.match(/([0-9\.]+)/);
         const gpa = gpaMatch ? parseFloat(gpaMatch[1]) : 0;
-        const status = gpa > 0 ? 'Pass' : 'Fail';
+        const status = resultText.toLowerCase().includes('pass') ? 'Pass' : 'Fail';
         
         const studentInfo = {
             name: getRowData("Name of Student"),
@@ -100,7 +98,6 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
              throw new Error("ফলাফল খুঁজে পাওয়া যায়নি। অনুগ্রহ করে আপনার রোল, রেজিস্ট্রেশন, বোর্ড এবং বছর পরীক্ষা করে আবার চেষ্টা করুন।");
         }
         
-
         const grades: GradeInfo[] = [];
         const gradeRows = gradesTable.querySelectorAll('tbody tr');
         gradeRows.forEach(row => {
@@ -109,7 +106,7 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
                 grades.push({
                     code: cells[0].textContent?.trim() || '',
                     subject: cells[1].textContent?.trim() || '',
-                    grade: cells[2].textContent?.trim() || ''
+                    grade: cells[cells.length -1].textContent?.trim() || '' // Last cell is the grade
                 });
             }
         });

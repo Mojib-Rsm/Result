@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Loader2 } from 'lucide-react';
+import { Loader2, RefreshCw } from 'lucide-react';
+import Image from 'next/image';
 
 export const formSchema = z.object({
   exam: z.string().min(1, 'পরীক্ষা নির্বাচন আবশ্যক।'),
@@ -15,6 +16,7 @@ export const formSchema = z.object({
   board: z.string().min(1, 'বোর্ড নির্বাচন আবশ্যক।'),
   roll: z.string().min(1, 'রোল নম্বর আবশ্যক।'),
   reg: z.string().min(1, 'রেজিস্ট্রেশন নম্বর আবশ্যক।'),
+  captcha: z.string().min(1, 'ক্যাপচা আবশ্যক।'),
 });
 
 const boards = [
@@ -38,13 +40,12 @@ const years = Array.from({ length: currentYear - 1995 }, (_, i) => currentYear -
 
 const exams = [
     { value: 'jsc', label: 'JSC/JDC' },
-    { value: 'ssc_voc', label: 'SSC(Vocational)' },
     { value: 'ssc', label: 'SSC/Dakhil' },
-    { value: 'hsc', label: 'HSC/Alim/Equivalent' },
+    { value: 'hsc', label: 'HSC/Alim' },
+    { value: 'ssc_voc', label: 'SSC(Vocational)' },
     { value: 'hsc_voc', label: 'HSC(Vocational)' },
-    { value: 'hsc_bm', label: 'HSC(BM)' },
-    { value: 'hsc_dic', label: 'Diploma in Commerce' },
-    { value: 'hsc_dba', label: 'Diploma in Business Studies' },
+    { value: 'hsc_bm', label: 'HSC(BM/Vocational)' },
+    { value: 'dibs', label: 'Diploma in Business Studies' },
 ];
 
 
@@ -52,9 +53,11 @@ interface ExamFormProps {
   form: ReturnType<typeof useForm<z.infer<typeof formSchema>>>;
   onSubmit: (values: z.infer<typeof formSchema>) => void;
   isSubmitting: boolean;
+  captchaUrl: string;
+  onCaptchaRefresh: () => void;
 }
 
-export function ExamForm({ form, onSubmit, isSubmitting }: ExamFormProps) {
+export function ExamForm({ form, onSubmit, isSubmitting, captchaUrl, onCaptchaRefresh }: ExamFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" id="exam-form-component">
@@ -162,6 +165,43 @@ export function ExamForm({ form, onSubmit, isSubmitting }: ExamFormProps) {
               )}
             />
         </div>
+
+        <div className="space-y-4 rounded-md border p-4 bg-muted/50">
+            <FormLabel>রোবট নন তা প্রমাণ করুন</FormLabel>
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+                <div className="relative w-40 h-12">
+                   {captchaUrl && <Image src={captchaUrl} alt="ক্যাপচা" layout="fill" objectFit="contain" unoptimized />}
+                </div>
+                <Button type="button" variant="destructive" size="sm" onClick={onCaptchaRefresh}>
+                  <RefreshCw className="mr-2 h-4 w-4" />
+                  অন্য ছবি
+                </Button>
+            </div>
+            <FormField
+              control={form.control}
+              name="captcha"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                      <Input 
+                          placeholder="ছবিতে দেখানো সংখ্যাগুলো লিখুন" 
+                          {...field}
+                          autoComplete="off"
+                          value={field.value || ''}
+                          onChange={(e) => {
+                              const value = e.target.value;
+                              if (/^\d*$/.test(value)) {
+                                  field.onChange(value);
+                              }
+                          }}
+                      />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+        </div>
+
 
         <div className="flex justify-end pt-4">
           <Button type="submit" disabled={isSubmitting} className="w-full md:w-auto">
