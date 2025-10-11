@@ -12,7 +12,7 @@ function Footer() {
     <footer className="no-print py-8 md:px-8 bg-background/95 border-t">
       <div className="container flex flex-col items-center justify-center gap-4">
         <div className="text-center">
-            <p className="text-md font-medium text-foreground">A Project by BDEdu</p>
+            <p className="text-md font-medium text-foreground">A Project by BD Edu Result</p>
             <p className="text-sm text-muted-foreground">All rights reserved.</p>
         </div>
         <div className="flex flex-col items-center gap-2 mt-2">

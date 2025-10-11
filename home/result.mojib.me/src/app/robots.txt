@@ -1,8 +1,0 @@
-# See https://www.robotstxt.org/robotstxt.html for documentation on how to use the robots.txt file
-#
-# This file is used to tell web crawlers which pages or files the crawler can or can't request from your site.
-
-User-agent: *
-Allow: /
-
-Sitemap: https://bdedu.me/sitemap.xml

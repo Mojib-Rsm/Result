@@ -23,16 +23,6 @@ import ResultsDisplay from '@/components/results-display';
 import type { HistoryItem } from '@/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useHistory } from '@/hooks/use-history';
-import type { Metadata } from 'next';
-
-// Although metadata is usually for server components, we can define it here for clarity.
-// Next.js might not pick it up from a client component directly, so it's better placed in a server-side entry point if needed.
-// For this case, we will add it to the page but it's good to be aware.
-export const metadata: Metadata = {
-  title: 'Result History',
-  description: 'View your past result searches and statistics on BD Edu Result.',
-};
-
 
 export default function HistoryPage() {
   const [isLoading, setIsLoading] = useState(true);
