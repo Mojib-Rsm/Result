@@ -28,6 +28,7 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
             method: 'POST',
             headers: headers,
             body: payload.toString(),
+            cache: 'no-store', // Disable caching to get fresh results
         });
         
         if (!response.ok) {
@@ -40,18 +41,25 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
             throw new Error("ফলাফল বোর্ড সার্ভার এই মুহূর্তে ব্যস্ত আছে। অনুগ্রহ করে কিছুক্ষণ পর আবার চেষ্টা করুন।");
         }
 
-        if (responseText.includes("Result not found")) {
+        if (responseText.includes("Result not found") || responseText.includes("roll does not exist")) {
             throw new Error("ফলাফল খুঁজে পাওয়া যায়নি। অনুগ্রহ করে আপনার রোল, রেজিস্ট্রেশন, বোর্ড এবং বছর পরীক্ষা করে আবার চেষ্টা করুন।");
         }
         
         const dom = new JSDOM(responseText);
         const document = dom.window.document;
         
-        const getCellText = (label: string) => {
+        const getCellText = (label: string): string => {
             const ths = Array.from(document.querySelectorAll('th'));
             const th = ths.find(el => el.textContent?.trim() === label);
-            return th?.nextElementSibling?.textContent?.trim() || 'N/A';
+            return th?.nextElementSibling?.textContent?.trim() || '';
         };
+
+        const studentName = getCellText('Student Name');
+        const rollNo = getCellText('Roll No');
+        
+        if (!studentName || !rollNo) {
+             throw new Error("ফলাফল খুঁজে পাওয়া যায়নি। অনুগ্রহ করে আপনার রোল, রেজিস্ট্রেশন, বোর্ড এবং বছর পরীক্ষা করে আবার চেষ্টা করুন।");
+        }
 
         const gpaText = getCellText('GPA');
         const gpa = parseFloat(gpaText) || 0;
@@ -71,7 +79,7 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
         });
         
         return {
-            roll: getCellText('Roll No'),
+            roll: rollNo,
             reg: getCellText('Registration No'),
             board: getCellText('Board'),
             year: getCellText('Year'),
@@ -79,7 +87,7 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
             gpa: gpa,
             status: status,
             studentInfo: {
-                name: getCellText('Student Name'),
+                name: studentName,
                 fatherName: getCellText("Father's Name"),
                 motherName: getCellText("Mother's Name"),
                 group: getCellText('Group'),
@@ -93,9 +101,13 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
     } catch (error) {
         console.error("Error in searchResultLegacy:", error);
         if (error instanceof Error) {
-            throw error;
+            // Re-throw specific, user-friendly messages
+            if (error.message.startsWith('ফলাফল')) {
+                 throw error;
+            }
         }
-        throw new Error('একটি অজানা ত্রুটি ঘটেছে। অনুগ্রহ করে পরে আবার চেষ্টা করুন।');
+        // Generic fallback for other errors
+        throw new Error('ফলাফল আনতে একটি অপ্রত্যাশিত সমস্যা হয়েছে। আপনার ইন্টারনেট সংযোগ পরীক্ষা করুন এবং কিছুক্ষণ পর আবার চেষ্টা করুন।');
     }
 }
 
