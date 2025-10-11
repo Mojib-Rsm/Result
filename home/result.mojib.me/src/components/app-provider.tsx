@@ -18,7 +18,7 @@ function Footer() {
         <div className="flex flex-col items-center gap-2 mt-2">
             <Link href="https://www.bdedu.me" target="_blank" rel="noopener noreferrer">
                  <Image 
-                    src="https://www.bdedu.me/favicon.png"
+                    src="https://www.bdedu.me/logo.png"
                     alt="BD Edu Result Logo"
                     width={40}
                     height={40}

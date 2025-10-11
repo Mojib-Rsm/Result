@@ -84,9 +84,9 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: 'https://www.bdedu.me/favicon.png',
-    shortcut: 'https://www.bdedu.me/favicon.png',
-    apple: 'https://www.bdedu.me/favicon.png',
+    icon: 'https://www.bdedu.me/logo.png',
+    shortcut: 'https://www.bdedu.me/logo.png',
+    apple: 'https://www.bdedu.me/logo.png',
   },
   verification: {
     google: 'FOlKCdIBPLnKIty-uFCQb1dJh7EfLFCcshPgHzaaUCI',

@@ -21,7 +21,7 @@ export default function Header({ className }: { className?: string }) {
       <div className="container flex h-14 max-w-screen-2xl items-center">
         <Link href="/" className="mr-6 flex items-center space-x-2">
            <Image
-            src="https://www.bdedu.me/favicon.png"
+            src="https://www.bdedu.me/logo.png"
             alt="BD Edu Result Logo"
             width={32}
             height={32}
