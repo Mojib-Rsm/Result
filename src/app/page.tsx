@@ -22,10 +22,9 @@ export default function Home() {
   const { addHistoryItem } = useHistory();
   const [showNotice, setShowNotice] = useState(false);
   const [captchaUrl, setCaptchaUrl] = useState('');
-  const [captchaValue, setCaptchaValue] = useState('');
 
   const refreshCaptcha = () => {
-    setCaptchaUrl(`https://eboardresults.com/v2/captcha?t=${Date.now()}`);
+    setCaptchaUrl(`/api/captcha?t=${Date.now()}`);
   }
 
   useEffect(() => {
@@ -75,6 +74,7 @@ export default function Home() {
        refreshCaptcha(); // Refresh captcha on error
     } finally {
         setIsSubmitting(false);
+        form.setValue('captcha', '');
     }
   };
 

@@ -90,7 +90,7 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
             motherName: getRowData("Mother's Name"),
             group: getRowData('Group'),
             dob: getRowData('Date of Birth'),
-            institute: document.querySelector('#i_name')?.textContent?.trim() || '',
+            institute: document.querySelector('#i_name')?.textContent?.trim() || getRowData('Name of Institute'),
             session: getRowData('Session')
         };
         
