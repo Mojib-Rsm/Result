@@ -35,52 +35,48 @@ It covers a wide range of public examinations and, wherever possible, provides *
 
 ## 🚀 Getting Started
 
-### Requirements
-
-- Works in most web environments (HTML, PHP, JS, etc.)
-- Internet connection (for live result fetching, if API connected)
-
 ### Installation & Usage
 
 1. Clone the repository:
    ```bash
    git clone https://github.com/Mojib-Rsm/Result.git
    cd Result
-Review or update the data and scripts.
+   ```
+2.  Review or update the data and scripts.
+3.  Use the frontend form or API endpoint (if connected) to fetch/display results.
+4.  Deploy it on your preferred hosting.
 
-Use the frontend form or API endpoint (if connected) to fetch/display results.
-
-Deploy it on your preferred hosting.
-
-📂 Repository Structure
-php
-Copy
-Edit
-Result/
-├── LICENSE               # GPL-3.0 License
-├── README.md             # Project documentation
-├── data/                 # Archived exam data (JSON/CSV etc.)
-├── scripts/              # Fetching or parsing scripts
-├── public/               # Static frontend/templates
-└── docs/                 # Extra documentation
-📜 License
+---
+## 📜 License
 This project is licensed under the GPL-3.0 License.
 See the LICENSE file for details.
 
-🤝 Contributing
+---
+## 👨‍💻 Developer Info
+- **Name:** Mojibur Rahman (Mojib Rsm)
+- **Role:** Junior Web Developer, Creative Designer, and CEO of Oftern IT & Oftern Shop
+
+---
+## 🔗 Connect with Me
+- 📧 **Email:** [mojibrsm@gmail.com](mailto:mojibrsm@gmail.com)
+- 🌐 **Portfolio:** [www.mojib.me](https://www.mojib.me)
+- 📰 **Blog:** [Oftern](https://oftern.com)
+- 💬 **Telegram:** [@MrTools_BD](https://t.me/MrTools_BD)
+- 📱 **Facebook:** [Mojib Rsm](https://www.facebook.com/Mr.MojibRsm)
+- 📞 **Phone:** +8801601519007
+
+---
+## 🤝 Contributing
 Contributions are welcome!
 
-Fork the repo
+1.  Fork the repo
+2.  Create a branch (`git checkout -b feature/my-update`)
+3.  Commit changes (`git commit -m "Add feature"`)
+4.  Push to branch (`git push origin feature/my-update`)
+5.  Create a Pull Request
 
-Create a branch (git checkout -b feature/my-update)
-
-Commit changes (git commit -m "Add feature")
-
-Push to branch (git push origin feature/my-update)
-
-Create a Pull Request
-
-🙌 Acknowledgements
+---
+## 🙌 Acknowledgements
 Special thanks to the Bangladesh Education Boards and the open-source community.
 This project aims to make academic results more accessible, transparent, and reliable for everyone.
 
