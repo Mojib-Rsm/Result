@@ -70,6 +70,11 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
+  icons: {
+    icon: 'https://www.bdedu.me/favicon.png',
+    shortcut: 'https://www.bdedu.me/favicon.png',
+    apple: 'https://www.bdedu.me/favicon.png',
+  },
 };
 
 

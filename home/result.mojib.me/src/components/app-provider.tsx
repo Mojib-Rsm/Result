@@ -18,11 +18,11 @@ function Footer() {
         <div className="flex flex-col items-center gap-2 mt-2">
             <Link href="https://www.bdedu.me" target="_blank" rel="noopener noreferrer">
                  <Image 
-                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Government_Seal_of_Bangladesh.svg/800px-Government_Seal_of_Bangladesh.svg.png"
+                    src="https://www.bdedu.me/favicon.png"
                     alt="BD Edu Result Logo"
                     width={40}
                     height={40}
-                    className="h-10 w-10 rounded-full"
+                    className="h-10 w-10"
                 />
             </Link>
              <Link href="https://www.bdedu.me" target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">

@@ -18,7 +18,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'upload.wikimedia.org',
+        hostname: 'www.bdedu.me',
         port: '',
         pathname: '/**',
       }

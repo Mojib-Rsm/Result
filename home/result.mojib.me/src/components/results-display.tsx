@@ -38,11 +38,11 @@ const FooterContent = () => (
             <div className="flex flex-col items-center gap-2 mt-2">
                 <Link href="https://www.bdedu.me" target="_blank" rel="noopener noreferrer">
                     <Image 
-                        src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Government_Seal_of_Bangladesh.svg/800px-Government_Seal_of_Bangladesh.svg.png"
+                        src="https://www.bdedu.me/favicon.png"
                         alt="BD Edu Result Logo"
                         width={40}
                         height={40}
-                        className="h-10 w-10 rounded-full"
+                        className="h-10 w-10"
                     />
                 </Link>
                 <Link href="https://www.bdedu.me" target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">
@@ -108,8 +108,8 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
                    <div className="relative text-center">
                       <div className="flex justify-center">
                           <Image 
-                              src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Government_Seal_of_Bangladesh.svg/800px-Government_Seal_of_Bangladesh.svg.png" 
-                              alt="Government Seal of Bangladesh"
+                              src="https://www.bdedu.me/favicon.png"
+                              alt="BD Edu Result Logo"
                               width={60}
                               height={60}
                               className="h-16 w-16 mb-2"
