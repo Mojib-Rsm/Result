@@ -9,15 +9,21 @@ import { JSDOM } from 'jsdom';
 async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<ExamResult> {
     const { exam, year, board, roll, reg } = values;
 
-    const payload = new URLSearchParams();
-    payload.append('exam', exam);
-    payload.append('year', year);
-    payload.append('board', board);
-    payload.append('roll', roll);
-    payload.append('reg', reg);
+    // The captcha and result_type are seemingly static values for this endpoint.
+    const payload = new URLSearchParams({
+        exam,
+        year,
+        board,
+        roll,
+        reg,
+        result_type: '1', // For individual result
+        captcha: '1054' // This seems to be a static check
+    });
     
     const headers = {
-        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        'Accept': 'application/json, text/javascript, */*; q=0.01',
+        'X-Requested-With': 'XMLHttpRequest',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
         'Origin': 'https://eboardresults.com',
         'Referer': 'https://eboardresults.com/v2/home',
@@ -28,71 +34,46 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
             method: 'POST',
             headers: headers,
             body: payload.toString(),
-            cache: 'no-store', // Disable caching to get fresh results
+            cache: 'no-store',
         });
         
         if (!response.ok) {
             throw new Error(`সার্ভার থেকে একটি ত্রুটিপূর্ণ প্রতিক্রিয়া এসেছে: ${response.status} ${response.statusText}`);
         }
 
-        const responseText = await response.text();
-        
-        if (!responseText || responseText.includes("Sorry, the server is busy now")) {
-            throw new Error("ফলাফল বোর্ড সার্ভার এই মুহূর্তে ব্যস্ত আছে। অনুগ্রহ করে কিছুক্ষণ পর আবার চেষ্টা করুন।");
-        }
+        const data = await response.json();
 
-        if (responseText.includes("Result not found") || responseText.includes("roll does not exist")) {
-            throw new Error("ফলাফল খুঁজে পাওয়া যায়নি। অনুগ্রহ করে আপনার রোল, রেজিস্ট্রেশন, বোর্ড এবং বছর পরীক্ষা করে আবার চেষ্টা করুন।");
-        }
-        
-        const dom = new JSDOM(responseText);
-        const document = dom.window.document;
-        
-        const getCellText = (label: string): string => {
-            const ths = Array.from(document.querySelectorAll('th'));
-            const th = ths.find(el => el.textContent?.trim() === label);
-            return th?.nextElementSibling?.textContent?.trim() || '';
-        };
-
-        const studentName = getCellText('Student Name');
-        const rollNo = getCellText('Roll No');
-        
-        if (!studentName || !rollNo) {
+        if (data.error || data.message === 'Result not found') {
              throw new Error("ফলাফল খুঁজে পাওয়া যায়নি। অনুগ্রহ করে আপনার রোল, রেজিস্ট্রেশন, বোর্ড এবং বছর পরীক্ষা করে আবার চেষ্টা করুন।");
         }
 
-        const gpaText = getCellText('GPA');
-        const gpa = parseFloat(gpaText) || 0;
-        const status = gpa > 0 ? 'Pass' : 'Fail';
+        // The actual result data is nested inside a 'data' property which is a JSON string.
+        const resultData = JSON.parse(data.data);
 
-        const grades: GradeInfo[] = [];
-        const gradeRows = document.querySelectorAll('table.table-bordered tbody tr');
-        gradeRows.forEach(row => {
-            const cells = row.querySelectorAll('td');
-            if (cells.length === 3) {
-                grades.push({
-                    code: cells[0].textContent?.trim() || '',
-                    subject: cells[1].textContent?.trim() || '',
-                    grade: cells[2].textContent?.trim() || ''
-                });
-            }
-        });
+        const gpa = parseFloat(resultData.gpa) || 0;
+        const status = gpa > 0 ? 'Pass' : 'Fail';
+        
+        const grades: GradeInfo[] = resultData.subject_wise_grade.map((g: any) => ({
+            code: g.code,
+            subject: g.name,
+            grade: g.grade,
+        }));
         
         return {
-            roll: rollNo,
-            reg: getCellText('Registration No'),
-            board: getCellText('Board'),
-            year: getCellText('Year'),
-            exam: getCellText('Examination'),
+            roll: resultData.roll,
+            reg: resultData.reg,
+            board: resultData.board,
+            year: resultData.year,
+            exam: resultData.exam,
             gpa: gpa,
             status: status,
             studentInfo: {
-                name: studentName,
-                fatherName: getCellText("Father's Name"),
-                motherName: getCellText("Mother's Name"),
-                group: getCellText('Group'),
-                dob: getCellText('Date of Birth'),
-                institute: getCellText('Institute'),
+                name: resultData.name,
+                fatherName: resultData.fname,
+                motherName: resultData.mname,
+                group: resultData.group,
+                dob: resultData.dob,
+                institute: resultData.institute,
                 session: '' 
             },
             grades: grades,
