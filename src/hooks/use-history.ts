@@ -11,28 +11,25 @@ const LOCAL_HISTORY_KEY = 'bd-results-history-local';
 export function useHistory() {
   const [isInitialized, setIsInitialized] = useState(false);
 
-  const incrementVisitCount = useCallback(() => {
-    if (typeof window === 'undefined') return;
+  useEffect(() => {
+    // This effect runs only on the client side after hydration.
+    // All localStorage/sessionStorage logic is moved here.
+    
+    // Increment visit count
     try {
-      if (sessionStorage.getItem(VISIT_SESSION_KEY)) {
-        return;
+      if (!sessionStorage.getItem(VISIT_SESSION_KEY)) {
+        const statsRaw = localStorage.getItem(STATS_KEY);
+        const stats = statsRaw ? JSON.parse(statsRaw) : { visits: 0, searches: 0 };
+        stats.visits += 1;
+        localStorage.setItem(STATS_KEY, JSON.stringify(stats));
+        sessionStorage.setItem(VISIT_SESSION_KEY, 'true');
       }
-      
-      const statsRaw = localStorage.getItem(STATS_KEY);
-      const stats = statsRaw ? JSON.parse(statsRaw) : { visits: 0, searches: 0 };
-      stats.visits += 1;
-      localStorage.setItem(STATS_KEY, JSON.stringify(stats));
-      sessionStorage.setItem(VISIT_SESSION_KEY, 'true');
-
     } catch (error) {
       console.error("Local visit count increment failed: ", error);
     }
-  }, []);
 
-  useEffect(() => {
-    incrementVisitCount();
     setIsInitialized(true);
-  }, [incrementVisitCount]);
+  }, []);
 
   const addHistoryItem = useCallback((item: Omit<HistoryItem, 'timestamp'>) => {
     if (typeof window === 'undefined') return;
