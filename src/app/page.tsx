@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { ExamForm, formSchema } from '@/components/exam-form';
+import { ExamForm } from '@/components/exam-form';
 import ResultsDisplay from '@/components/results-display';
 import type { ExamResult } from '@/types';
 import { z } from 'zod';
@@ -14,6 +14,7 @@ import { useHistory } from '@/hooks/use-history';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { formSchema } from '@/lib/schema';
 
 export default function Home() {
   const [result, setResult] = useState<ExamResult | null>(null);
@@ -22,13 +23,26 @@ export default function Home() {
   const { addHistoryItem } = useHistory();
   const [showNotice, setShowNotice] = useState(false);
   const [captchaUrl, setCaptchaUrl] = useState('');
+  const [captchaCookie, setCaptchaCookie] = useState('');
 
-  const refreshCaptcha = () => {
-    setCaptchaUrl(`/api/captcha?t=${Date.now()}`);
+
+  const refreshCaptcha = async () => {
+    try {
+        const res = await fetch('/api/captcha');
+        const data = await res.json();
+        setCaptchaUrl(data.img);
+        setCaptchaCookie(data.cookie);
+    } catch(e) {
+        console.error("Failed to refresh captcha", e);
+        toast({
+            title: "ত্রুটি",
+            description: "ক্যাপচা লোড করা যায়নি। অনুগ্রহ করে পৃষ্ঠাটি রিফ্রেশ করুন।",
+            variant: "destructive"
+        });
+    }
   }
 
   useEffect(() => {
-    // This will run only on the client side
     const noticeSeen = sessionStorage.getItem('noticeSeen');
     if (!noticeSeen) {
       setShowNotice(true);
@@ -54,8 +68,10 @@ export default function Home() {
     setIsSubmitting(true);
     setResult(null);
 
+    const valuesWithCookie = { ...values, cookie: captchaCookie };
+
     try {
-      const searchResult = await searchResultLegacy(values);
+      const searchResult = await searchResultLegacy(valuesWithCookie);
       setResult(searchResult);
       addHistoryItem({
           roll: values.roll,
@@ -71,7 +87,7 @@ export default function Home() {
         description: e.message,
         variant: "destructive"
        });
-       refreshCaptcha(); // Refresh captcha on error
+       refreshCaptcha();
     } finally {
         setIsSubmitting(false);
         form.setValue('captcha', '');

@@ -3,11 +3,12 @@
 
 import type { ExamResult, GradeInfo } from '@/types';
 import { z } from 'zod';
-import { formSchema } from '@/components/exam-form';
+import { formSchemaWithCookie } from '@/lib/schema';
 import { JSDOM } from 'jsdom';
 
-async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<ExamResult> {
-    const { exam, year, board, roll, reg, captcha } = values;
+
+async function searchResultLegacy(values: z.infer<typeof formSchemaWithCookie>): Promise<ExamResult> {
+    const { exam, year, board, roll, reg, captcha, cookie } = values;
 
     const payload = new URLSearchParams({
         exam,
@@ -19,7 +20,7 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
         captcha,
     });
     
-    const headers = {
+    const headers: HeadersInit = {
         'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
         'Accept': 'application/json, text/javascript, */*; q=0.01',
         'X-Requested-With': 'XMLHttpRequest',
@@ -27,6 +28,10 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
         'Origin': 'https://eboardresults.com',
         'Referer': 'https://eboardresults.com/v2/home',
     };
+
+    if (cookie) {
+        headers['Cookie'] = cookie;
+    }
 
     try {
         const response = await fetch("https://eboardresults.com/v2/getres", {
@@ -56,7 +61,7 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
             throw new Error("ফলাফল খুঁজে পাওয়া যায়নি। অনুগ্রহ করে আপনার রোল, রেজিস্ট্রেশন, বোর্ড এবং বছর পরীক্ষা করে আবার চেষ্টা করুন।");
         }
         
-        const tables = result_div.querySelectorAll('table.table-striped');
+        const tables = result_div.querySelectorAll('table');
         if (tables.length < 2) {
              throw new Error("ফলাফলের মার্কশিট পার্স করা যায়নি। ফলাফল কাঠামো পরিবর্তিত হতে পারে।");
         }
@@ -78,6 +83,11 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
             }
             return '';
         }
+        
+        if (!getRowData("Name of Student") || !getRowData('Roll No')) {
+             throw new Error("ফলাফল খুঁজে পাওয়া যায়নি। অনুগ্রহ করে আপনার রোল, রেজিস্ট্রেশন, বোর্ড এবং বছর পরীক্ষা করে আবার চেষ্টা করুন।");
+        }
+
 
         const resultText = getRowData('Result');
         const gpaMatch = resultText.match(/([0-9\.]+)/);
@@ -94,9 +104,6 @@ async function searchResultLegacy(values: z.infer<typeof formSchema>): Promise<E
             session: getRowData('Session')
         };
         
-        if (!studentInfo.name || !getRowData('Roll No')) {
-             throw new Error("ফলাফল খুঁজে পাওয়া যায়নি। অনুগ্রহ করে আপনার রোল, রেজিস্ট্রেশন, বোর্ড এবং বছর পরীক্ষা করে আবার চেষ্টা করুন।");
-        }
         
         const grades: GradeInfo[] = [];
         const gradeRows = gradesTable.querySelectorAll('tbody tr');
