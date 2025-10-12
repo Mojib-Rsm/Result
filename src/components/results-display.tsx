@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Loader2, Search, Download, BarChart, ArrowUp, ArrowDown, Star, Sparkles } from 'lucide-react';
+import { Loader2, Search, Download, BarChart, ArrowUp, ArrowDown, Star, Sparkles, Share2 } from 'lucide-react';
 import type { ExamResult, GradeInfo } from '@/types';
 import { Separator } from './ui/separator';
 import { cn } from '@/lib/utils';
@@ -165,6 +165,8 @@ const GradesTable = ({ grades, showMarks }: { grades: GradeInfo[], showMarks: bo
 
 export default function ResultsDisplay({ result, onReset, isDialog = false }: ResultsDisplayProps) {
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isSharing, setIsSharing] = useState(false);
+
   
   const handleDownload = async () => {
     setIsDownloading(true);
@@ -214,6 +216,54 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
     }
   }
 
+  const handleShare = async () => {
+      setIsSharing(true);
+      const element = document.getElementById('share-card');
+      if (!element) {
+          setIsSharing(false);
+          return;
+      }
+
+      try {
+          const canvas = await html2canvas(element, { 
+              scale: 2, 
+              useCORS: true,
+              backgroundColor: null, // Use transparent background
+          });
+
+          const fileName = `result-${result.roll}.png`;
+
+          if (navigator.share) {
+              canvas.toBlob(async (blob) => {
+                  if (blob) {
+                      const file = new File([blob], fileName, { type: 'image/png' });
+                      try {
+                          await navigator.share({
+                              title: 'My Exam Result',
+                              text: `I got GPA ${gpa} in ${result.exam.toUpperCase()} ${result.year}! 🎉`,
+                              files: [file],
+                          });
+                      } catch (error) {
+                         console.info("User cancelled share or something went wrong", error);
+                      }
+                  }
+              }, 'image/png');
+          } else {
+              // Fallback for desktop/browsers without share API
+              const link = document.createElement('a');
+              link.download = fileName;
+              link.href = canvas.toDataURL("image/png");
+              link.click();
+          }
+
+      } catch (error) {
+          console.error("Could not generate share image", error);
+      } finally {
+          setIsSharing(false);
+      }
+  };
+
+
   const gpa = result.gpa?.toFixed(2);
   const isPass = result.status === 'Pass';
   const showMarks = result.grades.some(g => g.marks);
@@ -241,15 +291,42 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
 
   return (
     <div className={containerClasses}>
+       {/* Hidden card for sharing */}
+        <div id="share-card" className="fixed top-0 left-[200vw] w-[600px] h-[315px] bg-gradient-to-br from-primary to-accent p-8 text-white font-sans">
+             <div className="flex flex-col justify-between h-full">
+                <div>
+                     <div className="flex items-center gap-3">
+                         <Image src="/logo.png" alt="Logo" width={48} height={48} className="h-12 w-12 rounded-full" />
+                        <p className="text-2xl font-bold">BD Edu Result</p>
+                    </div>
+                     <p className="mt-4 text-lg">Congratulations, {result.studentInfo.name}!</p>
+                </div>
+
+                <div className="text-center">
+                    <p className="text-3xl font-bold leading-tight">
+                        I have passed the <span className="uppercase">{result.exam}</span> - {result.year} exam
+                    </p>
+                    {isPass && gpa && <p className="text-5xl font-extrabold mt-2">with GPA {gpa} 🎉</p>}
+                </div>
+
+                 <p className="text-sm text-right opacity-80">Check your result at bdedu.me</p>
+            </div>
+        </div>
+
        <div className={cn("flex justify-end gap-2", !isDialog && "no-print")}>
           {!isDialog && onReset && (
-              <Button variant="outline" onClick={onReset} disabled={isDownloading}>
+              <Button variant="outline" onClick={onReset} disabled={isDownloading || isSharing}>
                   <Search className="mr-2 h-4 w-4" />
                   অন্য ফলাফল খুঁজুন
               </Button>
           )}
 
-          <Button onClick={handleDownload} disabled={isDownloading}>
+           <Button onClick={handleShare} disabled={isSharing || isDownloading}>
+                {isSharing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Share2 className="mr-2 h-4 w-4" />}
+                শেয়ার করুন
+           </Button>
+
+          <Button onClick={handleDownload} disabled={isDownloading || isSharing}>
               {isDownloading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
               ডাউনলোড করুন
           </Button>
@@ -333,12 +410,16 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
       {!isDialog && (
          <CardFooter className="flex justify-end gap-2 no-print">
             {onReset && (
-                <Button variant="outline" onClick={onReset} disabled={isDownloading}>
+                <Button variant="outline" onClick={onReset} disabled={isDownloading || isSharing}>
                     <Search className="mr-2 h-4 w-4" />
                     অন্য ফলাফল খুঁজুন
                 </Button>
             )}
-            <Button onClick={handleDownload} disabled={isDownloading}>
+             <Button onClick={handleShare} disabled={isSharing || isDownloading}>
+                {isSharing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Share2 className="mr-2 h-4 w-4" />}
+                শেয়ার করুন
+            </Button>
+            <Button onClick={handleDownload} disabled={isDownloading || isSharing}>
                {isDownloading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
                 ডাউনলোড করুন
             </Button>
@@ -348,5 +429,3 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
     </div>
   );
 }
-
-    
