@@ -2,7 +2,7 @@
 'use client'
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText, Users, BarChart, DatabaseZap, MailCheck } from 'lucide-react';
+import { FileText, Users, MailCheck, DatabaseZap } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import Link from 'next/link';
 
