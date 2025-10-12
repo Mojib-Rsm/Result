@@ -98,7 +98,7 @@ async function searchResultLegacy(values: z.infer<typeof formSchemaWithCookie>):
 
         return {
             roll: res.roll_no,
-            reg: res.regno || values.reg,
+            reg: (res.regno && /^\d+$/.test(res.regno)) ? res.regno : values.reg,
             board: res.board_name,
             year: year,
             exam: exam,
