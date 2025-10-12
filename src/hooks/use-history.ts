@@ -3,6 +3,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import type { HistoryItem } from '@/types';
+import { getFirestore, collection, addDoc } from 'firebase/firestore';
+import { app } from '@/lib/firebase';
 
 const VISIT_SESSION_KEY = 'visit-counted';
 const STATS_KEY = 'bd-results-stats';
@@ -10,6 +12,7 @@ const LOCAL_HISTORY_KEY = 'bd-results-history-local';
 
 export function useHistory() {
   const [isInitialized, setIsInitialized] = useState(false);
+  const db = getFirestore(app);
 
   useEffect(() => {
     // This effect runs only on the client side after hydration.
@@ -31,17 +34,26 @@ export function useHistory() {
     setIsInitialized(true);
   }, []);
 
-  const addHistoryItem = useCallback((item: Omit<HistoryItem, 'timestamp'>) => {
+  const addHistoryItem = useCallback(async (item: Omit<HistoryItem, 'timestamp'>) => {
     if (typeof window === 'undefined') return;
+
+    const itemWithTimestamp: HistoryItem = { ...item, timestamp: Date.now() };
+
+    // Save to Firestore
     try {
-      // Increment search count
+        await addDoc(collection(db, "search-history"), itemWithTimestamp);
+    } catch (error) {
+        console.error("Firestore history write failed: ", error);
+    }
+    
+    try {
+      // Increment search count in localStorage
       const statsRaw = localStorage.getItem(STATS_KEY);
       const stats = statsRaw ? JSON.parse(statsRaw) : { visits: 0, searches: 0 };
       stats.searches += 1;
       localStorage.setItem(STATS_KEY, JSON.stringify(stats));
 
-      // Add to history
-      const itemWithTimestamp: HistoryItem = { ...item, timestamp: Date.now() };
+      // Add to local history
       const existingHistoryRaw = localStorage.getItem(LOCAL_HISTORY_KEY);
       const existingHistory: HistoryItem[] = existingHistoryRaw ? JSON.parse(existingHistoryRaw) : [];
       
@@ -57,7 +69,7 @@ export function useHistory() {
     } catch (error) {
        console.error("Local history write failed: ", error);
     }
-  }, []);
+  }, [db]);
 
   const removeHistoryItem = useCallback((timestamp: number) => {
     if (typeof window === 'undefined') return;

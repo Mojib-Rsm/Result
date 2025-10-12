@@ -1,10 +1,14 @@
 
 'use client'
 
+import { useState, useEffect } from 'react';
+import { getFirestore, collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
+import { app } from '@/lib/firebase';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileText, Users, MailCheck, DatabaseZap } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import Link from 'next/link';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const adminFeatures = [
     {
@@ -35,11 +39,6 @@ const demoUsers = [
     { id: '2', name: 'Mojib Rsm', email: 'mojibrsm@gmail.com', role: 'editor' },
 ];
 
-const demoResults = [
-    { roll: '123456', exam: 'HSC', year: '2023', gpa: '5.00' },
-    { roll: '654321', exam: 'SSC', year: '2023', gpa: '4.89' },
-];
-
 const demoSubscriptions = [
     { id: '1', phone: '01xxxxxxxxx', roll: '123456', exam: 'HSC', year: '2024' },
     { id: '2', phone: '01xxxxxxxxx', roll: '654321', exam: 'SSC', year: '2025' },
@@ -47,6 +46,29 @@ const demoSubscriptions = [
 
 
 export default function AdminPage() {
+    const [recentSearches, setRecentSearches] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const db = getFirestore(app);
+
+    useEffect(() => {
+        const fetchRecentSearches = async () => {
+            try {
+                const searchesRef = collection(db, 'search-history');
+                const q = query(searchesRef, orderBy('timestamp', 'desc'), limit(10));
+                const querySnapshot = await getDocs(q);
+                const searches = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                setRecentSearches(searches);
+            } catch (error) {
+                console.error("Error fetching recent searches: ", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchRecentSearches();
+    }, [db]);
+
+
     return (
         <div className="container mx-auto max-w-7xl px-4 py-8 md:py-12">
             <div className="mb-10">
@@ -116,14 +138,29 @@ export default function AdminPage() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {demoResults.map(result => (
-                                    <TableRow key={result.roll}>
-                                        <TableCell>{result.roll}</TableCell>
-                                        <TableCell>{result.exam}</TableCell>
-                                        <TableCell>{result.year}</TableCell>
-                                        <TableCell>{result.gpa}</TableCell>
+                                {loading ? (
+                                    [...Array(5)].map((_, i) => (
+                                        <TableRow key={i}>
+                                            <TableCell><Skeleton className="h-4 w-full" /></TableCell>
+                                            <TableCell><Skeleton className="h-4 w-full" /></TableCell>
+                                            <TableCell><Skeleton className="h-4 w-full" /></TableCell>
+                                            <TableCell><Skeleton className="h-4 w-full" /></TableCell>
+                                        </TableRow>
+                                    ))
+                                ) : recentSearches.length > 0 ? (
+                                    recentSearches.map(result => (
+                                        <TableRow key={result.id}>
+                                            <TableCell>{result.roll}</TableCell>
+                                            <TableCell className="uppercase">{result.exam}</TableCell>
+                                            <TableCell>{result.year}</TableCell>
+                                            <TableCell>{result.result?.gpa?.toFixed(2) || 'N/A'}</TableCell>
+                                        </TableRow>
+                                    ))
+                                ) : (
+                                    <TableRow>
+                                        <TableCell colSpan={4} className="text-center">কোনো সাম্প্রতিক অনুসন্ধান নেই।</TableCell>
                                     </TableRow>
-                                ))}
+                                )}
                             </TableBody>
                         </Table>
                     </CardContent>
