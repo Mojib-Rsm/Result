@@ -15,6 +15,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { formSchema } from '@/lib/schema';
+import ResultAlertForm from '@/components/result-alert-form';
+import { Separator } from '@/components/ui/separator';
 
 export default function Home() {
   const [result, setResult] = useState<ExamResult | null>(null);
@@ -136,14 +138,18 @@ export default function Home() {
       </div>
 
       {!result ? (
-        <div className="rounded-xl border bg-card text-card-foreground shadow p-4 md:p-8">
-            <ExamForm 
-              form={form} 
-              onSubmit={onSubmit} 
-              isSubmitting={isSubmitting}
-              captchaUrl={captchaUrl}
-              onCaptchaRefresh={refreshCaptcha}
-            />
+        <div className="space-y-12">
+          <div className="rounded-xl border bg-card text-card-foreground shadow p-4 md:p-8">
+              <ExamForm 
+                form={form} 
+                onSubmit={onSubmit} 
+                isSubmitting={isSubmitting}
+                captchaUrl={captchaUrl}
+                onCaptchaRefresh={refreshCaptcha}
+              />
+          </div>
+           <Separator />
+          <ResultAlertForm />
         </div>
       ) : (
         <>

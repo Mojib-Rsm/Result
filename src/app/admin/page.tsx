@@ -2,7 +2,7 @@
 'use client'
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText, Users, BarChart, DatabaseZap } from 'lucide-react';
+import { FileText, Users, BarChart, DatabaseZap, MailCheck } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import Link from 'next/link';
 
@@ -18,9 +18,9 @@ const adminFeatures = [
         icon: FileText,
     },
     {
-        title: 'সাইট পরিসংখ্যান',
-        description: 'ভিজিটর, অনুসন্ধান এবং অন্যান্য পরিসংখ্যান ট্র্যাক করুন।',
-        icon: BarChart,
+        title: 'সাবস্ক্রিপশন',
+        description: 'ফলাফলেরแจ้งতার জন্য সাবস্ক্রাইব করা ব্যবহারকারীদের দেখুন।',
+        icon: MailCheck,
     },
     {
         title: 'ডাটাবেস সিডিং',
@@ -38,8 +38,12 @@ const demoUsers = [
 const demoResults = [
     { roll: '123456', exam: 'HSC', year: '2023', gpa: '5.00' },
     { roll: '654321', exam: 'SSC', year: '2023', gpa: '4.89' },
-    { roll: '101010', exam: 'JSC', year: '2023', gpa: 'Pass' },
 ];
+
+const demoSubscriptions = [
+    { id: '1', email: 'student1@example.com', exam: 'HSC', year: '2024' },
+    { id: '2', email: 'student2@example.com', exam: 'SSC', year: '2025' },
+]
 
 
 export default function AdminPage() {
@@ -64,7 +68,7 @@ export default function AdminPage() {
                         <CardContent>
                             <CardDescription>
                                 {feature.description}
-                                {feature.link && <Link href={feature.link} className="text-primary font-semibold hover:underline block mt-2">এখান থেকে করুন</Link>}
+                                {feature.title === 'ডাটাবেস সিডিং' && <Link href="/seeding" className="text-primary font-semibold hover:underline block mt-2">এখান থেকে করুন</Link>}
                             </CardDescription>
                         </CardContent>
                     </Card>
@@ -118,6 +122,34 @@ export default function AdminPage() {
                                         <TableCell>{result.exam}</TableCell>
                                         <TableCell>{result.year}</TableCell>
                                         <TableCell>{result.gpa}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </CardContent>
+                </Card>
+            </div>
+            
+             <div className="mt-8">
+                <Card>
+                    <CardHeader>
+                        <CardTitle>সাম্প্রতিক সাবস্ক্রিপশন</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>ইমেইল</TableHead>
+                                    <TableHead>পরীক্ষা</TableHead>
+                                    <TableHead>বছর</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {demoSubscriptions.map(sub => (
+                                    <TableRow key={sub.id}>
+                                        <TableCell>{sub.email}</TableCell>
+                                        <TableCell className="uppercase">{sub.exam}</TableCell>
+                                        <TableCell>{sub.year}</TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
