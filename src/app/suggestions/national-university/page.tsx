@@ -8,6 +8,7 @@ import Link from 'next/link';
 import { ArrowLeft, ExternalLink } from 'lucide-react';
 
 const nationalColleges = [
+    // Dhaka Division
     { name: 'ঢাকা কলেজ', location: 'ঢাকা', website: 'https://www.dhakacollege.edu.bd' },
     { name: 'ইডেন মহিলা কলেজ', location: 'ঢাকা', website: 'https://www.emc.edu.bd' },
     { name: 'সরকারি তিতুমীর কলেজ', location: 'ঢাকা', website: 'https://www.titumircollege.gov.bd' },
@@ -35,18 +36,18 @@ const nationalColleges = [
     { name: 'পাবনা এডওয়ার্ড কলেজ', location: 'পাবনা', website: 'https://www.edwardcollege.edu.bd' },
 
     // Khulna Division
-    { name: 'সরকারি ব্রজলাল কলেজ', location: 'খুলনা', website: 'https://www.blcollege.edu.bd' },
+    { name: 'সরকারি ব্রজলাল কলেজ (বি এল কলেজ)', location: 'খুলনা', website: 'https://www.blcollege.edu.bd' },
     { name: 'সরকারি এম. এম. কলেজ', location: 'যশোর', website: 'https://www.mmcollege.edu.bd' },
     { name: 'সাতক্ষীরা সরকারি কলেজ', location: 'সাতক্ষীরা', website: 'https://www.satkhiragovtcollege.edu.bd' },
     { name: 'কুষ্টিয়া সরকারি কলেজ', location: 'কুষ্টিয়া', website: 'https://www.kushtiagovtcollege.edu.bd' },
 
     // Barishal Division
-    { name: 'বরিশাল সরকারি ব্রজমোহন কলেজ', location: 'বরিশাল', website: 'https://www.bmcollege.gov.bd' },
+    { name: 'বরিশাল সরকারি ব্রজমোহন কলেজ (বি এম কলেজ)', location: 'বরিশাল', website: 'https://www.bmcollege.gov.bd' },
     { name: 'সরকারি সৈয়দ হাতেম আলী কলেজ', location: 'বরিশাল', website: 'https://www.shacollege.gov.bd' },
 
     // Sylhet Division
     { name: 'মদন মোহন কলেজ', location: 'সিলেট', website: 'https://www.mmc.edu.bd' },
-    { name: 'মুরারিচাঁদ কলেজ', location: 'সিলেট', website: 'https://www.mccollege.edu.bd' },
+    { name: 'মুরারিচাঁদ কলেজ (এম সি কলেজ)', location: 'সিলেট', website: 'https://www.mccollege.edu.bd' },
     { name: 'বৃন্দাবন সরকারি কলেজ', location: 'হবিগঞ্জ', website: 'https://www.brindabancollege.gov.bd' },
 
     // Rangpur Division
