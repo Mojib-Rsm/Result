@@ -93,7 +93,7 @@ export default function StatisticsPage() {
                         <BarChart className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{hsc2023_stats.totalGpa5.toLocaleString()}</div>
+                        <div className="text-2xl font-bold">{hsc2023Stats.totalGpa5.toLocaleString()}</div>
                         <p className="text-xs text-muted-foreground">সকল বোর্ডের মধ্যে</p>
                     </CardContent>
                 </Card>
