@@ -2,7 +2,7 @@
 'use client';
 
 import { useState } from 'react';
-import { getFirestore, writeBatch, doc } from 'firebase/firestore';
+import { getFirestore, setDoc, doc } from 'firebase/firestore';
 import { app } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -31,25 +31,18 @@ export default function SeedingPage() {
     const handleSeed = async () => {
         setIsSeeding(true);
         try {
-            const batch = writeBatch(db);
-
             // Seed users
-            usersToSeed.forEach(user => {
+            for (const user of usersToSeed) {
                 const userRef = doc(db, 'users', user.id);
-                // The user object is spread to include all its properties.
-                // The 'id' property is used for the document ID and not stored in the document fields.
                 const { id, ...userData } = user;
-                batch.set(userRef, userData);
-            });
+                await setDoc(userRef, userData);
+            }
 
             // Seed results
-            resultsToSeed.forEach(result => {
-                // Using roll as the document ID for simplicity, could be a generated ID as well
+            for (const result of resultsToSeed) {
                 const resultRef = doc(db, 'results', result.roll);
-                batch.set(resultRef, result);
-            });
-
-            await batch.commit();
+                await setDoc(resultRef, result);
+            }
 
             toast({
                 title: 'সাফল্য',
