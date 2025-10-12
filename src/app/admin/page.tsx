@@ -2,8 +2,9 @@
 'use client'
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText, Users, BarChart, Shield } from 'lucide-react';
+import { FileText, Users, BarChart, DatabaseZap } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import Link from 'next/link';
 
 const adminFeatures = [
     {
@@ -22,9 +23,10 @@ const adminFeatures = [
         icon: BarChart,
     },
     {
-        title: 'সেটিংস',
-        description: 'অ্যাপ্লিকেশনের বিভিন্ন সেটিংস কনফিগার করুন।',
-        icon: Shield,
+        title: 'ডাটাবেস সিডিং',
+        description: 'প্রাথমিক ডেটা দিয়ে ডাটাবেস প্রস্তুত করুন।',
+        icon: DatabaseZap,
+        link: '/admin/seeding'
     }
 ];
 
@@ -61,7 +63,10 @@ export default function AdminPage() {
                             <CardTitle>{feature.title}</CardTitle>
                         </CardHeader>
                         <CardContent>
-                            <CardDescription>{feature.description}</CardDescription>
+                            <CardDescription>
+                                {feature.description}
+                                {feature.link && <Link href={feature.link} className="text-primary font-semibold hover:underline block mt-2">এখান থেকে করুন</Link>}
+                            </CardDescription>
                         </CardContent>
                     </Card>
                 ))}
