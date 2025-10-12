@@ -1,12 +1,17 @@
-
 'use client';
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { GraduationCap, History, Calculator } from 'lucide-react';
+import { GraduationCap, History, Calculator, MoreVertical } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 export default function Header({ className }: { className?: string }) {
   const pathname = usePathname();
@@ -30,7 +35,7 @@ export default function Header({ className }: { className?: string }) {
           />
           <span className="font-bold sm:inline-block">BD Edu Result</span>
         </Link>
-        <nav className="flex flex-1 items-center gap-2 text-sm">
+        <nav className="hidden flex-1 items-center gap-2 text-sm md:flex">
           {navLinks.map((link) => (
             <Button
               key={link.href}
@@ -48,6 +53,27 @@ export default function Header({ className }: { className?: string }) {
             </Button>
           ))}
         </nav>
+
+        <div className="flex flex-1 items-center justify-end md:hidden">
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                        <MoreVertical className="h-5 w-5" />
+                        <span className="sr-only">Open menu</span>
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                    {navLinks.map(link => (
+                         <DropdownMenuItem key={link.href} asChild>
+                             <Link href={link.href} className="flex items-center gap-2">
+                                <link.icon className="h-4 w-4" />
+                                <span>{link.label}</span>
+                            </Link>
+                         </DropdownMenuItem>
+                    ))}
+                </DropdownMenuContent>
+            </DropdownMenu>
+        </div>
       </div>
     </header>
   );
