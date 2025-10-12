@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Loader2, Search, Download, BarChart, ArrowUp, ArrowDown, Star } from 'lucide-react';
+import { Loader2, Search, Download, BarChart, ArrowUp, ArrowDown, Star, Sparkles } from 'lucide-react';
 import type { ExamResult, GradeInfo } from '@/types';
 import { Separator } from './ui/separator';
 import { cn } from '@/lib/utils';
@@ -288,8 +288,25 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
             </div>
         </Card>
 
-        {!isDialog && isPass && <MarksheetAnalyzer grades={result.grades} />}
-
+        {!isDialog && isPass && (
+            <>
+                <Card className="mt-8 no-print">
+                    <CardHeader>
+                        <CardTitle>পরবর্তী ধাপ</CardTitle>
+                        <CardDescription>আপনার ফলাফলের উপর ভিত্তি করে ভর্তির জন্য সেরা প্রতিষ্ঠানগুলো সম্পর্কে জানুন।</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <Link href={`/suggestions?gpa=${gpa}`}>
+                            <Button className="w-full" size="lg">
+                                <Sparkles className="mr-2 h-4 w-4" />
+                                ভর্তি পরামর্শ দেখুন
+                            </Button>
+                        </Link>
+                    </CardContent>
+                </Card>
+                <MarksheetAnalyzer grades={result.grades} />
+            </>
+        )}
       </div>
       
       {!isDialog && (
