@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { getFirestore, collection, query, orderBy, getDocs, where, getCountFromServer } from 'firebase/firestore';
-import { startOfDay, endOfDay } from 'date-fns';
+import { startOfDay, endOfDay, subDays } from 'date-fns';
 import { app } from '@/lib/firebase';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileText, Users, MailCheck, DatabaseZap, Search, BellRing, MessageSquare, Bookmark } from 'lucide-react';
@@ -62,7 +62,9 @@ export default function AdminPage() {
         totalUsers: 0,
         totalSearches: 0,
         todaysSearches: 0,
-        totalSubscriptions: 0
+        totalSubscriptions: 0,
+        searchesLast7Days: 0,
+        searchesLast30Days: 0,
     });
     const [loading, setLoading] = useState(true);
     const [isSendingSms, setIsSendingSms] = useState(false);
@@ -76,7 +78,8 @@ export default function AdminPage() {
             try {
                 const today = new Date();
                 const startOfToday = startOfDay(today);
-                const endOfToday = endOfDay(today);
+                const startOf7DaysAgo = startOfDay(subDays(today, 7));
+                const startOf30DaysAgo = startOfDay(subDays(today, 30));
 
                 // Collections
                 const searchesRef = collection(db, 'search-history');
@@ -86,7 +89,9 @@ export default function AdminPage() {
                 // Stat Queries
                 const totalUsersQuery = query(usersRef);
                 const totalSearchesQuery = query(searchesRef);
-                const todaysSearchesQuery = query(searchesRef, where('timestamp', '>=', startOfToday), where('timestamp', '<=', endOfToday));
+                const todaysSearchesQuery = query(searchesRef, where('timestamp', '>=', startOfToday.getTime()));
+                const last7DaysSearchesQuery = query(searchesRef, where('timestamp', '>=', startOf7DaysAgo.getTime()));
+                const last30DaysSearchesQuery = query(searchesRef, where('timestamp', '>=', startOf30DaysAgo.getTime()));
                 const totalSubscriptionsQuery = query(subscriptionsRef);
 
                 // Data Table Queries
@@ -99,6 +104,8 @@ export default function AdminPage() {
                     totalUsersSnap,
                     totalSearchesSnap,
                     todaysSearchesSnap,
+                    last7DaysSearchesSnap,
+                    last30DaysSearchesSnap,
                     totalSubscriptionsSnap,
                     recentSearchesSnap,
                     allUsersSnap,
@@ -107,6 +114,8 @@ export default function AdminPage() {
                     getCountFromServer(totalUsersQuery),
                     getCountFromServer(totalSearchesQuery),
                     getCountFromServer(todaysSearchesQuery),
+                    getCountFromServer(last7DaysSearchesQuery),
+                    getCountFromServer(last30DaysSearchesQuery),
                     getCountFromServer(totalSubscriptionsQuery),
                     getDocs(recentSearchesQuery),
                     getDocs(allUsersQuery),
@@ -118,6 +127,8 @@ export default function AdminPage() {
                     totalUsers: totalUsersSnap.data().count,
                     totalSearches: totalSearchesSnap.data().count,
                     todaysSearches: todaysSearchesSnap.data().count,
+                    searchesLast7Days: last7DaysSearchesSnap.data().count,
+                    searchesLast30Days: last30DaysSearchesSnap.data().count,
                     totalSubscriptions: totalSubscriptionsSnap.data().count,
                 });
 
@@ -195,6 +206,8 @@ export default function AdminPage() {
                 <StatCard title="মোট অনুসন্ধান" value={stats.totalSearches} icon={Search} description="এখন পর্যন্ত মোট ফলাফল অনুসন্ধান" />
                 <StatCard title="আজকের অনুসন্ধান" value={stats.todaysSearches} icon={FileText} description="গত ২৪ ঘন্টায় অনুসন্ধান" />
                 <StatCard title="মোট সাবস্ক্রিপশন" value={stats.totalSubscriptions} icon={BellRing} description="ফলাফল অ্যালার্টের জন্য সাবস্ক্রাইবার" />
+                <StatCard title="গত ৭ দিনে অনুসন্ধান" value={stats.searchesLast7Days} icon={Search} description="সর্বশেষ ৭ দিনের মোট অনুসন্ধান" />
+                <StatCard title="গত ৩০ দিনে অনুসন্ধান" value={stats.searchesLast30Days} icon={Search} description="সর্বশেষ ৩০ দিনের মোট অনুসন্ধান" />
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
