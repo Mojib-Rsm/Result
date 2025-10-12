@@ -16,15 +16,18 @@ import { Loader2, MailCheck } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 
 const alertSchema = z.object({
-  email: z.string().email('অনুগ্রহ করে একটি বৈধ ইমেইল দিন।'),
+  phone: z.string().min(11, 'অনুগ্রহ করে একটি বৈধ ফোন নম্বর দিন।').max(14),
+  roll: z.string().min(1, 'রোল নম্বর আবশ্যক।'),
+  reg: z.string().min(1, 'রেজিস্ট্রেশন নম্বর আবশ্যক।'),
   exam: z.string().min(1, 'পরীক্ষা নির্বাচন আবশ্যক।'),
   year: z.string().min(1, 'বছর নির্বাচন আবশ্যক।'),
 });
 
 const exams = [
+    { value: 'hsc', label: 'HSC/Alim' },
+    { value: 'hsc_bm', label: 'HSC(BM/Vocational)' },
     { value: 'jsc', label: 'JSC/JDC' },
     { value: 'ssc', label: 'SSC/Dakhil' },
-    { value: 'hsc', label: 'HSC/Alim' },
 ];
 
 const currentYear = new Date().getFullYear();
@@ -38,7 +41,9 @@ export default function ResultAlertForm() {
   const form = useForm<z.infer<typeof alertSchema>>({
     resolver: zodResolver(alertSchema),
     defaultValues: {
-      email: '',
+      phone: '',
+      roll: '',
+      reg: '',
       exam: '',
       year: '',
     },
@@ -51,7 +56,8 @@ export default function ResultAlertForm() {
       
       // Check for existing subscription
       const q = query(subscriptionsRef, 
-        where('email', '==', values.email),
+        where('phone', '==', values.phone),
+        where('roll', '==', values.roll),
         where('exam', '==', values.exam),
         where('year', '==', values.year)
       );
@@ -74,7 +80,7 @@ export default function ResultAlertForm() {
 
       toast({
         title: 'সাবস্ক্রিপশন সফল',
-        description: 'ফলাফল প্রকাশিত হলে আপনাকে ইমেইলে জানানো হবে।',
+        description: 'ফলাফল প্রকাশিত হলে আপনাকে জানানো হবে।',
       });
       form.reset();
     } catch (error: any) {
@@ -94,7 +100,7 @@ export default function ResultAlertForm() {
         <div className="mx-auto bg-primary/10 p-3 rounded-full w-fit">
             <MailCheck className="h-8 w-8 text-primary" />
         </div>
-        <CardTitle className="text-2xl mt-4">ফলাফলের জন্য সতর্ক হোন!</CardTitle>
+        <CardTitle className="text-2xl mt-4">ফলাফল প্রকাশিত হলে সবার আগে জানুন!</CardTitle>
         <CardDescription>
           “Get notified when {form.watch('exam')?.toUpperCase() || 'EXAM'} Result {form.watch('year') || 'YEAR'} is published!”
         </CardDescription>
@@ -102,15 +108,41 @@ export default function ResultAlertForm() {
       <CardContent>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <FormField
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+               <FormField
                 control={form.control}
-                name="email"
+                name="phone"
                 render={({ field }) => (
-                  <FormItem className="md:col-span-3">
-                    <FormLabel>ইমেইল</FormLabel>
+                  <FormItem>
+                    <FormLabel>ফোন নম্বর</FormLabel>
                     <FormControl>
-                      <Input placeholder="your.email@example.com" {...field} />
+                      <Input type="tel" placeholder="01xxxxxxxxx" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+               <FormField
+                control={form.control}
+                name="roll"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>রোল নম্বর</FormLabel>
+                    <FormControl>
+                      <Input placeholder="আপনার রোল নম্বর" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+               <FormField
+                control={form.control}
+                name="reg"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>রেজিস্ট্রেশন নম্বর</FormLabel>
+                    <FormControl>
+                      <Input placeholder="আপনার রেজিস্ট্রেশন নম্বর" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

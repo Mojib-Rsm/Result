@@ -41,8 +41,8 @@ const demoResults = [
 ];
 
 const demoSubscriptions = [
-    { id: '1', email: 'student1@example.com', exam: 'HSC', year: '2024' },
-    { id: '2', email: 'student2@example.com', exam: 'SSC', year: '2025' },
+    { id: '1', phone: '01xxxxxxxxx', roll: '123456', exam: 'HSC', year: '2024' },
+    { id: '2', phone: '01xxxxxxxxx', roll: '654321', exam: 'SSC', year: '2025' },
 ]
 
 
@@ -139,7 +139,8 @@ export default function AdminPage() {
                         <Table>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHead>ইমেইল</TableHead>
+                                    <TableHead>ফোন নম্বর</TableHead>
+                                    <TableHead>রোল</TableHead>
                                     <TableHead>পরীক্ষা</TableHead>
                                     <TableHead>বছর</TableHead>
                                 </TableRow>
@@ -147,7 +148,8 @@ export default function AdminPage() {
                             <TableBody>
                                 {demoSubscriptions.map(sub => (
                                     <TableRow key={sub.id}>
-                                        <TableCell>{sub.email}</TableCell>
+                                        <TableCell>{sub.phone}</TableCell>
+                                        <TableCell>{sub.roll}</TableCell>
                                         <TableCell className="uppercase">{sub.exam}</TableCell>
                                         <TableCell>{sub.year}</TableCell>
                                     </TableRow>
