@@ -6,11 +6,14 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Loader2, Search, Printer } from 'lucide-react';
+import { Loader2, Search, Download } from 'lucide-react';
 import type { ExamResult } from '@/types';
 import { Separator } from './ui/separator';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+
 
 interface ResultsDisplayProps {
   result: ExamResult;
@@ -55,15 +58,49 @@ const FooterContent = () => (
 
 
 export default function ResultsDisplay({ result, onReset, isDialog = false }: ResultsDisplayProps) {
-  const [isPrinting, setIsPrinting] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
   
-  const handlePrint = () => {
-    setIsPrinting(true);
-    setTimeout(() => {
-        window.print();
-        setIsPrinting(false);
-    }, 100);
+  const handleDownload = async () => {
+    setIsDownloading(true);
+    const element = document.getElementById('printable-area');
+    if (!element) {
+        setIsDownloading(false);
+        return;
+    }
+
+    try {
+        const canvas = await html2canvas(element, { scale: 2 });
+        const imgData = canvas.toDataURL('image/png');
+
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const pdfWidth = pdf.internal.pageSize.getWidth();
+        const pdfHeight = pdf.internal.pageSize.getHeight();
+        
+        const imgWidth = canvas.width;
+        const imgHeight = canvas.height;
+        
+        const ratio = imgWidth / imgHeight;
+        let newImgWidth = pdfWidth;
+        let newImgHeight = newImgWidth / ratio;
+        
+        if (newImgHeight > pdfHeight) {
+            newImgHeight = pdfHeight;
+            newImgWidth = newImgHeight * ratio;
+        }
+        
+        const x = (pdfWidth - newImgWidth) / 2;
+        const y = (pdfHeight > newImgHeight) ? (pdfHeight - newImgHeight) / 2 : 0;
+        
+        pdf.addImage(imgData, 'PNG', x, y, newImgWidth, newImgHeight);
+        pdf.save(`BD-Edu-Result-${result.roll}-${result.year}.pdf`);
+
+    } catch (error) {
+        console.error("Could not generate PDF", error);
+    } finally {
+        setIsDownloading(false);
+    }
   }
+
 
   const gpa = result.gpa?.toFixed(2);
   const isPass = result.status === 'Pass';
@@ -90,15 +127,15 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
     <div className={containerClasses}>
        <div className={cn("flex justify-end gap-2", !isDialog && "no-print")}>
           {!isDialog && onReset && (
-              <Button variant="outline" onClick={onReset} disabled={isPrinting}>
+              <Button variant="outline" onClick={onReset} disabled={isDownloading}>
                   <Search className="mr-2 h-4 w-4" />
                   অন্য ফলাফল খুঁজুন
               </Button>
           )}
 
-          <Button onClick={handlePrint} disabled={isPrinting}>
-              {isPrinting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Printer className="mr-2 h-4 w-4" />}
-              প্রিন্ট করুন
+          <Button onClick={handleDownload} disabled={isDownloading}>
+              {isDownloading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
+              ডাউনলোড করুন
           </Button>
       </div>
 
@@ -176,14 +213,14 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
       {!isDialog && (
          <CardFooter className="flex justify-end gap-2 no-print">
             {onReset && (
-                <Button variant="outline" onClick={onReset} disabled={isPrinting}>
+                <Button variant="outline" onClick={onReset} disabled={isDownloading}>
                     <Search className="mr-2 h-4 w-4" />
                     অন্য ফলাফল খুঁজুন
                 </Button>
             )}
-            <Button onClick={handlePrint} disabled={isPrinting}>
-               {isPrinting ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Printer className="mr-2 h-4 w-4" />}
-                প্রিন্ট করুন
+            <Button onClick={handleDownload} disabled={isDownloading}>
+               {isDownloading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
+                ডাউনলোড করুন
             </Button>
         </CardFooter>
       )}
