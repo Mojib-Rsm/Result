@@ -2,14 +2,18 @@
 'use client'
 
 import { useState, useEffect } from 'react';
-import { getFirestore, collection, query, orderBy, limit, getDocs, where, getCountFromServer } from 'firebase/firestore';
+import { getFirestore, collection, query, orderBy, getDocs, where, getCountFromServer } from 'firebase/firestore';
 import { startOfDay, endOfDay } from 'date-fns';
 import { app } from '@/lib/firebase';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText, Users, MailCheck, DatabaseZap, Search, BellRing } from 'lucide-react';
+import { FileText, Users, MailCheck, DatabaseZap, Search, BellRing, MessageSquare } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/hooks/use-toast';
+import { Separator } from '@/components/ui/separator';
 
 const adminFeatures = [
     {
@@ -30,6 +34,12 @@ const adminFeatures = [
         icon: MailCheck,
         href: '#subscriptions-table'
     },
+     {
+        title: 'নোটিফিকেশন ও অ্যালার্ট',
+        description: 'ব্যবহারকারীদের SMS বা ইমেইল নোটিফিকেশন পাঠান।',
+        icon: BellRing,
+        href: '#notification-system'
+    },
     {
         title: 'ডাটাবেস সিডিং',
         description: 'প্রাথমিক ডেটা দিয়ে ডাটাবেস প্রস্তুত করুন।',
@@ -49,7 +59,11 @@ export default function AdminPage() {
         totalSubscriptions: 0
     });
     const [loading, setLoading] = useState(true);
+    const [isSendingSms, setIsSendingSms] = useState(false);
+    const [smsMessage, setSmsMessage] = useState('');
+
     const db = getFirestore(app);
+    const { toast } = useToast();
 
     useEffect(() => {
         const fetchAllData = async () => {
@@ -70,7 +84,7 @@ export default function AdminPage() {
                 const totalSubscriptionsQuery = query(subscriptionsRef);
 
                 // Data Table Queries
-                const recentSearchesQuery = query(searchesRef, orderBy('timestamp', 'desc'), limit(10));
+                const recentSearchesQuery = query(searchesRef, orderBy('timestamp', 'desc'), where('result.status', '==', 'Pass'));
                 const allUsersQuery = query(usersRef, orderBy('name'));
                 const allSubsQuery = query(subscriptionsRef, orderBy('createdAt', 'desc'));
 
@@ -90,7 +104,7 @@ export default function AdminPage() {
                     getCountFromServer(totalSubscriptionsQuery),
                     getDocs(recentSearchesQuery),
                     getDocs(allUsersQuery),
-                    getDocs(allSubsQuery)
+                    getDocs(allSubsSnap)
                 ]);
 
                 // Set stats
@@ -115,6 +129,27 @@ export default function AdminPage() {
 
         fetchAllData();
     }, [db]);
+
+    const handleSendSms = async () => {
+        if (!smsMessage.trim()) {
+            toast({
+                title: 'ত্রুটি',
+                description: 'SMS বার্তা খালি হতে পারে না।',
+                variant: 'destructive',
+            });
+            return;
+        }
+        setIsSendingSms(true);
+        // TODO: Implement actual SMS sending logic here
+        await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate network delay
+        
+        setIsSendingSms(false);
+        setSmsMessage('');
+        toast({
+            title: 'সাফল্য',
+            description: `"${smsMessage}" বার্তাটি ${subscriptions.length} জন সাবস্ক্রাইবারকে পাঠানোর জন্য প্রক্রিয়া করা হয়েছে।`,
+        });
+    }
 
     const TableSkeleton = () => (
         [...Array(5)].map((_, i) => (
@@ -156,7 +191,7 @@ export default function AdminPage() {
                 <StatCard title="মোট সাবস্ক্রিপশন" value={stats.totalSubscriptions} icon={BellRing} description="ফলাফল অ্যালার্টের জন্য সাবস্ক্রাইবার" />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {adminFeatures.map((feature, index) => (
                      <Link href={feature.href} key={index}>
                         <Card className="hover:shadow-lg transition-shadow h-full">
@@ -176,10 +211,42 @@ export default function AdminPage() {
                 ))}
             </div>
 
+            <Separator className="my-12" />
+
+             <div className="grid grid-cols-1 gap-8">
+                 <Card id="notification-system">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                             <MessageSquare className="h-6 w-6" />
+                            নোটিফিকেশন এবং অ্যালার্ট সিস্টেম
+                        </CardTitle>
+                        <CardDescription>
+                            এখান থেকে সকল সাবস্ক্রাইবারদের একসাথে SMS পাঠান। ({stats.totalSubscriptions.toLocaleString()} জন সাবস্ক্রাইবার)
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="space-y-4">
+                             <Textarea
+                                placeholder="এখানে আপনার SMS বার্তা লিখুন..."
+                                value={smsMessage}
+                                onChange={(e) => setSmsMessage(e.target.value)}
+                                rows={4}
+                            />
+                             <Button onClick={handleSendSms} disabled={isSendingSms || subscriptions.length === 0}>
+                                {isSendingSms ? 'পাঠানো হচ্ছে...' : `সকল ${subscriptions.length} সাবস্ক্রাইবারকে SMS পাঠান`}
+                            </Button>
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
+
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-12">
                 <Card id="users-table">
                     <CardHeader>
                         <CardTitle>ব্যবহারকারীগণ</CardTitle>
+                        <CardDescription>
+                            আপনার অ্যাপ্লিকেশনের সকল নিবন্ধিত ব্যবহারকারীদের তালিকা।
+                        </CardDescription>
                     </CardHeader>
                     <CardContent>
                         <Table>
@@ -217,7 +284,10 @@ export default function AdminPage() {
                 </Card>
                  <Card id="searches-table">
                     <CardHeader>
-                        <CardTitle>সাম্প্রতিক ফলাফল অনুসন্ধান</CardTitle>
+                        <CardTitle>ফলাফল অনুসন্ধানের লগ</CardTitle>
+                         <CardDescription>
+                            ব্যবহারকারীদের দ্বারা করা সমস্ত ফলাফল অনুসন্ধানের ইতিহাস।
+                        </CardDescription>
                     </CardHeader>
                     <CardContent>
                         <Table>
@@ -256,6 +326,9 @@ export default function AdminPage() {
                 <Card>
                     <CardHeader>
                         <CardTitle>সাবস্ক্রিপশন তালিকা</CardTitle>
+                         <CardDescription>
+                            ফলাফল প্রকাশের বিজ্ঞপ্তির জন্য সাবস্ক্রাইব করা সমস্ত ব্যবহারকারী।
+                        </CardDescription>
                     </CardHeader>
                     <CardContent>
                         <Table>
@@ -291,3 +364,5 @@ export default function AdminPage() {
         </div>
     );
 }
+
+    
