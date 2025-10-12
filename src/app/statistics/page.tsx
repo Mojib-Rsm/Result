@@ -2,8 +2,8 @@
 'use client';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart, PieChart, TrendingUp, Users } from 'lucide-react';
-import { Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { BarChart as BarChartIcon, PieChart, TrendingUp, Users } from 'lucide-react';
+import { Bar, BarChart, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 
 // Demo data for HSC 2023 (Illustrative)
@@ -90,7 +90,7 @@ export default function StatisticsPage() {
                 <Card>
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                         <CardTitle className="text-sm font-medium">মোট GPA-5</CardTitle>
-                        <BarChart className="h-4 w-4 text-muted-foreground" />
+                        <BarChartIcon className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold">{hsc2023Stats.totalGpa5.toLocaleString()}</div>
@@ -122,7 +122,7 @@ export default function StatisticsPage() {
                                     <CartesianGrid strokeDasharray="3 3" horizontal={false} />
                                     <XAxis type="number" />
                                     <YAxis dataKey="board" type="category" width={80} tick={{ fontSize: 12 }} />
-                                    <Tooltip
+                                    <ChartTooltip
                                         cursor={{ fill: 'hsl(var(--muted))' }}
                                         content={<ChartTooltipContent indicator="dot" />}
                                     />
@@ -151,7 +151,7 @@ export default function StatisticsPage() {
                                         tick={{ fontSize: 12 }}
                                      />
                                     <YAxis domain={[60, 100]} />
-                                    <Tooltip
+                                    <ChartTooltip
                                         cursor={{ fill: 'hsl(var(--muted))' }}
                                         content={<ChartTooltipContent indicator="dot" />}
                                     />
