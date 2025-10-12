@@ -16,10 +16,15 @@ function parseGrades(displayDetails: string, subDetails: SubjectDetail[]): Grade
     const subjectMap = new Map(subDetails.map(sub => [sub.SUB_CODE, sub.SUB_NAME]));
 
     return displayDetails.split(',').map(item => {
-        const [code, grade] = item.trim().split(':');
+        const [codes, grade] = item.trim().split(':');
+        
+        const subjectNames = codes.split('+')
+            .map(code => subjectMap.get(code.trim()) || 'Unknown Subject')
+            .join(' / ');
+
         return {
-            code: code,
-            subject: subjectMap.get(code) || 'Unknown Subject',
+            code: codes.replace(/\+/g, ' + '), // For display
+            subject: subjectNames,
             grade: grade,
         };
     });
