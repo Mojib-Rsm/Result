@@ -24,9 +24,8 @@ const adminFeatures = [
     },
     {
         title: 'ডাটাবেস সিডিং',
-        description: 'প্রাথমিক ডেটা দিয়ে ডাটাবেস প্রস্তুত করুন।',
+        description: 'প্রাথমিক ডেটা দিয়ে ডাটাবেস প্রস্তুত করুন। /seeding রুটে যান।',
         icon: DatabaseZap,
-        link: '/admin/seeding'
     }
 ];
 
