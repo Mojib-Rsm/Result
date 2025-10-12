@@ -135,6 +135,33 @@ const MarksheetAnalyzer = ({ grades }: { grades: GradeInfo[] }) => {
     );
 };
 
+const GradesTable = ({ grades, showMarks }: { grades: GradeInfo[], showMarks: boolean }) => {
+    return (
+        <div className="relative w-full overflow-auto">
+            <Table>
+                <TableHeader>
+                    <TableRow>
+                        <TableHead>Code</TableHead>
+                        <TableHead>Subject Name</TableHead>
+                        {showMarks && <TableHead className="text-right">Marks</TableHead>}
+                        <TableHead className="text-right">Letter Grade</TableHead>
+                    </TableRow>
+                </TableHeader>
+                <TableBody>
+                    {grades.map((g, index) => (
+                        <TableRow key={g.code + index} className={cn(index % 2 !== 0 && 'bg-muted/50')}>
+                            <TableCell>{g.code}</TableCell>
+                            <TableCell className="font-medium">{g.subject}</TableCell>
+                            {showMarks && <TableCell className="text-right font-bold">{g.marks}</TableCell>}
+                            <TableCell className="text-right font-bold">{g.grade}</TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
+        </div>
+    );
+};
+
 
 export default function ResultsDisplay({ result, onReset, isDialog = false }: ResultsDisplayProps) {
   const [isDownloading, setIsDownloading] = useState(false);
@@ -148,27 +175,34 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
     }
 
     try {
-        const canvas = await html2canvas(element, { scale: 2 });
+        const canvas = await html2canvas(element, { 
+            scale: 2,
+            useCORS: true,
+            allowTaint: true,
+            logging: false,
+        });
         const imgData = canvas.toDataURL('image/png');
 
         const pdf = new jsPDF('p', 'mm', 'a4');
         const pdfWidth = pdf.internal.pageSize.getWidth();
         const pdfHeight = pdf.internal.pageSize.getHeight();
         
-        const imgWidth = canvas.width;
-        const imgHeight = canvas.height;
+        const imgProps = pdf.getImageProperties(imgData);
+        const imgWidth = imgProps.width;
+        const imgHeight = imgProps.height;
         
         const ratio = imgWidth / imgHeight;
-        let newImgWidth = pdfWidth;
+        
+        let newImgWidth = pdfWidth - 20; // with some margin
         let newImgHeight = newImgWidth / ratio;
         
-        if (newImgHeight > pdfHeight) {
-            newImgHeight = pdfHeight;
+        if (newImgHeight > pdfHeight - 20) {
+            newImgHeight = pdfHeight - 20;
             newImgWidth = newImgHeight * ratio;
         }
         
         const x = (pdfWidth - newImgWidth) / 2;
-        const y = (pdfHeight > newImgHeight) ? (pdfHeight - newImgHeight) / 2 : 0;
+        const y = (pdfHeight - newImgHeight) / 2;
         
         pdf.addImage(imgData, 'PNG', x, y, newImgWidth, newImgHeight);
         pdf.save(`BD-Edu-Result-${result.roll}-${result.year}.pdf`);
@@ -200,6 +234,10 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
       "shadow-lg",
       isDialog && "shadow-none border-none"
   );
+  
+  const half = Math.ceil(result.grades.length / 2);
+  const firstHalfGrades = result.grades.slice(0, half);
+  const secondHalfGrades = result.grades.slice(half);
 
   return (
     <div className={containerClasses}>
@@ -239,7 +277,7 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
                   </div>
                    <CardDescription className="text-center">{result.exam.toUpperCase()} Examination - {result.year}</CardDescription>
               </CardHeader>
-              <CardContent>
+              <CardContent className="p-6">
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
                   <InfoItem label="Roll No" value={result.roll} />
                   <InfoItem label="Registration No" value={result.reg} />
@@ -257,27 +295,9 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
               <Separator className="my-6" />
 
               <h3 className="font-semibold text-lg mb-2 text-center">বিষয়ভিত্তিক গ্রেড</h3>
-                 <div className="relative w-full overflow-auto">
-                    <Table>
-                        <TableHeader>
-                        <TableRow>
-                            <TableHead>Code</TableHead>
-                            <TableHead>Subject Name</TableHead>
-                            {showMarks && <TableHead className="text-right">Marks</TableHead>}
-                            <TableHead className="text-right">Letter Grade</TableHead>
-                        </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                        {result.grades.map((g, index) => (
-                            <TableRow key={g.code + index} className={cn(index % 2 !== 0 && 'bg-muted/50')}>
-                            <TableCell>{g.code}</TableCell>
-                            <TableCell className="font-medium">{g.subject}</TableCell>
-                            {showMarks && <TableCell className="text-right font-bold">{g.marks}</TableCell>}
-                            <TableCell className="text-right font-bold">{g.grade}</TableCell>
-                            </TableRow>
-                        ))}
-                        </TableBody>
-                    </Table>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-8">
+                  <GradesTable grades={firstHalfGrades} showMarks={showMarks} />
+                  <GradesTable grades={secondHalfGrades} showMarks={showMarks} />
                 </div>
               </CardContent>
             
@@ -327,3 +347,5 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
     </div>
   );
 }
+
+    
