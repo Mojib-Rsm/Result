@@ -111,7 +111,7 @@ async function searchResultLegacy(values: z.infer<typeof formSchemaWithCookie>):
     } catch (error) {
         console.error("Error in searchResultLegacy:", error);
         if (error instanceof Error) {
-            if (error.message.includes('ফলাফল') || error.message.includes('সার্ভার')) {
+            if (error.message.includes('ফলাফল') || error.message.includes('সার্ভার') || error.message.includes('Invalid captcha')) {
                  throw error;
             }
         }
