@@ -1,6 +1,9 @@
 
+'use client'
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileText, Users, BarChart, Shield } from 'lucide-react';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 const adminFeatures = [
     {
@@ -24,6 +27,19 @@ const adminFeatures = [
         icon: Shield,
     }
 ];
+
+// Demo data - replace with Firestore data
+const demoUsers = [
+    { id: '1', name: 'Admin User', email: 'admin@example.com', role: 'admin' },
+    { id: '2', name: 'Mojib Rsm', email: 'mojibrsm@gmail.com', role: 'editor' },
+];
+
+const demoResults = [
+    { roll: '123456', exam: 'HSC', year: '2023', gpa: '5.00' },
+    { roll: '654321', exam: 'SSC', year: '2023', gpa: '4.89' },
+    { roll: '101010', exam: 'JSC', year: '2023', gpa: 'Pass' },
+];
+
 
 export default function AdminPage() {
     return (
@@ -50,10 +66,65 @@ export default function AdminPage() {
                     </Card>
                 ))}
             </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-12">
+                <Card>
+                    <CardHeader>
+                        <CardTitle>সাম্প্রতিক ব্যবহারকারীগণ</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>নাম</TableHead>
+                                    <TableHead>ইমেইল</TableHead>
+                                    <TableHead>ভূমিকা</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {demoUsers.map(user => (
+                                    <TableRow key={user.id}>
+                                        <TableCell>{user.name}</TableCell>
+                                        <TableCell>{user.email}</TableCell>
+                                        <TableCell>{user.role}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </CardContent>
+                </Card>
+                 <Card>
+                    <CardHeader>
+                        <CardTitle>সাম্প্রতিক ফলাফল অনুসন্ধান</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <Table>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHead>রোল</TableHead>
+                                    <TableHead>পরীক্ষা</TableHead>
+                                    <TableHead>বছর</TableHead>
+                                    <TableHead>GPA</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {demoResults.map(result => (
+                                    <TableRow key={result.roll}>
+                                        <TableCell>{result.roll}</TableCell>
+                                        <TableCell>{result.exam}</TableCell>
+                                        <TableCell>{result.year}</TableCell>
+                                        <TableCell>{result.gpa}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </CardContent>
+                </Card>
+            </div>
             
              <div className="mt-12 text-center">
                  <p className="text-muted-foreground">
-                    (দ্রষ্টব্য: এটি অ্যাডমিন প্যানেলের একটি প্রাথমিক ডেমো। কার্যকারিতা যোগ করা হবে।)
+                    (দ্রষ্টব্য: এটি অ্যাডমিন প্যানেলের একটি ডেমো। ফায়ারস্টোর থেকে ডেটা লোড করা হবে।)
                 </p>
             </div>
         </div>

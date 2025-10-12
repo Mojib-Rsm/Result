@@ -12,6 +12,8 @@ import { useAuth } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
+import { getFirestore, collection, query, where, getDocs } from 'firebase/firestore';
+import { app } from '@/lib/firebase';
 
 const loginSchema = z.object({
   email: z.string().email('অনুগ্রহ করে একটি বৈধ ইমেইল দিন।'),
@@ -23,6 +25,7 @@ export default function LoginPage() {
   const { login } = useAuth();
   const router = useRouter();
   const { toast } = useToast();
+  const db = getFirestore(app);
 
   const form = useForm<z.infer<typeof loginSchema>>({
     resolver: zodResolver(loginSchema),
@@ -35,7 +38,19 @@ export default function LoginPage() {
   const onSubmit = async (values: z.infer<typeof loginSchema>) => {
     setIsSubmitting(true);
     try {
-      await login(values.email, values.password);
+      const usersRef = collection(db, 'users');
+      const q = query(usersRef, where('email', '==', values.email), where('password', '==', values.password));
+      const querySnapshot = await getDocs(q);
+
+      if (querySnapshot.empty) {
+        throw new Error('আপনার ইমেইল বা পাসওয়ার্ড ভুল।');
+      }
+
+      const userDoc = querySnapshot.docs[0];
+      const user = { uid: userDoc.id, ...userDoc.data() };
+      
+      login(user);
+
       toast({
         title: 'সফল',
         description: 'আপনি সফলভাবে লগইন করেছেন।',

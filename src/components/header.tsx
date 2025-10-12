@@ -2,8 +2,8 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { GraduationCap, History, Calculator, MoreVertical, Sparkles, LogOut } from 'lucide-react';
-import { usePathname } from 'next/navigation';
+import { GraduationCap, History, Calculator, MoreVertical, Sparkles, LogOut, User } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import {
@@ -17,6 +17,7 @@ import { useAuth } from '@/hooks/use-auth';
 
 export default function Header({ className }: { className?: string }) {
   const pathname = usePathname();
+  const router = useRouter();
   const { user, logout } = useAuth();
   const isAdminPage = pathname.startsWith('/admin');
 
@@ -26,6 +27,11 @@ export default function Header({ className }: { className?: string }) {
     { href: '/history', label: 'ইতিহাস', icon: History },
     { href: '/gpa-calculator', label: 'GPA ক্যালকুলেটর', icon: Calculator },
   ];
+
+  const handleLogout = () => {
+    logout();
+    router.push('/login');
+  }
 
   return (
     <header className={cn("sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60", className)}>
@@ -66,14 +72,14 @@ export default function Header({ className }: { className?: string }) {
 
         <div className="flex items-center justify-end">
             {isAdminPage && user ? (
-                 <Button variant="ghost" onClick={logout}>
+                 <Button variant="ghost" onClick={handleLogout}>
                     <LogOut className="mr-2 h-4 w-4" />
                     লগআউট
                 </Button>
-            ) : (
+            ) : !isAdminPage && (
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className={cn("md:hidden", isAdminPage && "hidden")}>
+                        <Button variant="ghost" className="md:hidden">
                             <MoreVertical className="h-5 w-5" />
                             <span className="sr-only">Open menu</span>
                         </Button>

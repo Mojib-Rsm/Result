@@ -5,9 +5,8 @@ import Header from '@/components/header';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import Link from 'next/link';
-import React, { useState, useEffect, ReactNode } from 'react';
-import { User, onAuthStateChanged, signInWithEmailAndPassword, signOut, setPersistence, browserLocalPersistence } from 'firebase/auth';
-import { AuthContext, auth } from '@/hooks/use-auth';
+import React, { useState, useEffect, ReactNode, useCallback } from 'react';
+import { AuthContext, AuthUser } from '@/hooks/use-auth';
 
 function Footer() {
   return (
@@ -39,25 +38,31 @@ function Footer() {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
+    try {
+      const storedUser = localStorage.getItem('auth-user');
+      if (storedUser) {
+        setUser(JSON.parse(storedUser));
+      }
+    } catch (error) {
+      console.error('Failed to parse user from localStorage', error);
+    } finally {
       setLoading(false);
-    });
-    return () => unsubscribe();
+    }
   }, []);
 
-  const login = async (email: string, password: string) => {
-    await setPersistence(auth, browserLocalPersistence);
-    await signInWithEmailAndPassword(auth, email, password);
-  };
+  const login = useCallback((userData: AuthUser) => {
+    localStorage.setItem('auth-user', JSON.stringify(userData));
+    setUser(userData);
+  }, []);
 
-  const logout = async () => {
-    await signOut(auth);
-  };
+  const logout = useCallback(() => {
+    localStorage.removeItem('auth-user');
+    setUser(null);
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, loading, login, logout }}>

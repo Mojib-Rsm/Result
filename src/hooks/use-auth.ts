@@ -1,16 +1,20 @@
 'use client';
 
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { getAuth, onAuthStateChanged, User, signInWithEmailAndPassword, signOut, browserLocalPersistence, setPersistence } from 'firebase/auth';
-import { app } from '@/lib/firebase';
+import React, { createContext, useContext } from 'react';
 
-export const auth = getAuth(app);
+export interface AuthUser {
+  uid: string;
+  email: string;
+  name?: string;
+  role?: string;
+  [key: string]: any;
+}
 
 export interface AuthContextType {
-  user: User | null;
+  user: AuthUser | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  logout: () => Promise<void>;
+  login: (user: AuthUser) => void;
+  logout: () => void;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
