@@ -26,7 +26,7 @@ const adminFeatures = [
     },
     {
         title: 'সাবস্ক্রিপশন',
-        description: 'ফলাফলের বিজ্ঞপ্তির জন্য সাবস্ক্রাইব করা ব্যবহারকারীদের দেখুন।',
+        description: 'সমস্ত ফলাফল বিজ্ঞপ্তির সাবস্ক্রাইবারদের পরিচালনা করুন।',
         icon: MailCheck,
         href: '#subscriptions-table'
     },
@@ -69,10 +69,10 @@ export default function AdminPage() {
                 const todaysSearchesQuery = query(searchesRef, where('timestamp', '>=', startOfToday.getTime()), where('timestamp', '<=', endOfToday.getTime()));
                 const totalSubscriptionsQuery = query(subscriptionsRef);
 
-                // Recent Data Queries
-                const recentSearchesQuery = query(searchesRef, orderBy('timestamp', 'desc'), limit(5));
-                const recentUsersQuery = query(usersRef, orderBy('name'), limit(5));
-                const recentSubsQuery = query(subscriptionsRef, orderBy('createdAt', 'desc'), limit(5));
+                // Data Table Queries
+                const recentSearchesQuery = query(searchesRef, orderBy('timestamp', 'desc'), limit(10));
+                const allUsersQuery = query(usersRef, orderBy('name'));
+                const allSubsQuery = query(subscriptionsRef, orderBy('createdAt', 'desc'));
 
                 // Execute all queries in parallel
                 const [
@@ -81,16 +81,16 @@ export default function AdminPage() {
                     todaysSearchesSnap,
                     totalSubscriptionsSnap,
                     recentSearchesSnap,
-                    recentUsersSnap,
-                    recentSubsSnap
+                    allUsersSnap,
+                    allSubsSnap
                 ] = await Promise.all([
                     getCountFromServer(totalUsersQuery),
                     getCountFromServer(totalSearchesQuery),
                     getCountFromServer(todaysSearchesQuery),
                     getCountFromServer(totalSubscriptionsQuery),
                     getDocs(recentSearchesQuery),
-                    getDocs(recentUsersQuery),
-                    getDocs(recentSubsQuery)
+                    getDocs(allUsersQuery),
+                    getDocs(allSubsQuery)
                 ]);
 
                 // Set stats
@@ -101,10 +101,10 @@ export default function AdminPage() {
                     totalSubscriptions: totalSubscriptionsSnap.data().count,
                 });
 
-                // Set recent data
+                // Set table data
                 setRecentSearches(recentSearchesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-                setUsers(recentUsersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-                setSubscriptions(recentSubsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+                setUsers(allUsersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+                setSubscriptions(allSubsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
 
             } catch (error) {
                 console.error("Error fetching admin data: ", error);
@@ -179,7 +179,7 @@ export default function AdminPage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-12">
                 <Card id="users-table">
                     <CardHeader>
-                        <CardTitle>সাম্প্রতিক ব্যবহারকারীগণ</CardTitle>
+                        <CardTitle>ব্যবহারকারীগণ</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <Table>
@@ -192,11 +192,11 @@ export default function AdminPage() {
                             </TableHeader>
                             <TableBody>
                                 {loading ? (
-                                    [...Array(2)].map((_, i) => (
+                                    [...Array(5)].map((_, i) => (
                                          <TableRow key={i}>
+                                            <TableCell><Skeleton className="h-4 w-2/4" /></TableCell>
                                             <TableCell><Skeleton className="h-4 w-full" /></TableCell>
-                                            <TableCell><Skeleton className="h-4 w-full" /></TableCell>
-                                            <TableCell><Skeleton className="h-4 w-full" /></TableCell>
+                                            <TableCell><Skeleton className="h-4 w-1/4" /></TableCell>
                                         </TableRow>
                                     ))
                                 ) : users.length > 0 ? (
@@ -255,7 +255,7 @@ export default function AdminPage() {
              <div className="mt-8" id="subscriptions-table">
                 <Card>
                     <CardHeader>
-                        <CardTitle>সাম্প্রতিক সাবস্ক্রিপশন</CardTitle>
+                        <CardTitle>সাবস্ক্রিপশন তালিকা</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <Table>
@@ -280,7 +280,7 @@ export default function AdminPage() {
                                     </TableRow>
                                 ))) : (
                                      <TableRow>
-                                        <TableCell colSpan={4} className="text-center">কোনো সাম্প্রতিক সাবস্ক্রিপশন নেই।</TableCell>
+                                        <TableCell colSpan={4} className="text-center">কোনো সাবস্ক্রিপশন নেই।</TableCell>
                                     </TableRow>
                                 )}
                             </TableBody>
@@ -291,5 +291,3 @@ export default function AdminPage() {
         </div>
     );
 }
-
-    
