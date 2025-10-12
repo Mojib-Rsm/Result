@@ -141,26 +141,28 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
               <Separator className="my-6" />
 
               <h3 className="font-semibold text-lg mb-2 text-center">Subject-wise Grade</h3>
-              <Table>
-                  <TableHeader>
-                  <TableRow>
-                      <TableHead>Code</TableHead>
-                      <TableHead>Subject Name</TableHead>
-                      {showMarks && <TableHead className="text-right">Marks</TableHead>}
-                      <TableHead className="text-right">Letter Grade</TableHead>
-                  </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                  {result.grades.map((g, index) => (
-                      <TableRow key={g.code + index} className={cn(index % 2 !== 0 && 'bg-muted/50')}>
-                      <TableCell>{g.code}</TableCell>
-                      <TableCell className="font-medium">{g.subject}</TableCell>
-                      {showMarks && <TableCell className="text-right font-bold">{g.marks}</TableCell>}
-                      <TableCell className="text-right font-bold">{g.grade}</TableCell>
-                      </TableRow>
-                  ))}
-                  </TableBody>
-              </Table>
+                 <div className="relative w-full overflow-auto">
+                    <Table>
+                        <TableHeader>
+                        <TableRow>
+                            <TableHead>Code</TableHead>
+                            <TableHead>Subject Name</TableHead>
+                            {showMarks && <TableHead className="text-right">Marks</TableHead>}
+                            <TableHead className="text-right">Letter Grade</TableHead>
+                        </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                        {result.grades.map((g, index) => (
+                            <TableRow key={g.code + index} className={cn(index % 2 !== 0 && 'bg-muted/50')}>
+                            <TableCell>{g.code}</TableCell>
+                            <TableCell className="font-medium">{g.subject}</TableCell>
+                            {showMarks && <TableCell className="text-right font-bold">{g.marks}</TableCell>}
+                            <TableCell className="text-right font-bold">{g.grade}</TableCell>
+                            </TableRow>
+                        ))}
+                        </TableBody>
+                    </Table>
+                </div>
               </CardContent>
             
             <Separator className="my-6" />
