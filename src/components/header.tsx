@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { GraduationCap, History, Calculator, MoreVertical, Sparkles, LogOut, User, Bookmark } from 'lucide-react';
+import { GraduationCap, History, Calculator, MoreVertical, Sparkles, LogOut, User, Bookmark, BarChart } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -25,6 +25,7 @@ export default function Header({ className }: { className?: string }) {
     { href: '/', label: 'হোম', icon: GraduationCap },
     { href: '/education-news', label: 'শিক্ষা সংবাদ', icon: Bookmark },
     { href: '/suggestions', label: 'ভর্তি পরামর্শ', icon: Sparkles },
+    { href: '/statistics', label: 'পরিসংখ্যান', icon: BarChart },
     { href: '/history', label: 'ইতিহাস', icon: History },
     { href: '/gpa-calculator', label: 'GPA ক্যালকুলেটর', icon: Calculator },
   ];
