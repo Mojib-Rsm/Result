@@ -66,7 +66,7 @@ export default function ResultAlertForm() {
       if (!querySnapshot.empty) {
         toast({
           title: 'ইতিমধ্যে সাবস্ক্রাইব করা হয়েছে',
-          description: ' আপনি এই পরীক্ষার জন্য ইতিমধ্যে সাবস্ক্রাইব করেছেন।',
+          description: 'আপনি এই পরীক্ষার জন্য ইতিমধ্যে সাবস্ক্রাইব করেছেন।',
           variant: 'default',
         });
         return;

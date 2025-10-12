@@ -144,7 +144,7 @@ export default function HistoryPage() {
               <AlertDialogHeader>
                   <AlertDialogTitle>আপনি কি নিশ্চিত?</AlertDialogTitle>
                   <AlertDialogDescription>
-                      এই কাজটি ফিরিয়ে আনা যাবে না। এটি আপনার সমস্ত অনুসন্ধানের ইতিহাস এবং পরিসংখ্যান স্থায়ীভাবে মুছে ফেলবে।
+                      এই কাজটি ফিরিয়ে আনা যাবে না। এটি আপনার সমস্ত অনুসন্ধানের ইতিহাস এবং পরিসংখ্যান স্থায়ীভাবে মুছে ফেলবে।
                   </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>

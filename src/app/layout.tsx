@@ -1,3 +1,4 @@
+
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { Inter } from 'next/font/google';
@@ -10,7 +11,7 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bdedu.me';
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: 'BD Edu Result - Check All Board Exam Results in Bangladesh',
-  description: 'Check JSC, JDC, SSC, Dakhil, HSC, Alim, and Vocational exam results from all education boards in Bangladesh. Get detailed marksheet if available. Fast and reliable.',
+  description: 'JSC, JDC, SSC, Dakhil, HSC, Alim এবং ভোকেশনাল পরীক্ষার ফলাফল দেখুন। বিস্তারিত মার্কশিট সহ। দ্রুত ও নির্ভরযোগ্য।',
   keywords: [
     'BD Edu Result', 'Mojib Rsm', 'BD Result', 'Education Board Result', 'SSC Result', 'HSC Result', 'JSC Result', 'Dakhil Result', 'Alim Result', 'JDC Result', 'Bangladesh Education Board', 'Public Exam Result', 'Marksheet', 'Online Result', 
     'ফলাফল', 'রেজাল্ট', 'এসএসসি রেজাল্ট', 'এইচএসসি রেজাল্ট', 'জেএসসি রেজাল্ট', 'দাখিল রেজাল্ট', 'আলিম রেজাল্ট', 'জেডিসি রেজাল্ট', 'শিক্ষা বোর্ড', 'মার্কশিট', 'অনলাইন রেজাল্ট'

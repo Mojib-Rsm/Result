@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useSearchParams } from 'next/navigation';
@@ -77,7 +78,7 @@ export default function SuggestionsPage() {
 
             <div className="mt-12 text-center">
                  <p className="text-muted-foreground">
-                    (দ্রষ্টব্য: এটি একটি পরীক্ষামূলক ফিচার। প্রদত্ত তথ্য參考 হিসেবে ব্যবহার করুন। ভর্তির জন্য সংশ্লিষ্ট প্রতিষ্ঠানের অফিসিয়াল ওয়েবসাইট দেখুন।)
+                    (দ্রষ্টব্য: এটি একটি পরীক্ষামূলক ফিচার। প্রদত্ত তথ্য রেফারেন্স হিসেবে ব্যবহার করুন। ভর্তির জন্য সংশ্লিষ্ট প্রতিষ্ঠানের অফিসিয়াল ওয়েবসাইট দেখুন।)
                 </p>
             </div>
         </div>

@@ -256,7 +256,7 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
 
               <Separator className="my-6" />
 
-              <h3 className="font-semibold text-lg mb-2 text-center">Subject-wise Grade</h3>
+              <h3 className="font-semibold text-lg mb-2 text-center">বিষয়ভিত্তিক গ্রেড</h3>
                  <div className="relative w-full overflow-auto">
                     <Table>
                         <TableHeader>
