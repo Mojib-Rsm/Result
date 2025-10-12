@@ -111,10 +111,12 @@ async function searchResultLegacy(values: z.infer<typeof formSchemaWithCookie>):
     } catch (error) {
         console.error("Error in searchResultLegacy:", error);
         if (error instanceof Error) {
+            // Re-throw specific, user-facing errors from the API or our checks
             if (error.message.includes('ফলাফল') || error.message.includes('সার্ভার') || error.message.includes('Invalid captcha')) {
                  throw error;
             }
         }
+        // Throw a generic error for unexpected issues (e.g., network problems)
         throw new Error('ফলাফল আনতে একটি অপ্রত্যাশিত সমস্যা হয়েছে। আপনার ইন্টারনেট সংযোগ পরীক্ষা করুন এবং কিছুক্ষণ পর আবার চেষ্টা করুন।');
     }
 }
