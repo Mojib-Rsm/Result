@@ -278,7 +278,7 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
                    <CardDescription className="text-center">{result.exam.toUpperCase()} Examination - {result.year}</CardDescription>
               </CardHeader>
               <CardContent className="p-6">
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
                   <InfoItem label="Roll No" value={result.roll} />
                   <InfoItem label="Registration No" value={result.reg} />
                   <InfoItem label="Board" value={result.board} />
@@ -287,7 +287,8 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
                   <InfoItem label="Mother's Name" value={result.studentInfo.motherName} />
                   <InfoItem label="Group" value={result.studentInfo.group} />
                   <InfoItem label="Date of Birth" value={result.studentInfo.dob} />
-                  <div className="col-span-full">
+                  <InfoItem label="Session" value={result.studentInfo.session} />
+                  <div className="col-span-full md:col-span-3">
                     <InfoItem label="Institute" value={result.studentInfo.institute} />
                   </div>
               </div>

@@ -85,6 +85,10 @@ async function searchResultLegacy(values: z.infer<typeof formSchemaWithCookie>):
              const caGrades = parseGrades(res.display_details_ca, data.sub_details || []);
              allGrades.push(...caGrades);
         }
+        
+        const passingYear = parseInt(year, 10);
+        const calculatedSession = res.session || `${passingYear - 2}-${passingYear - 1}`;
+
 
         const studentInfo = {
             name: res.name || 'N/A',
@@ -93,7 +97,7 @@ async function searchResultLegacy(values: z.infer<typeof formSchemaWithCookie>):
             group: res.stud_group || 'N/A',
             dob: res.dob || 'N/A',
             institute: res.inst_name || 'N/A',
-            session: res.session || 'N/A',
+            session: calculatedSession,
         };
 
         return {
