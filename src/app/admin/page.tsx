@@ -33,40 +33,57 @@ const adminFeatures = [
     }
 ];
 
-// Demo data - replace with Firestore data
-const demoUsers = [
-    { id: '1', name: 'Admin User', email: 'admin@example.com', role: 'admin' },
-    { id: '2', name: 'Mojib Rsm', email: 'mojibrsm@gmail.com', role: 'editor' },
-];
-
-const demoSubscriptions = [
-    { id: '1', phone: '01xxxxxxxxx', roll: '123456', exam: 'HSC', year: '2024' },
-    { id: '2', phone: '01xxxxxxxxx', roll: '654321', exam: 'SSC', year: '2025' },
-]
-
-
 export default function AdminPage() {
     const [recentSearches, setRecentSearches] = useState<any[]>([]);
+    const [users, setUsers] = useState<any[]>([]);
+    const [subscriptions, setSubscriptions] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const db = getFirestore(app);
 
     useEffect(() => {
-        const fetchRecentSearches = async () => {
+        const fetchAllData = async () => {
             try {
+                // Fetch Recent Searches
                 const searchesRef = collection(db, 'search-history');
-                const q = query(searchesRef, orderBy('timestamp', 'desc'), limit(10));
-                const querySnapshot = await getDocs(q);
-                const searches = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                const searchesQuery = query(searchesRef, orderBy('timestamp', 'desc'), limit(10));
+                const searchesSnapshot = await getDocs(searchesQuery);
+                const searches = searchesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
                 setRecentSearches(searches);
+
+                // Fetch Users
+                const usersRef = collection(db, 'users');
+                const usersQuery = query(usersRef, limit(10)); // Example: limit to 10 users
+                const usersSnapshot = await getDocs(usersQuery);
+                const fetchedUsers = usersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                setUsers(fetchedUsers);
+
+                // Fetch Subscriptions
+                const subscriptionsRef = collection(db, 'subscriptions');
+                const subsQuery = query(subscriptionsRef, orderBy('createdAt', 'desc'), limit(10));
+                const subsSnapshot = await getDocs(subsQuery);
+                const fetchedSubs = subsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                setSubscriptions(fetchedSubs);
+
             } catch (error) {
-                console.error("Error fetching recent searches: ", error);
+                console.error("Error fetching admin data: ", error);
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchRecentSearches();
+        fetchAllData();
     }, [db]);
+
+    const TableSkeleton = () => (
+        [...Array(5)].map((_, i) => (
+            <TableRow key={i}>
+                <TableCell><Skeleton className="h-4 w-full" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-full" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-full" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-full" /></TableCell>
+            </TableRow>
+        ))
+    );
 
 
     return (
@@ -112,13 +129,26 @@ export default function AdminPage() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {demoUsers.map(user => (
+                                {loading ? (
+                                    [...Array(2)].map((_, i) => (
+                                         <TableRow key={i}>
+                                            <TableCell><Skeleton className="h-4 w-full" /></TableCell>
+                                            <TableCell><Skeleton className="h-4 w-full" /></TableCell>
+                                            <TableCell><Skeleton className="h-4 w-full" /></TableCell>
+                                        </TableRow>
+                                    ))
+                                ) : users.length > 0 ? (
+                                    users.map(user => (
                                     <TableRow key={user.id}>
                                         <TableCell>{user.name}</TableCell>
                                         <TableCell>{user.email}</TableCell>
                                         <TableCell>{user.role}</TableCell>
                                     </TableRow>
-                                ))}
+                                ))) : (
+                                    <TableRow>
+                                        <TableCell colSpan={3} className="text-center">কোনো ব্যবহারকারী নেই।</TableCell>
+                                    </TableRow>
+                                )}
                             </TableBody>
                         </Table>
                     </CardContent>
@@ -139,14 +169,7 @@ export default function AdminPage() {
                             </TableHeader>
                             <TableBody>
                                 {loading ? (
-                                    [...Array(5)].map((_, i) => (
-                                        <TableRow key={i}>
-                                            <TableCell><Skeleton className="h-4 w-full" /></TableCell>
-                                            <TableCell><Skeleton className="h-4 w-full" /></TableCell>
-                                            <TableCell><Skeleton className="h-4 w-full" /></TableCell>
-                                            <TableCell><Skeleton className="h-4 w-full" /></TableCell>
-                                        </TableRow>
-                                    ))
+                                    <TableSkeleton />
                                 ) : recentSearches.length > 0 ? (
                                     recentSearches.map(result => (
                                         <TableRow key={result.id}>
@@ -183,24 +206,25 @@ export default function AdminPage() {
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
-                                {demoSubscriptions.map(sub => (
+                                {loading ? (
+                                    <TableSkeleton />
+                                ) : subscriptions.length > 0 ? (
+                                    subscriptions.map(sub => (
                                     <TableRow key={sub.id}>
                                         <TableCell>{sub.phone}</TableCell>
                                         <TableCell>{sub.roll}</TableCell>
                                         <TableCell className="uppercase">{sub.exam}</TableCell>
                                         <TableCell>{sub.year}</TableCell>
                                     </TableRow>
-                                ))}
+                                ))) : (
+                                     <TableRow>
+                                        <TableCell colSpan={4} className="text-center">কোনো সাম্প্রতিক সাবস্ক্রিপশন নেই।</TableCell>
+                                    </TableRow>
+                                )}
                             </TableBody>
                         </Table>
                     </CardContent>
                 </Card>
-            </div>
-            
-             <div className="mt-12 text-center">
-                 <p className="text-muted-foreground">
-                    (দ্রষ্টব্য: এটি অ্যাডমিন প্যানেলের একটি ডেমো। ফায়ারস্টোর থেকে ডেটা লোড করা হবে।)
-                </p>
             </div>
         </div>
     );
