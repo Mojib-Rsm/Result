@@ -12,37 +12,37 @@ const institutionCategories = [
     title: 'পাবলিক বিশ্ববিদ্যালয়',
     description: 'দেশের শীর্ষস্থানীয় পাবলিক বিশ্ববিদ্যালয়গুলোর সম্পর্কে জানুন।',
     icon: GraduationCap,
-    href: '#', 
+    href: '/suggestions/public-universities', 
   },
   {
     title: 'প্রাইভেট বিশ্ববিদ্যালয়',
     description: 'আপনার পছন্দের বিষয়ে পড়ার জন্য সেরা প্রাইভেট বিশ্ববিদ্যালয়গুলো দেখুন।',
     icon: Building,
-    href: '#',
+    href: '/suggestions/private-universities',
   },
   {
     title: 'মেডিকেল কলেজ',
     description: 'ডাক্তারি পড়ার জন্য সরকারি ও বেসরকারি মেডিকেল কলেজের তালিকা।',
     icon: HeartPulse,
-    href: '#',
+    href: '/suggestions/medical-colleges',
   },
   {
     title: 'ইঞ্জিনিয়ারিং কলেজ',
     description: 'প্রকৌশলী হওয়ার স্বপ্ন পূরণে সেরা ইঞ্জিনিয়ারিং কলেজগুলো সম্পর্কে জানুন।',
     icon: HardHat,
-    href: '#',
+    href: '/suggestions/engineering-colleges',
   },
     {
     title: 'জাতীয় বিশ্ববিদ্যালয়',
     description: 'স্নাতক ও স্নাতকোত্তর ডিগ্রির জন্য অধিভুক্ত কলেজগুলোর তালিকা দেখুন।',
     icon: School,
-    href: '#',
+    href: '/suggestions/national-university',
   },
   {
     title: 'পলিটেকনিক ইনস্টিটিউট',
     description: 'কারিগরি ও বৃত্তিমূলক শিক্ষার জন্য সেরা পলিটেকনিক ইনস্টিটিউটগুলো জানুন।',
     icon: Wrench,
-    href: '#',
+    href: '/suggestions/polytechnic-institutes',
   },
 ];
 
@@ -102,4 +102,3 @@ export default function SuggestionsPage() {
         </div>
     );
 }
-
