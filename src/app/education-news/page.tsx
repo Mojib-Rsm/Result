@@ -40,7 +40,7 @@ const newsItems = [
         imageUrl: 'https://picsum.photos/seed/news4/600/400',
         source: 'Jago News 24',
         date: 'জুলাই ১৮, ২০২৪',
-        link: '#,
+        link: '#',
         tags: ['ছুটি', 'বন্যা'],
     }
 ];
