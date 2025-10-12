@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { GraduationCap, History, Calculator, MoreVertical, Sparkles } from 'lucide-react';
+import { GraduationCap, History, Calculator, MoreVertical, Sparkles, Shield } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
 
 export default function Header({ className }: { className?: string }) {
@@ -22,6 +23,8 @@ export default function Header({ className }: { className?: string }) {
     { href: '/history', label: 'ইতিহাস', icon: History },
     { href: '/gpa-calculator', label: 'GPA ক্যালকুলেটর', icon: Calculator },
   ];
+
+  const adminLink = { href: '/admin', label: 'অ্যাডমিন', icon: Shield };
 
   return (
     <header className={cn("sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60", className)}>
@@ -55,10 +58,10 @@ export default function Header({ className }: { className?: string }) {
           ))}
         </nav>
 
-        <div className="flex flex-1 items-center justify-end md:hidden">
+        <div className="flex flex-1 items-center justify-end">
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon">
+                    <Button variant="ghost" className="md:hidden">
                         <MoreVertical className="h-5 w-5" />
                         <span className="sr-only">Open menu</span>
                     </Button>
@@ -72,8 +75,22 @@ export default function Header({ className }: { className?: string }) {
                             </Link>
                          </DropdownMenuItem>
                     ))}
+                    <DropdownMenuSeparator />
+                     <DropdownMenuItem asChild>
+                         <Link href={adminLink.href} className="flex items-center gap-2">
+                            <adminLink.icon className="h-4 w-4" />
+                            <span>{adminLink.label}</span>
+                        </Link>
+                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
+            
+            <Button variant="ghost" asChild className={cn('hidden md:flex', pathname === adminLink.href ? 'text-foreground' : 'text-foreground/60')}>
+              <Link href={adminLink.href} className="flex items-center gap-2">
+                <adminLink.icon className="h-4 w-4" />
+                {adminLink.label}
+              </Link>
+            </Button>
         </div>
       </div>
     </header>
