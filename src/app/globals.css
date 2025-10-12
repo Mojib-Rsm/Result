@@ -67,9 +67,16 @@
   }
 }
 
+@page {
+  size: A4;
+  margin: 0;
+}
+
 @media print {
   body {
     background-color: white !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
   .no-print {
     display: none !important;
@@ -77,5 +84,15 @@
   #printable-area {
     box-shadow: none !important;
     border: none !important;
+    margin: 0;
+    padding: 1.5rem; /* A4-friendly padding */
+    width: 100%;
+    height: 100%;
+    page-break-after: auto;
+  }
+  #pdf-container {
+    padding: 0;
+    margin: 0;
   }
 }
+
