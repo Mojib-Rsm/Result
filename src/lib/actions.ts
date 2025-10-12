@@ -112,7 +112,7 @@ async function searchResultLegacy(values: z.infer<typeof formSchemaWithCookie>):
         console.error("Error in searchResultLegacy:", error);
         if (error instanceof Error) {
             // Re-throw specific, user-facing errors from the API or our checks
-            if (error.message.includes('You need to provide a valid Security Key') || error.message.includes('ফলাফল খুঁজে পাওয়া যায়নি') || error.message.includes('সার্ভার থেকে একটি ত্রুটিপূর্ণ প্রতিক্রিয়া এসেছে')) {
+            if (error.message.includes('Incorrect registration number') || error.message.includes('You need to provide a valid Security Key') || error.message.includes('ফলাফল খুঁজে পাওয়া যায়নি') || error.message.includes('সার্ভার থেকে একটি ত্রুটিপূর্ণ প্রতিক্রিয়া এসেছে')) {
                  throw error;
             }
         }
