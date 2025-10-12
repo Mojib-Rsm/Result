@@ -33,7 +33,7 @@ export async function readCaptcha(input: ReadCaptchaInput): Promise<ReadCaptchaO
 
 const prompt = ai.definePrompt({
   name: 'readCaptchaPrompt',
-  model: 'googleai/gemini-1.5-flash-preview',
+  model: 'googleai/gemini-1.5-flash',
   input: { schema: ReadCaptchaInputSchema },
   output: { schema: ReadCaptchaOutputSchema },
   prompt: `You are an expert at reading CAPTCHAs. Extract the numbers from the provided image. Only return the numbers.
