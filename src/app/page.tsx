@@ -15,7 +15,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { formSchema } from '@/lib/schema';
-import { readCaptcha, type ReadCaptchaInput } from '@/ai/flows/read-captcha-flow';
 
 export default function Home() {
   const [result, setResult] = useState<ExamResult | null>(null);
@@ -25,7 +24,6 @@ export default function Home() {
   const [showNotice, setShowNotice] = useState(false);
   const [captchaUrl, setCaptchaUrl] = useState('');
   const [captchaCookie, setCaptchaCookie] = useState('');
-  const [isReadingCaptcha, setIsReadingCaptcha] = useState(false);
 
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -40,31 +38,13 @@ export default function Home() {
     },
   });
 
-  const runCaptchaAI = useCallback(async (captchaDataUri: string) => {
-    if (!captchaDataUri) return;
-    setIsReadingCaptcha(true);
-    form.setValue('captcha', '');
-    try {
-      const input: ReadCaptchaInput = { photoDataUri: captchaDataUri };
-      const result = await readCaptcha(input);
-      if (result.captchaText) {
-          form.setValue('captcha', result.captchaText.trim());
-      }
-    } catch (e) {
-      console.error("AI CAPTCHA read failed", e);
-      // Don't show a toast, let the user enter it manually.
-    } finally {
-      setIsReadingCaptcha(false);
-    }
-  }, [form]);
-
   const refreshCaptcha = useCallback(async () => {
+    form.setValue('captcha', '');
     try {
         const res = await fetch('/api/captcha');
         const data = await res.json();
         setCaptchaUrl(data.img);
         setCaptchaCookie(data.cookie);
-        runCaptchaAI(data.img);
     } catch(e) {
         console.error("Failed to refresh captcha", e);
         toast({
@@ -73,7 +53,7 @@ export default function Home() {
             variant: "destructive"
         });
     }
-  }, [toast, runCaptchaAI]);
+  }, [form, toast]);
 
 
   useEffect(() => {
@@ -163,7 +143,6 @@ export default function Home() {
               isSubmitting={isSubmitting}
               captchaUrl={captchaUrl}
               onCaptchaRefresh={refreshCaptcha}
-              isReadingCaptcha={isReadingCaptcha}
             />
         </div>
       ) : (
