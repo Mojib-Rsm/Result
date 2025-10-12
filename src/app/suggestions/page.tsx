@@ -3,37 +3,8 @@
 
 import { useSearchParams } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { ArrowRight, Building, GraduationCap, HeartPulse, TestTube, School } from 'lucide-react';
-import Link from 'next/link';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-
-const institutionTypes = [
-    {
-        id: 'public-universities',
-        title: 'পাবলিক বিশ্ববিদ্যালয়',
-        description: 'দেশের শীর্ষস্থানীয় পাবলিক বিশ্ববিদ্যালয়গুলোর সম্পর্কে জানুন।',
-        icon: GraduationCap,
-    },
-    {
-        id: 'private-universities',
-        title: 'প্রাইভেট বিশ্ববিদ্যালয়',
-        description: 'আপনার পছন্দের বিষয়ে পড়ার জন্য সেরা প্রাইভেট বিশ্ববিদ্যালয়গুলো দেখুন।',
-        icon: Building,
-    },
-    {
-        id: 'medical-colleges',
-        title: 'মেডিকেল কলেজ',
-        description: 'ডাক্তারি পড়ার জন্য সরকারি ও বেসরকারি মেডিকেল কলেজের তালিকা।',
-        icon: HeartPulse,
-    },
-    {
-        id: 'engineering-colleges',
-        title: 'ইঞ্জিনিয়ারিং কলেজ',
-        description: 'প্রকৌশলী হওয়ার স্বপ্ন পূরণে সেরা ইঞ্জিনিয়ারিং কলেজগুলো সম্পর্কে জানুন।',
-        icon: TestTube,
-    }
-];
 
 const publicUniversities = [
   { name: 'ঢাকা বিশ্ববিদ্যালয়', location: 'ঢাকা' },
@@ -73,12 +44,9 @@ const engineeringColleges = [
   { name: ' মিলিটারি ইনস্টিটিউট অফ সায়েন্স অ্যান্ড টেকনোলজি (এমআইএসটি)', location: 'ঢাকা' },
 ];
 
-const InstitutionTable = ({ title, institutions }: { title: string, institutions: { name: string, location: string }[] }) => (
+const InstitutionTable = ({ institutions }: { institutions: { name: string, location: string }[] }) => (
     <Card>
-        <CardHeader>
-            <CardTitle>{title}</CardTitle>
-        </CardHeader>
-        <CardContent>
+        <CardContent className="pt-6">
             <Table>
                 <TableHeader>
                     <TableRow>
@@ -120,44 +88,26 @@ export default function SuggestionsPage() {
                 )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-                {institutionTypes.map((institution) => (
-                    <Card key={institution.id} className="flex flex-col hover:border-primary transition-all">
-                        <CardHeader className="flex-row items-center gap-4">
-                            <div className="p-3 bg-primary/10 rounded-lg">
-                                <institution.icon className="h-8 w-8 text-primary" />
-                            </div>
-                            <div>
-                                <CardTitle>{institution.title}</CardTitle>
-                                <CardDescription>{institution.description}</CardDescription>
-                            </div>
-                        </CardHeader>
-                        <CardContent className="flex-grow flex items-end">
-                            <Link href={`#${institution.id}`} className="w-full">
-                                <Button variant="outline" className="w-full">
-                                    তালিকা দেখুন
-                                    <ArrowRight className="ml-2 h-4 w-4" />
-                                </Button>
-                            </Link>
-                        </CardContent>
-                    </Card>
-                ))}
-            </div>
-
-            <div className="space-y-12">
-                <div id="public-universities">
-                    <InstitutionTable title="সেরা পাবলিক বিশ্ববিদ্যালয়" institutions={publicUniversities} />
-                </div>
-                <div id="private-universities">
-                     <InstitutionTable title="সেরা প্রাইভেট বিশ্ববিদ্যালয়" institutions={privateUniversities} />
-                </div>
-                 <div id="medical-colleges">
-                     <InstitutionTable title="সেরা মেডিকেল কলেজ" institutions={medicalColleges} />
-                </div>
-                <div id="engineering-colleges">
-                     <InstitutionTable title="সেরা ইঞ্জিনিয়ারিং কলেজ ও বিশ্ববিদ্যালয়" institutions={engineeringColleges} />
-                </div>
-            </div>
+            <Tabs defaultValue="public" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 h-auto">
+                    <TabsTrigger value="public" className="py-2">পাবলিক বিশ্ববিদ্যালয়</TabsTrigger>
+                    <TabsTrigger value="private" className="py-2">প্রাইভেট বিশ্ববিদ্যালয়</TabsTrigger>
+                    <TabsTrigger value="medical" className="py-2">মেডিকেল কলেজ</TabsTrigger>
+                    <TabsTrigger value="engineering" className="py-2">ইঞ্জিনিয়ারিং কলেজ</TabsTrigger>
+                </TabsList>
+                <TabsContent value="public" className="mt-6">
+                     <InstitutionTable institutions={publicUniversities} />
+                </TabsContent>
+                <TabsContent value="private" className="mt-6">
+                     <InstitutionTable institutions={privateUniversities} />
+                </TabsContent>
+                <TabsContent value="medical" className="mt-6">
+                    <InstitutionTable institutions={medicalColleges} />
+                </TabsContent>
+                <TabsContent value="engineering" className="mt-6">
+                    <InstitutionTable institutions={engineeringColleges} />
+                </TabsContent>
+            </Tabs>
 
             <div className="mt-12 text-center">
                  <p className="text-muted-foreground">
