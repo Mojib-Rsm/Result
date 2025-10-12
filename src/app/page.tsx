@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ExamForm } from '@/components/exam-form';
@@ -15,6 +15,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import { formSchema } from '@/lib/schema';
+import { readCaptcha, type ReadCaptchaInput } from '@/ai/flows/read-captcha-flow';
 
 export default function Home() {
   const [result, setResult] = useState<ExamResult | null>(null);
@@ -24,32 +25,7 @@ export default function Home() {
   const [showNotice, setShowNotice] = useState(false);
   const [captchaUrl, setCaptchaUrl] = useState('');
   const [captchaCookie, setCaptchaCookie] = useState('');
-
-
-  const refreshCaptcha = async () => {
-    try {
-        const res = await fetch('/api/captcha');
-        const data = await res.json();
-        setCaptchaUrl(data.img);
-        setCaptchaCookie(data.cookie);
-    } catch(e) {
-        console.error("Failed to refresh captcha", e);
-        toast({
-            title: "ত্রুটি",
-            description: "ক্যাপচা লোড করা যায়নি। অনুগ্রহ করে পৃষ্ঠাটি রিফ্রেশ করুন।",
-            variant: "destructive"
-        });
-    }
-  }
-
-  useEffect(() => {
-    const noticeSeen = sessionStorage.getItem('noticeSeen');
-    if (!noticeSeen) {
-      setShowNotice(true);
-      sessionStorage.setItem('noticeSeen', 'true');
-    }
-    refreshCaptcha();
-  }, []);
+  const [isReadingCaptcha, setIsReadingCaptcha] = useState(false);
 
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -63,6 +39,52 @@ export default function Home() {
       captcha: '',
     },
   });
+
+  const runCaptchaAI = useCallback(async (captchaDataUri: string) => {
+    if (!captchaDataUri) return;
+    setIsReadingCaptcha(true);
+    form.setValue('captcha', '');
+    try {
+      const input: ReadCaptchaInput = { photoDataUri: captchaDataUri };
+      const result = await readCaptcha(input);
+      if (result.captchaText) {
+          form.setValue('captcha', result.captchaText.trim());
+      }
+    } catch (e) {
+      console.error("AI CAPTCHA read failed", e);
+      // Don't show a toast, let the user enter it manually.
+    } finally {
+      setIsReadingCaptcha(false);
+    }
+  }, [form]);
+
+  const refreshCaptcha = useCallback(async () => {
+    try {
+        const res = await fetch('/api/captcha');
+        const data = await res.json();
+        setCaptchaUrl(data.img);
+        setCaptchaCookie(data.cookie);
+        runCaptchaAI(data.img);
+    } catch(e) {
+        console.error("Failed to refresh captcha", e);
+        toast({
+            title: "ত্রুটি",
+            description: "ক্যাপচা লোড করা যায়নি। অনুগ্রহ করে পৃষ্ঠাটি রিফ্রেশ করুন।",
+            variant: "destructive"
+        });
+    }
+  }, [toast, runCaptchaAI]);
+
+
+  useEffect(() => {
+    const noticeSeen = sessionStorage.getItem('noticeSeen');
+    if (!noticeSeen) {
+      setShowNotice(true);
+      sessionStorage.setItem('noticeSeen', 'true');
+    }
+    refreshCaptcha();
+  }, [refreshCaptcha]);
+
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSubmitting(true);
@@ -90,7 +112,6 @@ export default function Home() {
        refreshCaptcha();
     } finally {
         setIsSubmitting(false);
-        form.setValue('captcha', '');
     }
   };
 
@@ -142,6 +163,7 @@ export default function Home() {
               isSubmitting={isSubmitting}
               captchaUrl={captchaUrl}
               onCaptchaRefresh={refreshCaptcha}
+              isReadingCaptcha={isReadingCaptcha}
             />
         </div>
       ) : (

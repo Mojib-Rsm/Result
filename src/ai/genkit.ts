@@ -1,3 +1,14 @@
 
-// This file is intentionally left blank as all AI functionality has been removed.
-// The app now functions as a frontend-only demo.
+'use server';
+import { genkit } from 'genkit';
+import { googleAI } from '@genkit-ai/google-genai';
+
+export const ai = genkit({
+  plugins: [
+    googleAI({
+      apiVersion: 'v1beta',
+    }),
+  ],
+  logLevel: 'debug',
+  enableTracingAndMetrics: true,
+});

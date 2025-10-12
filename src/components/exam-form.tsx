@@ -47,9 +47,10 @@ interface ExamFormProps {
   isSubmitting: boolean;
   captchaUrl: string;
   onCaptchaRefresh: () => void;
+  isReadingCaptcha: boolean;
 }
 
-export function ExamForm({ form, onSubmit, isSubmitting, captchaUrl, onCaptchaRefresh }: ExamFormProps) {
+export function ExamForm({ form, onSubmit, isSubmitting, captchaUrl, onCaptchaRefresh, isReadingCaptcha }: ExamFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" id="exam-form-component">
@@ -165,7 +166,7 @@ export function ExamForm({ form, onSubmit, isSubmitting, captchaUrl, onCaptchaRe
               <div className="relative w-28 h-10 flex-shrink-0">
                 {captchaUrl && <Image src={captchaUrl} alt="ক্যাপচা" layout="fill" objectFit="contain" unoptimized />}
               </div>
-              <Button type="button" variant="outline" size="icon" onClick={onCaptchaRefresh} className="h-10 w-10 flex-shrink-0">
+              <Button type="button" variant="outline" size="icon" onClick={onCaptchaRefresh} disabled={isReadingCaptcha} className="h-10 w-10 flex-shrink-0">
                 <RefreshCw className="h-4 w-4" />
                 <span className="sr-only">অন্য ছবি</span>
               </Button>
@@ -176,18 +177,22 @@ export function ExamForm({ form, onSubmit, isSubmitting, captchaUrl, onCaptchaRe
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                      <Input 
-                          placeholder="ছবিতে দেখানো সংখ্যাগুলো লিখুন" 
-                          {...field}
-                          autoComplete="off"
-                          value={field.value || ''}
-                          onChange={(e) => {
-                              const value = e.target.value;
-                              if (/^\d*$/.test(value)) {
-                                  field.onChange(value);
-                              }
-                          }}
-                      />
+                      <div className="relative">
+                           <Input 
+                              placeholder="ছবিতে দেখানো সংখ্যাগুলো লিখুন" 
+                              {...field}
+                              autoComplete="off"
+                              disabled={isReadingCaptcha}
+                              value={field.value || ''}
+                              onChange={(e) => {
+                                  const value = e.target.value;
+                                  if (/^\d*$/.test(value)) {
+                                      field.onChange(value);
+                                  }
+                              }}
+                          />
+                          {isReadingCaptcha && <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 animate-spin" />}
+                      </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -198,8 +203,8 @@ export function ExamForm({ form, onSubmit, isSubmitting, captchaUrl, onCaptchaRe
 
 
         <div className="flex justify-end pt-4">
-          <Button type="submit" disabled={isSubmitting} className="w-full md:w-auto">
-            {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+          <Button type="submit" disabled={isSubmitting || isReadingCaptcha} className="w-full md:w-auto">
+            {(isSubmitting || isReadingCaptcha) && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             ফলাফল দেখুন
           </Button>
         </div>
