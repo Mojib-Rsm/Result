@@ -6,7 +6,7 @@ import AppProvider from '@/components/app-provider';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.bdedu.me';
+const siteUrl = 'https://www.bdedu.me';
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
