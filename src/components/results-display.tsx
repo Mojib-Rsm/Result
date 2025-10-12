@@ -6,30 +6,19 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Loader2, Search, Download } from 'lucide-react';
-import type { ExamResult } from '@/types';
+import { Loader2, Search, Download, BarChart, ArrowUp, ArrowDown, Star } from 'lucide-react';
+import type { ExamResult, GradeInfo } from '@/types';
 import { Separator } from './ui/separator';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 
-
 interface ResultsDisplayProps {
   result: ExamResult;
   onReset?: () => void;
   isDialog?: boolean;
 }
-
-const getGpaGrade = (gpa: number): string => {
-    if (gpa >= 5) return 'A+';
-    if (gpa >= 4) return 'A';
-    if (gpa >= 3.5) return 'A-';
-    if (gpa >= 3) return 'B';
-    if (gpa >= 2) return 'C';
-    if (gpa >= 1) return 'D';
-    return 'F';
-};
 
 const FooterContent = () => (
     <div className="text-center">
@@ -55,6 +44,96 @@ const FooterContent = () => (
         </div>
     </div>
 );
+
+const MarksheetAnalyzer = ({ grades }: { grades: GradeInfo[] }) => {
+    if (grades.length === 0) return null;
+
+    const gradeOrder = ['A+', 'A', 'A-', 'B', 'C', 'D', 'F'];
+    
+    const sortedGrades = [...grades].sort((a, b) => {
+        const indexA = gradeOrder.indexOf(a.grade);
+        const indexB = gradeOrder.indexOf(b.grade);
+        if (indexA === -1) return 1;
+        if (indexB === -1) return -1;
+        return indexA - indexB;
+    });
+
+    const highestGrade = sortedGrades[0];
+    const lowestGrade = sortedGrades[sortedGrades.length - 1];
+
+    const gradeCounts = grades.reduce((acc, g) => {
+        acc[g.grade] = (acc[g.grade] || 0) + 1;
+        return acc;
+    }, {} as Record<string, number>);
+
+    return (
+        <Card className="mt-8">
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                    <BarChart className="h-6 w-6" />
+                    ফলাফল বিশ্লেষণ
+                </CardTitle>
+                <CardDescription>আপনার ফলাফলের একটি সংক্ষিপ্ত বিবরণ।</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                    <div className="flex items-start p-4 bg-muted/50 rounded-lg">
+                        <div className="p-2 bg-green-100 dark:bg-green-900 rounded-full mr-4">
+                           <Star className="h-6 w-6 text-green-600 dark:text-green-300" />
+                        </div>
+                        <div>
+                            <p className="text-sm text-muted-foreground">সেরা পারফরম্যান্স</p>
+                            <p className="font-bold text-lg">{highestGrade.subject}</p>
+                            <p className="font-semibold text-green-600 dark:text-green-300">গ্রেড: {highestGrade.grade}</p>
+                        </div>
+                    </div>
+                    <div className="flex items-start p-4 bg-muted/50 rounded-lg">
+                         <div className="p-2 bg-red-100 dark:bg-red-900 rounded-full mr-4">
+                           <ArrowDown className="h-6 w-6 text-red-600 dark:text-red-300" />
+                        </div>
+                        <div>
+                            <p className="text-sm text-muted-foreground">উন্নতির সুযোগ</p>
+                            <p className="font-bold text-lg">{lowestGrade.subject}</p>
+                             <p className="font-semibold text-red-600 dark:text-red-300">গ্রেড: {lowestGrade.grade}</p>
+                        </div>
+                    </div>
+                     <div className="flex items-start p-4 bg-muted/50 rounded-lg md:col-span-1">
+                         <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-full mr-4">
+                           <ArrowUp className="h-6 w-6 text-blue-600 dark:text-blue-300" />
+                        </div>
+                        <div>
+                            <p className="text-sm text-muted-foreground">সর্বোচ্চ গ্রেড (A+)</p>
+                            <p className="font-bold text-lg">
+                                {gradeCounts['A+'] || 0} টি বিষয়ে
+                            </p>
+                             <p className="text-sm font-semibold text-blue-600 dark:text-blue-300">অসাধারণ ফলাফল!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <h4 className="font-semibold mb-2 text-center">গ্রেড বিতরণ</h4>
+                 <div className="relative w-full overflow-auto">
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                {gradeOrder.map(g => <TableHead key={g} className="text-center">{g}</TableHead>)}
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            <TableRow>
+                                {gradeOrder.map(g => (
+                                    <TableCell key={g} className="text-center font-bold text-lg">
+                                        {gradeCounts[g] || 0}
+                                    </TableCell>
+                                ))}
+                            </TableRow>
+                        </TableBody>
+                    </Table>
+                </div>
+            </CardContent>
+        </Card>
+    );
+};
 
 
 export default function ResultsDisplay({ result, onReset, isDialog = false }: ResultsDisplayProps) {
@@ -100,7 +179,6 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
         setIsDownloading(false);
     }
   }
-
 
   const gpa = result.gpa?.toFixed(2);
   const isPass = result.status === 'Pass';
@@ -208,6 +286,9 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
                  <FooterContent />
             </div>
         </Card>
+
+        {!isDialog && isPass && <MarksheetAnalyzer grades={result.grades} />}
+
       </div>
       
       {!isDialog && (

@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { GraduationCap, History } from 'lucide-react';
+import { GraduationCap, History, Calculator } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -14,6 +14,7 @@ export default function Header({ className }: { className?: string }) {
   const navLinks = [
     { href: '/', label: 'হোম', icon: GraduationCap },
     { href: '/history', label: 'ইতিহাস', icon: History },
+    { href: '/gpa-calculator', label: 'GPA ক্যালকুলেটর', icon: Calculator },
   ];
 
   return (
