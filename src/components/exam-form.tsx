@@ -160,12 +160,12 @@ export function ExamForm({ form, onSubmit, isSubmitting, captchaUrl, onCaptchaRe
 
         <div className="space-y-2 rounded-md border p-4 bg-muted/50">
           <FormLabel>রোবট নন তা প্রমাণ করুন</FormLabel>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-end">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 items-end">
             <div className="flex items-center gap-2">
-              <div className="relative w-28 h-10 flex-shrink-0">
+              <div className="relative w-24 h-9 flex-shrink-0">
                 {captchaUrl && <Image src={captchaUrl} alt="ক্যাপচা" layout="fill" objectFit="contain" unoptimized />}
               </div>
-              <Button type="button" variant="outline" size="icon" onClick={onCaptchaRefresh} className="h-10 w-10 flex-shrink-0">
+              <Button type="button" variant="outline" size="icon" onClick={onCaptchaRefresh} className="h-9 w-9 flex-shrink-0">
                 <RefreshCw className="h-4 w-4" />
                 <span className="sr-only">অন্য ছবি</span>
               </Button>
@@ -181,6 +181,7 @@ export function ExamForm({ form, onSubmit, isSubmitting, captchaUrl, onCaptchaRe
                               placeholder="ছবিতে দেখানো সংখ্যাগুলো লিখুন" 
                               {...field}
                               autoComplete="off"
+                              className="h-9 py-1"
                               value={field.value || ''}
                               onChange={(e) => {
                                   const value = e.target.value;
