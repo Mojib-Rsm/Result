@@ -98,7 +98,7 @@ async function searchResultLegacy(values: z.infer<typeof formSchemaWithCookie>):
 
         return {
             roll: res.roll_no,
-            reg: res.regno,
+            reg: res.regno || reg, // Fallback to user-provided registration number
             board: res.board_name,
             year: year,
             exam: exam,

@@ -242,6 +242,7 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
               <CardContent>
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-4">
                   <InfoItem label="Roll No" value={result.roll} />
+                  <InfoItem label="Registration No" value={result.reg} />
                   <InfoItem label="Board" value={result.board} />
                   <InfoItem label="Name" value={result.studentInfo.name} />
                   <InfoItem label="Father's Name" value={result.studentInfo.fatherName} />
