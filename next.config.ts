@@ -27,6 +27,12 @@ const nextConfig: NextConfig = {
         hostname: 'www.oftern.com',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'picsum.photos',
+        port: '',
+        pathname: '/**',
       }
     ],
   },
