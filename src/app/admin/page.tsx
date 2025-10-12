@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { getFirestore, collection, query, orderBy, getDocs, where, getCountFromServer } from 'firebase/firestore';
-import { startOfDay, endOfDay, subDays } from 'date-fns';
+import { startOfDay, subDays } from 'date-fns';
 import { app } from '@/lib/firebase';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileText, Users, MailCheck, DatabaseZap, Search, BellRing, MessageSquare, Bookmark } from 'lucide-react';
@@ -75,31 +75,17 @@ export default function AdminPage() {
 
     useEffect(() => {
         const fetchAllData = async () => {
+            setLoading(true);
             try {
                 const today = new Date();
                 const startOfToday = startOfDay(today);
                 const startOf7DaysAgo = startOfDay(subDays(today, 7));
                 const startOf30DaysAgo = startOfDay(subDays(today, 30));
 
-                // Collections
                 const searchesRef = collection(db, 'search-history');
                 const usersRef = collection(db, 'users');
                 const subscriptionsRef = collection(db, 'subscriptions');
-
-                // Stat Queries
-                const totalUsersQuery = query(usersRef);
-                const totalSearchesQuery = query(searchesRef);
-                const todaysSearchesQuery = query(searchesRef, where('timestamp', '>=', startOfToday.getTime()));
-                const last7DaysSearchesQuery = query(searchesRef, where('timestamp', '>=', startOf7DaysAgo.getTime()));
-                const last30DaysSearchesQuery = query(searchesRef, where('timestamp', '>=', startOf30DaysAgo.getTime()));
-                const totalSubscriptionsQuery = query(subscriptionsRef);
-
-                // Data Table Queries
-                const recentSearchesQuery = query(searchesRef, orderBy('timestamp', 'desc'));
-                const allUsersQuery = query(usersRef, orderBy('name'));
-                const allSubsQuery = query(subscriptionsRef, orderBy('createdAt', 'desc'));
-
-                // Execute all queries in parallel
+                
                 const [
                     totalUsersSnap,
                     totalSearchesSnap,
@@ -111,18 +97,17 @@ export default function AdminPage() {
                     allUsersSnap,
                     allSubsSnap
                 ] = await Promise.all([
-                    getCountFromServer(totalUsersQuery),
-                    getCountFromServer(totalSearchesQuery),
-                    getCountFromServer(todaysSearchesQuery),
-                    getCountFromServer(last7DaysSearchesQuery),
-                    getCountFromServer(last30DaysSearchesQuery),
-                    getCountFromServer(totalSubscriptionsQuery),
-                    getDocs(recentSearchesQuery),
-                    getDocs(allUsersQuery),
-                    getDocs(allSubsQuery)
+                    getCountFromServer(query(usersRef)),
+                    getCountFromServer(query(searchesRef)),
+                    getCountFromServer(query(searchesRef, where('timestamp', '>=', startOfToday))),
+                    getCountFromServer(query(searchesRef, where('timestamp', '>=', startOf7DaysAgo))),
+                    getCountFromServer(query(searchesRef, where('timestamp', '>=', startOf30DaysAgo))),
+                    getCountFromServer(query(subscriptionsRef)),
+                    getDocs(query(searchesRef, orderBy('timestamp', 'desc'))),
+                    getDocs(query(usersRef, orderBy('name'))),
+                    getDocs(query(subscriptionsRef, orderBy('createdAt', 'desc')))
                 ]);
-
-                // Set stats
+                
                 setStats({
                     totalUsers: totalUsersSnap.data().count,
                     totalSearches: totalSearchesSnap.data().count,
@@ -132,20 +117,24 @@ export default function AdminPage() {
                     totalSubscriptions: totalSubscriptionsSnap.data().count,
                 });
 
-                // Set table data
                 setRecentSearches(recentSearchesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
                 setUsers(allUsersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
                 setSubscriptions(allSubsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
 
             } catch (error) {
                 console.error("Error fetching admin data: ", error);
+                toast({
+                    title: "ত্রুটি",
+                    description: "অ্যাডমিন ডেটা আনতে সমস্যা হয়েছে।",
+                    variant: "destructive",
+                });
             } finally {
                 setLoading(false);
             }
         };
 
         fetchAllData();
-    }, [db]);
+    }, [db, toast]);
 
     const handleSendSms = async () => {
         if (!smsMessage.trim()) {
@@ -240,7 +229,7 @@ export default function AdminPage() {
                             নোটিফিকেশন এবং অ্যালার্ট সিস্টেম
                         </CardTitle>
                         <CardDescription>
-                            এখান থেকে সকল সাবস্ক্রাইবারদের একসাথে SMS পাঠান। ({stats.totalSubscriptions.toLocaleString()} জন সাবস্ক্রাইবার)
+                            এখান থেকে সকল সাবস্ক্রাইবারদের একসাথে SMS পাঠান। ({loading ? '...' : stats.totalSubscriptions.toLocaleString()} জন সাবস্ক্রাইবার)
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -383,5 +372,3 @@ export default function AdminPage() {
         </div>
     );
 }
-
-    
