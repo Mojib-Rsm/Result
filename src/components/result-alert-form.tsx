@@ -21,6 +21,7 @@ const alertSchema = z.object({
   reg: z.string().min(1, 'রেজিস্ট্রেশন নম্বর আবশ্যক।'),
   exam: z.string().min(1, 'পরীক্ষা নির্বাচন আবশ্যক।'),
   year: z.string().min(1, 'বছর নির্বাচন আবশ্যক।'),
+  board: z.string().min(1, 'বোর্ড নির্বাচন আবশ্যক।'),
 });
 
 const exams = [
@@ -28,6 +29,21 @@ const exams = [
     { value: 'hsc_bm', label: 'HSC(BM/Vocational)' },
     { value: 'jsc', label: 'JSC/JDC' },
     { value: 'ssc', label: 'SSC/Dakhil' },
+];
+
+const boards = [
+    { value: 'dhaka', label: 'Dhaka' },
+    { value: 'barisal', label: 'Barisal' },
+    { value: 'chittagong', label: 'Chittagong' },
+    { value: 'comilla', label: 'Comilla' },
+    { value: 'dinajpur', label: 'Dinajpur' },
+    { value: 'jessore', label: 'Jessore' },
+    { value: 'mymensingh', label: 'Mymensingh' },
+    { value: 'rajshahi', label: 'Rajshahi' },
+    { value: 'sylhet', label: 'Sylhet' },
+    { value: 'madrasah', label: 'Madrasah' },
+    { value: 'tec', label: 'Technical' },
+    { value: 'dibs', label: 'DIBS(Dhaka)' },
 ];
 
 const currentYear = new Date().getFullYear();
@@ -46,6 +62,7 @@ export default function ResultAlertForm() {
       reg: '',
       exam: '',
       year: '2025',
+      board: '',
     },
   });
 
@@ -59,7 +76,8 @@ export default function ResultAlertForm() {
         where('phone', '==', values.phone),
         where('roll', '==', values.roll),
         where('exam', '==', values.exam),
-        where('year', '==', values.year)
+        where('year', '==', values.year),
+        where('board', '==', values.board)
       );
       const querySnapshot = await getDocs(q);
 
@@ -102,7 +120,7 @@ export default function ResultAlertForm() {
         </div>
         <CardTitle className="text-2xl mt-4">ফলাফল প্রকাশিত হলে সবার আগে জানুন!</CardTitle>
         <CardDescription>
-          “Get notified when {form.watch('exam')?.toUpperCase() || 'EXAM'} Result {form.watch('year') || 'YEAR'} is published!”
+          ফলাফল প্রকাশিত হলে আপনাকে SMS-এর মাধ্যমে জানানো হবে।
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -148,6 +166,24 @@ export default function ResultAlertForm() {
                   </FormItem>
                 )}
               />
+               <FormField
+                control={form.control}
+                name="board"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>বোর্ড</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger><SelectValue placeholder="বোর্ড নির্বাচন করুন" /></SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {boards.map(b => <SelectItem key={b.value} value={b.value}>{b.label}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="exam"
@@ -184,13 +220,13 @@ export default function ResultAlertForm() {
                   </FormItem>
                 )}
               />
-              <div className="flex items-end">
+              </div>
+               <div className="pt-4">
                 <Button type="submit" disabled={isSubmitting} className="w-full">
                   {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   সাবস্ক্রাইব করুন
                 </Button>
               </div>
-            </div>
           </form>
         </Form>
       </CardContent>
