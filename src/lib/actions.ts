@@ -73,7 +73,7 @@ async function searchResultLegacy(values: z.infer<typeof formSchemaWithCookie>):
 
         const gpaMatch = res.res_detail?.match(/([0-9\.]+)/);
         const gpa = gpaMatch ? parseFloat(gpaMatch[1]) : 0;
-        const status = res.res_detail?.toLowerCase().includes('pass') ? 'Pass' : 'Fail';
+        const status = res.res_detail?.toLowerCase().includes('pass') || res.res_detail?.toLowerCase().includes('gpa=') ? 'Pass' : 'Fail';
         
         const allGrades = parseGrades(res.display_details, data.sub_details || []);
         if (res.display_details_ca) {
