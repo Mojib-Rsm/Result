@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { GraduationCap, History, Calculator, MoreVertical, Sparkles } from 'lucide-react';
+import { GraduationCap, History, Calculator, MoreVertical, Sparkles, LogOut } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -11,10 +11,14 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
+import { useAuth } from '@/hooks/use-auth';
 
 export default function Header({ className }: { className?: string }) {
   const pathname = usePathname();
+  const { user, logout } = useAuth();
+  const isAdminPage = pathname.startsWith('/admin');
 
   const navLinks = [
     { href: '/', label: 'হোম', icon: GraduationCap },
@@ -36,44 +40,56 @@ export default function Header({ className }: { className?: string }) {
           />
           <span className="font-bold sm:inline-block">BD Edu Result</span>
         </Link>
-        <nav className="hidden flex-1 items-center gap-2 text-sm md:flex">
-          {navLinks.map((link) => (
-            <Button
-              key={link.href}
-              variant="ghost"
-              asChild
-              className={cn(
-                'transition-colors hover:text-foreground/80',
-                pathname === link.href ? 'text-foreground' : 'text-foreground/60'
-              )}
-            >
-              <Link href={link.href} className="flex items-center gap-2">
-                <link.icon className="h-4 w-4" />
-                {link.label}
-              </Link>
-            </Button>
-          ))}
-        </nav>
+        
+        {!isAdminPage && (
+          <nav className="hidden flex-1 items-center gap-2 text-sm md:flex">
+            {navLinks.map((link) => (
+              <Button
+                key={link.href}
+                variant="ghost"
+                asChild
+                className={cn(
+                  'transition-colors hover:text-foreground/80',
+                  pathname === link.href ? 'text-foreground' : 'text-foreground/60'
+                )}
+              >
+                <Link href={link.href} className="flex items-center gap-2">
+                  <link.icon className="h-4 w-4" />
+                  {link.label}
+                </Link>
+              </Button>
+            ))}
+          </nav>
+        )}
+        
+        {isAdminPage && <div className="flex-1" />}
 
-        <div className="flex flex-1 items-center justify-end">
-            <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="md:hidden">
-                        <MoreVertical className="h-5 w-5" />
-                        <span className="sr-only">Open menu</span>
-                    </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                    {navLinks.map(link => (
-                         <DropdownMenuItem key={link.href} asChild>
-                             <Link href={link.href} className="flex items-center gap-2">
-                                <link.icon className="h-4 w-4" />
-                                <span>{link.label}</span>
-                            </Link>
-                         </DropdownMenuItem>
-                    ))}
-                </DropdownMenuContent>
-            </DropdownMenu>
+        <div className="flex items-center justify-end">
+            {isAdminPage && user ? (
+                 <Button variant="ghost" onClick={logout}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    লগআউট
+                </Button>
+            ) : (
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className={cn("md:hidden", isAdminPage && "hidden")}>
+                            <MoreVertical className="h-5 w-5" />
+                            <span className="sr-only">Open menu</span>
+                        </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        {navLinks.map(link => (
+                             <DropdownMenuItem key={link.href} asChild>
+                                 <Link href={link.href} className="flex items-center gap-2">
+                                    <link.icon className="h-4 w-4" />
+                                    <span>{link.label}</span>
+                                </Link>
+                             </DropdownMenuItem>
+                        ))}
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            )}
         </div>
       </div>
     </header>

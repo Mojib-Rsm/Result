@@ -1,4 +1,3 @@
-
 'use client';
 
 import { Toaster } from '@/components/ui/toaster';
@@ -6,6 +5,9 @@ import Header from '@/components/header';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 import Link from 'next/link';
+import React, { useState, useEffect, ReactNode } from 'react';
+import { User, onAuthStateChanged, signInWithEmailAndPassword, signOut, setPersistence, browserLocalPersistence } from 'firebase/auth';
+import { AuthContext, auth } from '@/hooks/use-auth';
 
 function Footer() {
   return (
@@ -36,19 +38,50 @@ function Footer() {
   )
 }
 
+export function AuthProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
+      setLoading(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+  const login = async (email: string, password: string) => {
+    await setPersistence(auth, browserLocalPersistence);
+    await signInWithEmailAndPassword(auth, email, password);
+  };
+
+  const logout = async () => {
+    await signOut(auth);
+  };
+
+  return (
+    <AuthContext.Provider value={{ user, loading, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+
 export default function AppProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
   return (
-    <div className={cn('font-sans antialiased bg-background text-foreground')}>
-      <div className="relative flex min-h-screen flex-col">
-        <Header className="no-print" />
-        <main className="flex-1">{children}</main>
-        <Footer />
+    <AuthProvider>
+      <div className={cn('font-sans antialiased bg-background text-foreground')}>
+        <div className="relative flex min-h-screen flex-col">
+          <Header className="no-print" />
+          <main className="flex-1">{children}</main>
+          <Footer />
+        </div>
+        <Toaster />
       </div>
-      <Toaster />
-    </div>
+    </AuthProvider>
   );
 }
