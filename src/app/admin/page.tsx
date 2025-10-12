@@ -6,7 +6,7 @@ import { getFirestore, collection, query, orderBy, getDocs, where, getCountFromS
 import { startOfDay, endOfDay } from 'date-fns';
 import { app } from '@/lib/firebase';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText, Users, MailCheck, DatabaseZap, Search, BellRing, MessageSquare } from 'lucide-react';
+import { FileText, Users, MailCheck, DatabaseZap, Search, BellRing, MessageSquare, Bookmark } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -39,6 +39,12 @@ const adminFeatures = [
         description: 'ব্যবহারকারীদের SMS বা ইমেইল নোটিফিকেশন পাঠান।',
         icon: BellRing,
         href: '#notification-system'
+    },
+    {
+        title: 'শিক্ষা সংবাদ',
+        description: 'সাইটের সংবাদ এবং নোটিশ পরিচালনা করুন।',
+        icon: Bookmark,
+        href: '/admin/news'
     },
     {
         title: 'ডাটাবেস সিডিং',
@@ -80,11 +86,11 @@ export default function AdminPage() {
                 // Stat Queries
                 const totalUsersQuery = query(usersRef);
                 const totalSearchesQuery = query(searchesRef);
-                const todaysSearchesQuery = query(searchesRef, where('timestamp', '>=', startOfToday.getTime()), where('timestamp', '<=', endOfToday.getTime()));
+                const todaysSearchesQuery = query(searchesRef, where('timestamp', '>=', startOfToday), where('timestamp', '<=', endOfToday));
                 const totalSubscriptionsQuery = query(subscriptionsRef);
 
                 // Data Table Queries
-                const recentSearchesQuery = query(searchesRef, orderBy('timestamp', 'desc'), where('result.status', '==', 'Pass'));
+                const recentSearchesQuery = query(searchesRef, orderBy('timestamp', 'desc'));
                 const allUsersQuery = query(usersRef, orderBy('name'));
                 const allSubsQuery = query(subscriptionsRef, orderBy('createdAt', 'desc'));
 
@@ -104,7 +110,7 @@ export default function AdminPage() {
                     getCountFromServer(totalSubscriptionsQuery),
                     getDocs(recentSearchesQuery),
                     getDocs(allUsersQuery),
-                    getDocs(allSubsSnap)
+                    getDocs(allSubsQuery)
                 ]);
 
                 // Set stats

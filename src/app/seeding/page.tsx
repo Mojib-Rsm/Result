@@ -2,7 +2,7 @@
 'use client';
 
 import { useState } from 'react';
-import { getFirestore, setDoc, doc, collection, writeBatch } from 'firebase/firestore';
+import { getFirestore, setDoc, doc, writeBatch } from 'firebase/firestore';
 import { app } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -59,6 +59,9 @@ const polytechnicInstitutes = [
 
 const newsItems = [
     { id: 'news1', title: '২০২৫ সালের এসএসসি পরীক্ষা ফেব্রুয়ারিতে, এইচএসসি এপ্রিলে', description: 'আগামী বছরের (২০২৫) এসএসসি ও সমমান পরীক্ষা ফেব্রুয়ারিতে এবং এইচএসসি ও সমমান পরীক্ষা এপ্রিলে অনুষ্ঠিত হবে।', imageUrl: 'https://picsum.photos/seed/news1/600/400', source: 'প্রথম আলো', date: 'জুলাই ২১, ২০২৪', link: '#', tags: ['এসএসসি', 'এইচএসসি', '২০২৫'], },
+    { id: 'news2', title: 'পাবলিক বিশ্ববিদ্যালয়ে থাকছে না দ্বিতীয়বার ভর্তির সুযোগ', description: 'দেশের পাবলিক বিশ্ববিদ্যালয়গুলোতে স্নাতক প্রথম বর্ষে দ্বিতীয়বার ভর্তির সুযোগ আর থাকছে না। अगले শিক্ষাবর্ষ থেকে এটি কার্যকর হবে।', imageUrl: 'https://picsum.photos/seed/news2/600/400', source: 'The Daily Star', date: 'জুলাই ২০, ২০২৪', link: '#', tags: ['ভর্তি', 'পাবলিক বিশ্ববিদ্যালয়'], },
+    { id: 'news3', title: 'গুচ্ছ ভর্তি পরীক্ষা: প্রাথমিক আবেদন শুরু', description: 'দেশের ২২টি সাধারণ এবং বিজ্ঞান ও প্রযুক্তি বিশ্ববিদ্যালয়ের গুচ্ছ ভর্তি পরীক্ষার প্রাথমিক আবেদন শুরু হয়েছে।', imageUrl: 'https://picsum.photos/seed/news3/600/400', source: 'দৈনিক শিক্ষা', date: 'জুলাই ১৯, ২০২৪', link: '#', tags: ['গুচ্ছ', 'ভর্তি পরীক্ষা'], },
+    { id: 'news4', title: 'জুলাইয়ে খুলছে না শিক্ষা প্রতিষ্ঠান, ছুটি আরও বাড়তে পারে', description: 'সারা দেশে বন্যা পরিস্থিতির অবনতি হওয়ায় জুলাই মাসে শিক্ষা প্রতিষ্ঠান খোলার সম্ভাবনা নেই। ছুটি আরও বাড়তে পারে বলে জানিয়েছে শিক্ষা মন্ত্রণালয়।', imageUrl: 'https://picsum.photos/seed/news4/600/400', source: 'Jago News 24', date: 'জুলাই ১৮, ২০২৪', link: '#', tags: ['ছুটি', 'বন্যা'], },
 ];
 
 const hsc2023Stats = {
@@ -157,3 +160,5 @@ export default function SeedingPage() {
         </div>
     );
 }
+
+    

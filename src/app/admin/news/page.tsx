@@ -1,0 +1,127 @@
+
+'use client'
+
+import { useState, useEffect } from 'react';
+import { getFirestore, collection, query, orderBy, getDocs } from 'firebase/firestore';
+import { app } from '@/lib/firebase';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Plus, Edit, Trash2 } from 'lucide-react';
+import Image from 'next/image';
+import { Badge } from '@/components/ui/badge';
+import Link from 'next/link';
+
+export default function NewsManagementPage() {
+    const [newsItems, setNewsItems] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+    const db = getFirestore(app);
+
+    useEffect(() => {
+        const fetchNews = async () => {
+            try {
+                const newsRef = collection(db, 'news');
+                const q = query(newsRef, orderBy('date', 'desc'));
+                const querySnapshot = await getDocs(q);
+                setNewsItems(querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+            } catch (error) {
+                console.error("Error fetching news: ", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchNews();
+    }, [db]);
+
+    const TableSkeleton = () => (
+        [...Array(5)].map((_, i) => (
+            <TableRow key={i}>
+                <TableCell><Skeleton className="h-10 w-16" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-3/4" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-1/2" /></TableCell>
+                <TableCell><Skeleton className="h-4 w-1/4" /></TableCell>
+                <TableCell><Skeleton className="h-8 w-24" /></TableCell>
+            </TableRow>
+        ))
+    );
+
+    return (
+        <div className="container mx-auto max-w-7xl px-4 py-8 md:py-12">
+            <div className="flex items-center justify-between mb-8">
+                <div>
+                    <h1 className="text-3xl font-bold tracking-tight">শিক্ষা সংবাদ ব্যবস্থাপনা</h1>
+                    <p className="mt-2 text-md text-muted-foreground">
+                        ওয়েবসাইটের সকল সংবাদ ও নোটিশ পরিচালনা করুন।
+                    </p>
+                </div>
+                <Button>
+                    <Plus className="mr-2 h-4 w-4" />
+                    নতুন খবর যোগ করুন
+                </Button>
+            </div>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>সংবাদের তালিকা</CardTitle>
+                    <CardDescription>এখানে ওয়েবসাইটের সকল সংবাদ তালিকাভুক্ত রয়েছে।</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>ছবি</TableHead>
+                                <TableHead>শিরোনাম</TableHead>
+                                <TableHead>উৎস</TableHead>
+                                <TableHead>তারিখ</TableHead>
+                                <TableHead className="text-right">פעולות</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {loading ? (
+                                <TableSkeleton />
+                            ) : newsItems.length > 0 ? (
+                                newsItems.map(item => (
+                                    <TableRow key={item.id}>
+                                        <TableCell>
+                                            <Image
+                                                src={item.imageUrl}
+                                                alt={item.title}
+                                                width={64}
+                                                height={40}
+                                                className="rounded-md object-cover"
+                                            />
+                                        </TableCell>
+                                        <TableCell className="font-medium max-w-xs truncate">
+                                            <Link href={item.link} target="_blank" className="hover:underline">{item.title}</Link>
+                                        </TableCell>
+                                        <TableCell>{item.source}</TableCell>
+                                        <TableCell>{item.date}</TableCell>
+                                        <TableCell className="text-right">
+                                            <div className="flex justify-end gap-2">
+                                                <Button variant="ghost" size="icon" disabled>
+                                                    <Edit className="h-4 w-4" />
+                                                </Button>
+                                                <Button variant="ghost" size="icon" className="text-destructive" disabled>
+                                                    <Trash2 className="h-4 w-4" />
+                                                </Button>
+                                            </div>
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            ) : (
+                                <TableRow>
+                                    <TableCell colSpan={5} className="text-center h-24">
+                                        কোনো সংবাদ পাওয়া যায়নি।
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
+                </CardContent>
+            </Card>
+        </div>
+    );
+}
+
+    
