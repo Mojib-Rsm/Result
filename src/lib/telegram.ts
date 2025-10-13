@@ -1,5 +1,4 @@
 
-'use server';
 
 export async function sendTelegramNotification(message: string): Promise<{ success: boolean; error?: string }> {
     const botToken = process.env.TELEGRAM_BOT_TOKEN;
@@ -21,7 +20,6 @@ export async function sendTelegramNotification(message: string): Promise<{ succe
             body: JSON.stringify({
                 chat_id: chatId,
                 text: message,
-                parse_mode: 'Markdown',
             }),
             cache: 'no-store'
         });

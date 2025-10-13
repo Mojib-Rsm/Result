@@ -14,8 +14,6 @@ import { app } from '@/lib/firebase';
 import { useState } from 'react';
 import { Loader2, MailCheck } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { sendBulkSms } from '@/lib/sms';
-import { sendTelegramNotification } from '@/lib/telegram';
 
 const alertSchema = z.object({
   phone: z.string().min(11, 'অনুগ্রহ করে একটি বৈধ ফোন নম্বর দিন।').max(14),
@@ -50,6 +48,18 @@ const boards = [
 
 const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 5 }, (_, i) => currentYear - 2 + i).map(String);
+
+async function sendNotification(payload: { message: string; type: 'sms' | 'telegram', recipient?: string }) {
+    try {
+        await fetch('/api/notify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+        });
+    } catch (error) {
+        console.error(`Failed to send ${payload.type} notification:`, error);
+    }
+}
 
 
 export default function ResultAlertForm() {
@@ -103,18 +113,17 @@ export default function ResultAlertForm() {
       });
       
       // Send confirmation SMS to user
-      await sendBulkSms([values.phone], `BD Edu Result-এ স্বাগতম! আপনার পরীক্ষার ফলাফল প্রকাশিত হলে আপনাকে SMS-এর মাধ্যমে জানানো হবে। ধন্যবাদ। - www.bdedu.me`);
+      const userMessage = `BD Edu Result-এ স্বাগতম! আপনার পরীক্ষার ফলাফল প্রকাশিত হলে আপনাকে SMS-এর মাধ্যমে জানানো হবে। ধন্যবাদ। - www.bdedu.me`;
+      await sendNotification({ message: userMessage, type: 'sms', recipient: values.phone });
 
-      // Send notification SMS to admin
-      const adminPhoneNumber = process.env.NEXT_PUBLIC_ADMIN_PHONE_NUMBER;
+      // Prepare admin notification message
       const adminMessage = `New Subscription on BD Edu Result:\nRoll: ${values.roll}\nExam: ${values.exam.toUpperCase()}\nYear: ${values.year}\nBoard: ${values.board}\nPhone: ${values.phone}`;
       
-      if (adminPhoneNumber) {
-          await sendBulkSms([adminPhoneNumber], `${adminMessage} - www.bdedu.me`);
-      }
+      // Send notification SMS to admin
+      await sendNotification({ message: `${adminMessage} - www.bdedu.me`, type: 'sms' });
       
       // Send Telegram notification
-      await sendTelegramNotification(adminMessage);
+      await sendNotification({ message: adminMessage, type: 'telegram' });
 
 
       form.reset();

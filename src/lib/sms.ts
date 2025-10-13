@@ -1,5 +1,4 @@
 
-'use server';
 
 interface SmsApiResult {
     error: number; // 0 for success

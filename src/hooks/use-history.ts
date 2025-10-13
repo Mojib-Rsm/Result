@@ -5,11 +5,23 @@ import { useState, useEffect, useCallback } from 'react';
 import type { HistoryItem } from '@/types';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
 import { app } from '@/lib/firebase';
-import { sendTelegramNotification } from '@/lib/telegram';
 
 const VISIT_SESSION_KEY = 'visit-counted';
 const STATS_KEY = 'bd-results-stats';
 const LOCAL_HISTORY_KEY = 'bd-results-history-local';
+
+async function sendNotification(payload: { message: string; type: 'sms' | 'telegram' }) {
+    try {
+        await fetch('/api/notify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+        });
+    } catch (error) {
+        console.error(`Failed to send ${payload.type} notification:`, error);
+    }
+}
+
 
 export function useHistory() {
   const [isInitialized, setIsInitialized] = useState(false);
@@ -44,7 +56,7 @@ export function useHistory() {
     try {
       const { result } = item;
       const message = `New Result Search:\nRoll: ${result.roll}\nExam: ${result.exam.toUpperCase()}\nYear: ${result.year}\nBoard: ${result.board}\nStatus: ${result.status}\nGPA: ${result.gpa.toFixed(2)}`;
-      await sendTelegramNotification(message);
+      await sendNotification({ message, type: 'telegram' });
     } catch (error) {
        console.error("Telegram notification for search failed: ", error);
     }
