@@ -1,3 +1,4 @@
+
 'use client'
 
 import { useState, useEffect } from 'react';
@@ -210,6 +211,9 @@ export default function AdminPage() {
                 captcha: '12345', // Dummy captcha, might need adjustment
                 cookie: '',
             });
+            if ('error' in result) {
+                throw new Error(result.error);
+            }
             setCheckedResult(result);
             const message = result.status === 'Pass'
                 ? `অভিনন্দন! আপনার ${result.exam.toUpperCase()} পরীক্ষার ফলাফল প্রকাশিত হয়েছে। আপনার GPA: ${result.gpa.toFixed(2)}. বিস্তারিত দেখুন: www.bdedu.me`
