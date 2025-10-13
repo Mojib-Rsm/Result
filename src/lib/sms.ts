@@ -1,7 +1,7 @@
 
 'use server';
 
-interface IcomSmsResult {
+interface SmsApiResult {
     error: number; // 0 for success
     sent?: string;
     id?: string;
@@ -10,8 +10,8 @@ interface IcomSmsResult {
     [key: string]: any;
 }
 
-interface IcomSmsResponse {
-    result: IcomSmsResult;
+interface SmsApiResponse {
+    result: SmsApiResult;
 }
 
 export async function sendBulkSms(
@@ -19,20 +19,17 @@ export async function sendBulkSms(
     message: string
 ): Promise<{ success: boolean; error?: string }> {
     
-    const user = process.env.SMS_API_USER;
-    const password = process.env.SMS_API_PASS;
-    const senderid = "8809617611956";
+    const apiKey = process.env.SMS_API_KEY;
 
-    if (!user || !password) {
-        console.error("SMS API User/Password is not configured in .env file.");
+    if (!apiKey) {
+        console.error("SMS API Key is not configured in .env file.");
         return { success: false, error: "SMS সার্ভিসটি কনফিগার করা হয়নি।" };
     }
 
     const recipients = phoneNumbers.join(',');
     const encodedMessage = encodeURIComponent(message);
     
-    // New API URL structure from icombd
-    const apiUrl = `https://bulksms.icombd.com/api/v3/sendsms/plain?user=${user}&password=${password}&number=${recipients}&senderid=${senderid}&message=${encodedMessage}`;
+    const apiUrl = `https://api.smsmobileapi.com/sendsms/?apikey=${apiKey}&recipients=${recipients}&message=${encodedMessage}`;
 
     try {
         const response = await fetch(apiUrl, {
@@ -44,8 +41,7 @@ export async function sendBulkSms(
         console.log("SMS API Raw Response:", responseText);
 
         try {
-            // New API response structure
-            const data: IcomSmsResponse = JSON.parse(responseText);
+            const data: SmsApiResponse = JSON.parse(responseText);
 
             if (data.result && data.result.error === 0) {
                 return { success: true };
@@ -55,7 +51,6 @@ export async function sendBulkSms(
                 return { success: false, error: errorMessage };
             }
         } catch (jsonError) {
-             // Handle cases where response might not be JSON
              if (responseText.toLowerCase().includes('success')) {
                  return { success: true };
              }
