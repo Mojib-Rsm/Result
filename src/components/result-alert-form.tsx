@@ -15,6 +15,7 @@ import { useState } from 'react';
 import { Loader2, MailCheck } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 import { sendBulkSms } from '@/lib/sms';
+import { sendTelegramNotification } from '@/lib/telegram';
 
 const alertSchema = z.object({
   phone: z.string().min(11, 'অনুগ্রহ করে একটি বৈধ ফোন নম্বর দিন।').max(14),
@@ -106,10 +107,15 @@ export default function ResultAlertForm() {
 
       // Send notification SMS to admin
       const adminPhoneNumber = process.env.NEXT_PUBLIC_ADMIN_PHONE_NUMBER;
+      const adminMessage = `New Subscription on BD Edu Result:\nRoll: ${values.roll}\nExam: ${values.exam.toUpperCase()}\nYear: ${values.year}\nBoard: ${values.board}\nPhone: ${values.phone}`;
+      
       if (adminPhoneNumber) {
-          const adminMessage = `New Subscription on BD Edu Result: Roll: ${values.roll}, Exam: ${values.exam.toUpperCase()}, Year: ${values.year}, Board: ${values.board}. - www.bdedu.me`;
-          await sendBulkSms([adminPhoneNumber], adminMessage);
+          await sendBulkSms([adminPhoneNumber], `${adminMessage} - www.bdedu.me`);
       }
+      
+      // Send Telegram notification
+      await sendTelegramNotification(adminMessage);
+
 
       form.reset();
     } catch (error: any) {

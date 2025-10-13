@@ -5,6 +5,7 @@ import { useState, useEffect, useCallback } from 'react';
 import type { HistoryItem } from '@/types';
 import { getFirestore, collection, addDoc } from 'firebase/firestore';
 import { app } from '@/lib/firebase';
+import { sendTelegramNotification } from '@/lib/telegram';
 
 const VISIT_SESSION_KEY = 'visit-counted';
 const STATS_KEY = 'bd-results-stats';
@@ -38,6 +39,16 @@ export function useHistory() {
     if (typeof window === 'undefined') return;
 
     const itemWithTimestamp: HistoryItem = { ...item, timestamp: Date.now() };
+
+    // Send Telegram Notification
+    try {
+      const { result } = item;
+      const message = `New Result Search:\nRoll: ${result.roll}\nExam: ${result.exam.toUpperCase()}\nYear: ${result.year}\nBoard: ${result.board}\nStatus: ${result.status}\nGPA: ${result.gpa.toFixed(2)}`;
+      await sendTelegramNotification(message);
+    } catch (error) {
+       console.error("Telegram notification for search failed: ", error);
+    }
+
 
     // Save to Firestore
     try {
