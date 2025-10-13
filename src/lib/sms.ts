@@ -2,11 +2,33 @@
 'use server';
 
 interface SmsApiResponse {
-    // Define the expected success and error response structure from the new API
-    // As the new API's response structure is unknown, we'll keep it generic for now.
+    status_code?: number;
+    status_text?: string;
+    // other potential fields from the API response
     [key: string]: any;
 }
 
+const smsStatusMessages: { [key: number]: string } = {
+    1001: 'Invalid Number',
+    1002: 'Sender ID not correct/disabled',
+    1003: 'Required fields are missing',
+    1005: 'Internal Error',
+    1006: 'Balance Validity Not Available',
+    1007: 'Insufficient Balance',
+    1011: 'User ID not found',
+    1012: 'Masking SMS must be in Bengali',
+    1013: 'Gateway not found for API key',
+    1014: 'Sender Type Name not found',
+    1015: 'No Valid Gateway for Sender ID',
+    1016: 'Active Price Info not found',
+    1017: 'Price Info not found',
+    1018: 'Account is disabled',
+    1019: 'Price for this sender type is disabled',
+    1020: 'Parent account not found',
+    1021: 'Parent active price not found',
+    1031: 'Account Not Verified',
+    1032: 'IP Not Whitelisted',
+};
 
 export async function sendBulkSms(
     phoneNumbers: string[],
@@ -28,25 +50,29 @@ export async function sendBulkSms(
     try {
         const response = await fetch(apiUrl, {
             method: 'GET',
+            cache: 'no-store'
         });
         
-        // The success condition might need to be adjusted based on the new API's response format.
-        if (response.ok) {
-            const responseData: SmsApiResponse = await response.json().catch(() => ({}));
-            console.log("SMS API Response:", responseData);
-            // Assuming a successful response contains a specific status, e.g., status code 200 or a success field.
-            // This logic may need refinement based on actual API responses.
-            if (response.status === 200) { // Generic success check
-                 return { success: true };
-            } else {
-                 const errorMessage = responseData.message || responseData.error || `API returned status: ${response.status}`;
-                 console.error("SMS API Error:", responseData);
-                 return { success: false, error: errorMessage };
-            }
+        let responseData: SmsApiResponse;
+        try {
+            responseData = await response.json();
+        } catch (jsonError) {
+             // Handle cases where response is not JSON (e.g., plain text error from API)
+            const textResponse = await response.text();
+            console.error("SMS API non-JSON response:", textResponse);
+            return { success: false, error: `API থেকে একটি অপ্রত্যাশিত প্রতিক্রিয়া এসেছে: ${textResponse}` };
+        }
+
+        console.log("SMS API Response:", responseData);
+
+        const statusCode = responseData.status_code ? parseInt(responseData.status_code.toString(), 10) : 0;
+
+        if (statusCode === 202) {
+             return { success: true };
         } else {
-            const errorText = await response.text();
-            console.error("SMS API request failed with status:", response.status, errorText);
-            return { success: false, error: `SMS API থেকে একটি ত্রুটিপূর্ণ প্রতিক্রিয়া এসেছে: ${response.statusText}` };
+             const errorMessage = smsStatusMessages[statusCode] || responseData.status_text || `An unknown error occurred (Code: ${statusCode})`;
+             console.error("SMS API Error:", errorMessage);
+             return { success: false, error: errorMessage };
         }
 
     } catch (error: any) {

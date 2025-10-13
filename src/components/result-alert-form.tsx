@@ -14,6 +14,7 @@ import { app } from '@/lib/firebase';
 import { useState } from 'react';
 import { Loader2, MailCheck } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
+import { sendBulkSms } from '@/lib/sms';
 
 const alertSchema = z.object({
   phone: z.string().min(11, 'অনুগ্রহ করে একটি বৈধ ফোন নম্বর দিন।').max(14),
@@ -70,6 +71,16 @@ export default function ResultAlertForm() {
   const onSubmit = async (values: z.infer<typeof alertSchema>) => {
     setIsSubmitting(true);
     try {
+
+      if (parseInt(values.year) < 2024) {
+        toast({
+            title: 'শুধুমাত্র ভবিষ্যতের জন্য',
+            description: 'ফলাফলের বিজ্ঞপ্তির জন্য শুধুমাত্র ২০২৪ বা তার পরবর্তী বছরের জন্য সাবস্ক্রাইব করা যাবে।',
+            variant: 'destructive',
+        });
+        return;
+      }
+
       const subscriptionsRef = collection(db, 'subscriptions');
       
       // Check for existing subscription
@@ -99,8 +110,12 @@ export default function ResultAlertForm() {
 
       toast({
         title: 'সাবস্ক্রিপশন সফল',
-        description: 'ফলাফল প্রকাশিত হলে আপনাকে জানানো হবে।',
+        description: 'ফলাফল প্রকাশিত হলে আপনাকে জানানো হবে। একটি কনফার্মেশন SMS পাঠানো হয়েছে।',
       });
+      
+      // Send confirmation SMS
+      await sendBulkSms([values.phone], "BD Edu Result-এ স্বাগতম! আপনার পরীক্ষার ফলাফল প্রকাশিত হলে আপনাকে SMS-এর মাধ্যমে জানানো হবে। ধন্যবাদ।");
+
       form.reset();
     } catch (error: any) {
       toast({
@@ -121,7 +136,7 @@ export default function ResultAlertForm() {
         </div>
         <CardTitle className="text-2xl mt-4">ফলাফল প্রকাশিত হলে সবার আগে জানুন!</CardTitle>
         <CardDescription>
-          ফলাফল প্রকাশিত হলে আপনাকে SMS-এর মাধ্যমে জানানো হবে।
+          ফলাফল প্রকাশিত হলে আপনাকে SMS-এর মাধ্যমে জানানো হবে। (শুধুমাত্র ২০২৪ সাল ও তার পরবর্তী পরীক্ষার জন্য প্রযোজ্য)
         </CardDescription>
       </CardHeader>
       <CardContent>
