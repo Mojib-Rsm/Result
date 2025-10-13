@@ -6,7 +6,7 @@ import { getFirestore, collection, query, orderBy, getDocs, where, getCountFromS
 import { startOfDay, subDays } from 'date-fns';
 import { app } from '@/lib/firebase';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText, Users, MailCheck, DatabaseZap, Search, BellRing, MessageSquare, Bookmark, Trash2, RefreshCw } from 'lucide-react';
+import { FileText, Users, MailCheck, DatabaseZap, Search, BellRing, MessageSquare, Bookmark, Trash2, RefreshCw, Settings, BadgeDollarSign, FileCog } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -39,12 +39,12 @@ const adminFeatures = [
     },
     {
         title: 'সাবস্ক্রিপশন',
-        description: 'সমস্ত ফলাফল বিজ্ঞপ্তির সাবস্ক্রাইবারদের পরিচালনা করুন।',
+        description: 'ফলাফল বিজ্ঞপ্তির সাবস্ক্রাইবারদের পরিচালনা করুন।',
         icon: MailCheck,
         href: '#subscriptions-table'
     },
      {
-        title: 'নোটিফিকেশন ও অ্যালার্ট',
+        title: 'বাল্ক নোটিফিকেশন',
         description: 'ব্যবহারকারীদের SMS বা ইমেইল নোটিফিকেশন পাঠান।',
         icon: BellRing,
         href: '#notification-system'
@@ -60,6 +60,24 @@ const adminFeatures = [
         description: 'প্রাথমিক ডেটা দিয়ে ডাটাবেস প্রস্তুত করুন।',
         icon: DatabaseZap,
         href: '/seeding'
+    },
+    {
+        title: 'সেটিংস ও SEO',
+        description: 'সাইটের SEO, অ্যানালিটিক্স এবং অন্যান্য সেটিংস পরিচালনা করুন।',
+        icon: Settings,
+        href: '#'
+    },
+    {
+        title: 'বিজ্ঞাপন ম্যানেজমেন্ট',
+        description: 'Google AdSense বা অন্যান্য বিজ্ঞাপন নেটওয়ার্ক পরিচালনা করুন।',
+        icon: BadgeDollarSign,
+        href: '#'
+    },
+    {
+        title: 'পেইজ ম্যানেজমেন্ট',
+        description: 'About, Privacy Policy ইত্যাদি স্ট্যাটিক পেইজ এডিট করুন।',
+        icon: FileCog,
+        href: '#'
     }
 ];
 
