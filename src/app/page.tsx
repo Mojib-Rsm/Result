@@ -21,6 +21,7 @@ import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { app } from '@/lib/firebase';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { Megaphone } from 'lucide-react';
 
 export default function Home() {
   const [result, setResult] = useState<ExamResult | null>(null);
@@ -138,26 +139,42 @@ export default function Home() {
   return (
     <div className="container mx-auto max-w-4xl px-4 py-8 md:py-12" id="main-content">
       <Dialog open={showNotice} onOpenChange={setShowNotice}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>BD Edu Result-এ স্বাগতম!</DialogTitle>
-            <DialogDescription>
-              এই ওয়েবসাইটটি শুধুমাত্র শিক্ষামূলক উদ্দেশ্যে এবং একটি ডেমো প্রকল্প হিসেবে তৈরি করা হয়েছে। 
-              এখানে প্রদর্শিত সকল তথ্য সরাসরি শিক্ষা বোর্ডের অফিসিয়াল সার্ভার থেকে আনা হয়।
-            </DialogDescription>
-          </DialogHeader>
-          <div className="prose prose-sm dark:prose-invert">
-              <p>
-                আমরা কোনো তথ্য সংরক্ষণ করি না। আপনার অনুসন্ধানের ইতিহাস শুধুমাত্র আপনার ব্রাউজারেই সংরক্ষিত থাকে।
-              </p>
-               <p>
-                আমাদের মূল ওয়েবসাইট ভিজিট করুন: <Link href="https://www.bdedu.me" target="_blank" className="text-primary font-semibold">bdedu.me</Link>
-              </p>
-          </div>
-          <DialogFooter>
-            <Button onClick={() => setShowNotice(false)}>বুঝেছি</Button>
-          </DialogFooter>
-        </DialogContent>
+          <DialogContent>
+              <DialogHeader>
+                  <div className="mx-auto bg-primary/10 p-3 rounded-full w-fit mb-4">
+                      <Megaphone className="h-8 w-8 text-primary" />
+                  </div>
+                  <DialogTitle className="text-center">এইচএসসি ও সমমান পরীক্ষা ২০২৫-এর ফলাফল সংক্রান্ত বিজ্ঞপ্তি</DialogTitle>
+                  <DialogDescription className="text-center">
+                      মাধ্যমিক ও উচ্চমাধ্যমিক শিক্ষা বোর্ডের একটি গুরুত্বপূর্ণ প্রেস বিজ্ঞপ্তি।
+                  </DialogDescription>
+              </DialogHeader>
+              <div className="prose prose-sm dark:prose-invert max-w-full">
+                  <p className="font-semibold">
+                      মাধ্যমিক ও উচ্চমাধ্যমিক শিক্ষা বোর্ডসমূহের এইচএসসি ও সমমান পরীক্ষা ২০২৫-এর ফলাফল আগামী <strong className="text-primary">১৬ অক্টোবর ২০২৫</strong> তারিখ সকাল ১০:০০ টায় একযোগে প্রকাশ করা হবে।
+                  </p>
+                  <ul className="list-decimal pl-5 space-y-2">
+                      <li>
+                          সংশ্লিষ্ট প্রতিষ্ঠানসমূহ <a href="http://www.educationboardresults.gov.bd" target="_blank" rel="noopener noreferrer" className="font-semibold text-primary">www.educationboardresults.gov.bd</a> ওয়েবসাইটের Result কর্ণার থেকে EIIN ব্যবহার করে ফলাফল ডাউনলোড করতে পারবে।
+                      </li>
+                      <li>
+                          সকল শিক্ষা বোর্ডের ওয়েবসাইটে Result কর্ণারে ক্লিক করে শিক্ষা প্রতিষ্ঠানের EIIN এন্ট্রি করে স্ব স্ব প্রতিষ্ঠান Result sheet download করতে পারবে।
+                      </li>
+                      <li>
+                          পরীক্ষার্থীরা <a href="http://www.educationboardresults.gov.bd" target="_blank" rel="noopener noreferrer" className="font-semibold text-primary">www.educationboardresults.gov.bd</a> এবং সংশ্লিষ্ট বোর্ডের ওয়েবসাইটের মাধ্যমে ফলাফল সংগ্রহ করতে পারবে।
+                      </li>
+                      <li>
+                          নির্ধারিত Short Code <strong className="text-primary">16222</strong>-এ SMS এর মাধ্যমে ফল পাওয়া যাবে।
+                      </li>
+                       <li>
+                          পুনঃনিরীক্ষণের জন্য <a href="https://rescrutiny.eduboardresults.gov.bd" target="_blank" rel="noopener noreferrer" className="font-semibold text-primary">rescrutiny.eduboardresults.gov.bd</a>-এর মাধ্যমে ১৭/১০/২০২৫ তারিখ থেকে ২৩/১০/২০২৫ তারিখ পর্যন্ত আবেদন গ্রহণ করা হবে।
+                      </li>
+                  </ul>
+              </div>
+              <DialogFooter>
+                  <Button onClick={() => setShowNotice(false)}>বুঝেছি</Button>
+              </DialogFooter>
+          </DialogContent>
       </Dialog>
 
        <div className="flex flex-col items-center text-center mb-12 no-print">
