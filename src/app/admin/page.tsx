@@ -1,12 +1,12 @@
 
 'use client'
 
-import { useState, useEffect } from 'react';
-import { getFirestore, collection, query, orderBy, getDocs, where, getCountFromServer } from 'firebase/firestore';
+import { useState, useEffect, useCallback } from 'react';
+import { getFirestore, collection, query, orderBy, getDocs, where, getCountFromServer, doc, deleteDoc } from 'firebase/firestore';
 import { startOfDay, subDays } from 'date-fns';
 import { app } from '@/lib/firebase';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText, Users, MailCheck, DatabaseZap, Search, BellRing, MessageSquare, Bookmark } from 'lucide-react';
+import { FileText, Users, MailCheck, DatabaseZap, Search, BellRing, MessageSquare, Bookmark, Trash2, RefreshCw } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -16,9 +16,12 @@ import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 import { sendBulkSms } from '@/lib/sms';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { searchResultLegacy } from '@/lib/actions';
-import type { ExamResult, HistoryItem } from '@/types';
+import type { ExamResult } from '@/types';
 import { Loader2 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import Image from 'next/image';
 
 
 const adminFeatures = [
@@ -84,8 +87,31 @@ export default function AdminPage() {
     const [isSendingSingleSms, setIsSendingSingleSms] = useState(false);
     const [singleSmsMessage, setSingleSmsMessage] = useState('');
 
+    const [captchaUrl, setCaptchaUrl] = useState('');
+    const [captchaCookie, setCaptchaCookie] = useState('');
+    const [captchaInput, setCaptchaInput] = useState('');
+
+
     const db = getFirestore(app);
     const { toast } = useToast();
+
+    const refreshCaptcha = useCallback(async () => {
+        setCaptchaInput('');
+        setCaptchaUrl('');
+        try {
+            const res = await fetch('/api/captcha');
+            const data = await res.json();
+            setCaptchaUrl(data.img);
+            setCaptchaCookie(data.cookie);
+        } catch(e) {
+            console.error("Failed to refresh captcha", e);
+            toast({
+                title: "ত্রুটি",
+                description: "ক্যাপচা লোড করা যায়নি। অনুগ্রহ করে পৃষ্ঠাটি রিফ্রেশ করুন।",
+                variant: "destructive"
+            });
+        }
+      }, [toast]);
 
     useEffect(() => {
         const fetchAllData = async () => {
@@ -193,34 +219,49 @@ export default function AdminPage() {
             setIsSendingSms(false);
         }
     }
-    
-    const handleCheckResult = async (sub: any) => {
+
+    const openCheckResultDialog = (sub: any) => {
         setSelectedSub(sub);
-        setIsCheckingResult(true);
         setCheckedResult(null);
         setCheckError(null);
         setSingleSmsMessage('');
+        refreshCaptcha();
+    };
+    
+    const handleCheckResult = async () => {
+        if (!selectedSub || !captchaInput) {
+            setCheckError("অনুগ্রহ করে ক্যাপচা পূরণ করুন।");
+            return;
+        }
+
+        setIsCheckingResult(true);
+        setCheckedResult(null);
+        setCheckError(null);
         
         try {
             const result = await searchResultLegacy({
-                exam: sub.exam,
-                year: sub.year,
-                board: sub.board,
-                roll: sub.roll,
-                reg: sub.reg,
-            } as any); // Sending without captcha and cookie
+                exam: selectedSub.exam,
+                year: selectedSub.year,
+                board: selectedSub.board,
+                roll: selectedSub.roll,
+                reg: selectedSub.reg,
+                captcha: captchaInput,
+                cookie: captchaCookie,
+            });
+
             if ('error' in result) {
                 throw new Error(result.error);
             }
             setCheckedResult(result);
             const message = result.status === 'Pass'
                 ? `অভিনন্দন! আপনার ${result.exam.toUpperCase()} পরীক্ষার ফলাফল প্রকাশিত হয়েছে। আপনার GPA: ${result.gpa.toFixed(2)}. বিস্তারিত দেখুন: www.bdedu.me`
-                : `আপনার ${sub.exam.toUpperCase()} পরীক্ষার ফলাফল প্রকাশিত হয়েছে। স্ট্যাটাস: Fail. বিস্তারিত দেখুন: www.bdedu.me`;
+                : `আপনার ${selectedSub.exam.toUpperCase()} পরীক্ষার ফলাফল প্রকাশিত হয়েছে। স্ট্যাটাস: Fail. বিস্তারিত দেখুন: www.bdedu.me`;
             setSingleSmsMessage(message);
         } catch (error: any) {
             setCheckError(error.message);
-            const message = `দুঃখিত, আপনার ${sub.exam.toUpperCase()} পরীক্ষার জন্য দেওয়া রোল (${sub.roll}) ও বোর্ডের তথ্যে কোনো ফলাফল পাওয়া যায়নি। তথ্য সঠিক কিনা যাচাই করুন। -bdedu.me`;
+            const message = `দুঃখিত, আপনার ${selectedSub.exam.toUpperCase()} পরীক্ষার জন্য দেওয়া রোল (${selectedSub.roll}) ও বোর্ডের তথ্যে কোনো ফলাফল পাওয়া যায়নি। তথ্য সঠিক কিনা যাচাই করুন। -bdedu.me`;
             setSingleSmsMessage(message);
+            refreshCaptcha();
         } finally {
             setIsCheckingResult(false);
         }
@@ -248,6 +289,24 @@ export default function AdminPage() {
             });
         } finally {
             setIsSendingSingleSms(false);
+        }
+    };
+
+    const handleDeleteSubscriber = async (subId: string) => {
+        try {
+            await deleteDoc(doc(db, "subscriptions", subId));
+            setSubscriptions(prev => prev.filter(sub => sub.id !== subId));
+            setStats(prev => ({...prev, totalSubscriptions: prev.totalSubscriptions - 1}));
+            toast({
+                title: 'সাফল্য',
+                description: 'সাবস্ক্রাইবার সফলভাবে মুছে ফেলা হয়েছে।',
+            });
+        } catch (error: any) {
+            toast({
+                title: 'ত্রুটি',
+                description: 'সাবস্ক্রাইবার মুছতে সমস্যা হয়েছে।',
+                variant: 'destructive',
+            });
         }
     };
 
@@ -434,89 +493,132 @@ export default function AdminPage() {
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>ফোন নম্বর</TableHead>
-                                    <TableHead>রোল</TableHead>
-                                    <TableHead>পরীক্ষা</TableHead>
-                                    <TableHead>বছর</TableHead>
-                                    <TableHead className="text-right">কার্যকলাপ</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {loading ? (
-                                    <TableSkeleton />
-                                ) : subscriptions.length > 0 ? (
-                                    subscriptions.map(sub => (
-                                    <TableRow key={sub.id}>
-                                        <TableCell>{sub.phone}</TableCell>
-                                        <TableCell>{sub.roll}</TableCell>
-                                        <TableCell className="uppercase">{sub.exam}</TableCell>
-                                        <TableCell>{sub.year}</TableCell>
-                                        <TableCell className="text-right">
-                                           <Dialog>
-                                                <DialogTrigger asChild>
-                                                    <Button variant="outline" size="sm" onClick={() => handleCheckResult(sub)}>
-                                                        ফলাফল দেখুন ও পাঠান
-                                                    </Button>
-                                                </DialogTrigger>
-                                                {selectedSub?.id === sub.id && (
-                                                     <DialogContent>
-                                                        <DialogHeader>
-                                                            <DialogTitle>ফলাফল এবং SMS</DialogTitle>
-                                                            <DialogDescription>
-                                                                রোল: {selectedSub.roll}, ফোন: {selectedSub.phone}
-                                                            </DialogDescription>
-                                                        </DialogHeader>
-                                                        <div className="py-4 space-y-4">
-                                                             {isCheckingResult ? (
-                                                                <div className="flex items-center justify-center">
-                                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                                    <span>ফলাফল চেক করা হচ্ছে...</span>
-                                                                </div>
-                                                            ) : checkError ? (
-                                                                <p className="text-destructive text-sm">ত্রুটি: {checkError}</p>
-                                                            ) : checkedResult ? (
-                                                                 <div className="space-y-1">
-                                                                    <p><strong>নাম:</strong> {checkedResult.studentInfo.name}</p>
-                                                                    <p><strong>স্ট্যাটাস:</strong> <span className={checkedResult.status === 'Pass' ? 'text-green-600' : 'text-destructive'}>{checkedResult.status}</span></p>
-                                                                    {checkedResult.status === 'Pass' && <p><strong>GPA:</strong> {checkedResult.gpa.toFixed(2)}</p>}
-                                                                </div>
-                                                            ) : null}
-                                                            
-                                                             <Textarea
-                                                                placeholder="SMS বার্তা..."
-                                                                value={singleSmsMessage}
-                                                                onChange={(e) => setSingleSmsMessage(e.target.value)}
-                                                                rows={4}
-                                                                disabled={isCheckingResult}
-                                                            />
-                                                        </div>
-                                                        <DialogFooter>
-                                                            <Button
-                                                                onClick={handleSendSingleSms}
-                                                                disabled={isCheckingResult || isSendingSingleSms || !singleSmsMessage}
-                                                            >
-                                                                {isSendingSingleSms && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                                                                SMS পাঠান
+                         <Dialog>
+                            <Table>
+                                <TableHeader>
+                                    <TableRow>
+                                        <TableHead>ফোন নম্বর</TableHead>
+                                        <TableHead>রোল</TableHead>
+                                        <TableHead>পরীক্ষা</TableHead>
+                                        <TableHead>বছর</TableHead>
+                                        <TableHead className="text-right">কার্যকলাপ</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {loading ? (
+                                        <TableSkeleton />
+                                    ) : subscriptions.length > 0 ? (
+                                        subscriptions.map(sub => (
+                                        <TableRow key={sub.id}>
+                                            <TableCell>{sub.phone}</TableCell>
+                                            <TableCell>{sub.roll}</TableCell>
+                                            <TableCell className="uppercase">{sub.exam}</TableCell>
+                                            <TableCell>{sub.year}</TableCell>
+                                            <TableCell className="text-right">
+                                                <div className="flex justify-end gap-2">
+                                                    <DialogTrigger asChild>
+                                                        <Button variant="outline" size="sm" onClick={() => openCheckResultDialog(sub)}>
+                                                            ফলাফল দেখুন ও পাঠান
+                                                        </Button>
+                                                    </DialogTrigger>
+                                                    <AlertDialog>
+                                                        <AlertDialogTrigger asChild>
+                                                            <Button variant="ghost" size="icon" className="text-destructive">
+                                                                <Trash2 className="h-4 w-4" />
                                                             </Button>
-                                                        </DialogFooter>
-                                                    </DialogContent>
-                                                )}
-                                            </Dialog>
-                                        </TableCell>
-                                    </TableRow>
-                                ))) : (
-                                     <TableRow>
-                                        <TableCell colSpan={5} className="text-center">কোনো সাবস্ক্রিপশন নেই।</TableCell>
-                                    </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
+                                                        </AlertDialogTrigger>
+                                                        <AlertDialogContent>
+                                                            <AlertDialogHeader>
+                                                                <AlertDialogTitle>আপনি কি নিশ্চিত?</AlertDialogTitle>
+                                                                <AlertDialogDescription>
+                                                                    এই কাজটি ফিরিয়ে আনা যাবে না। এটি এই সাবস্ক্রাইবারকে স্থায়ীভাবে মুছে ফেলবে।
+                                                                </AlertDialogDescription>
+                                                            </AlertDialogHeader>
+                                                            <AlertDialogFooter>
+                                                                <AlertDialogCancel>বাতিল</AlertDialogCancel>
+                                                                <AlertDialogAction onClick={() => handleDeleteSubscriber(sub.id)}>
+                                                                    মুছে ফেলুন
+                                                                </AlertDialogAction>
+                                                            </AlertDialogFooter>
+                                                        </AlertDialogContent>
+                                                    </AlertDialog>
+                                                </div>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))) : (
+                                        <TableRow>
+                                            <TableCell colSpan={5} className="text-center">কোনো সাবস্ক্রিপশন নেই।</TableCell>
+                                        </TableRow>
+                                    )}
+                                </TableBody>
+                            </Table>
+                             {selectedSub && (
+                                    <DialogContent>
+                                        <DialogHeader>
+                                            <DialogTitle>ফলাফল এবং SMS</DialogTitle>
+                                            <DialogDescription>
+                                                রোল: {selectedSub.roll}, ফোন: {selectedSub.phone}
+                                            </DialogDescription>
+                                        </DialogHeader>
+                                        <div className="py-4 space-y-4">
+                                            {checkedResult ? (
+                                                <div className="space-y-1">
+                                                    <p><strong>নাম:</strong> {checkedResult.studentInfo.name}</p>
+                                                    <p><strong>স্ট্যাটাস:</strong> <span className={checkedResult.status === 'Pass' ? 'text-green-600' : 'text-destructive'}>{checkedResult.status}</span></p>
+                                                    {checkedResult.status === 'Pass' && <p><strong>GPA:</strong> {checkedResult.gpa.toFixed(2)}</p>}
+                                                </div>
+                                            ) : (
+                                                <div className="space-y-4">
+                                                     <div className="flex items-center gap-2">
+                                                        <div className="relative w-24 h-9 flex-shrink-0">
+                                                            {captchaUrl ? <Image src={captchaUrl} alt="ক্যাপচা" layout="fill" objectFit="contain" unoptimized /> : <Skeleton className="w-full h-full" />}
+                                                        </div>
+                                                        <Button type="button" variant="outline" size="icon" onClick={refreshCaptcha} className="h-9 w-9 flex-shrink-0">
+                                                            <RefreshCw className="h-4 w-4" />
+                                                        </Button>
+                                                    </div>
+                                                    <Input 
+                                                        placeholder="ক্যাপচা লিখুন"
+                                                        value={captchaInput}
+                                                        onChange={(e) => setCaptchaInput(e.target.value)}
+                                                        disabled={isCheckingResult}
+                                                    />
+                                                     <Button onClick={handleCheckResult} disabled={isCheckingResult || !captchaInput} className="w-full">
+                                                        {isCheckingResult && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                                        ফলাফল চেক করুন
+                                                    </Button>
+                                                </div>
+                                            )}
+                                            
+                                            {checkError && <p className="text-destructive text-sm font-medium">{checkError}</p>}
+                                            
+                                            <Separator />
+
+                                            <Textarea
+                                                placeholder="SMS বার্তা..."
+                                                value={singleSmsMessage}
+                                                onChange={(e) => setSingleSmsMessage(e.target.value)}
+                                                rows={4}
+                                                disabled={!checkedResult && !checkError}
+                                            />
+                                        </div>
+                                        <DialogFooter>
+                                            <Button
+                                                onClick={handleSendSingleSms}
+                                                disabled={isCheckingResult || isSendingSingleSms || !singleSmsMessage}
+                                            >
+                                                {isSendingSingleSms && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                                SMS পাঠান
+                                            </Button>
+                                        </DialogFooter>
+                                    </DialogContent>
+                             )}
+                        </Dialog>
                     </CardContent>
                 </Card>
             </div>
         </div>
     );
 }
+
+    
