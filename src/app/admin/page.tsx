@@ -208,9 +208,7 @@ export default function AdminPage() {
                 board: sub.board,
                 roll: sub.roll,
                 reg: sub.reg,
-                captcha: '12345', // Dummy captcha, might need adjustment
-                cookie: '',
-            });
+            } as any); // Sending without captcha and cookie
             if ('error' in result) {
                 throw new Error(result.error);
             }
