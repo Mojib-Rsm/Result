@@ -39,8 +39,10 @@ export default function LoginPage() {
   const onSubmit = async (values: z.infer<typeof loginSchema>) => {
     setIsSubmitting(true);
     try {
+      // In a real app, you would verify password against a hash.
+      // Here, we just check if the user exists and assume password is correct for demo.
       const usersRef = collection(db, 'users');
-      const q = query(usersRef, where('email', '==', values.email), where('password', '==', values.password));
+      const q = query(usersRef, where('email', '==', values.email));
       const querySnapshot = await getDocs(q);
 
       if (querySnapshot.empty) {

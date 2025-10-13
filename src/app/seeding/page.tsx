@@ -11,8 +11,8 @@ import { Loader2, DatabaseZap } from 'lucide-react';
 
 // Data to be seeded
 const usersToSeed = [
-    { id: 'admin-user', email: 'admin@example.com', password: 'password123', name: 'Admin User', role: 'admin' },
-    { id: 'editor-user', email: 'mojibrsm@gmail.com', password: 'password123', name: 'Mojib Rsm', role: 'editor' },
+    { id: 'admin-user', email: 'admin@example.com', name: 'Admin User', role: 'admin' },
+    { id: 'editor-user', email: 'mojibrsm@gmail.com', name: 'Mojib Rsm', role: 'editor' },
 ];
 
 const resultsToSeed = [
@@ -160,5 +160,3 @@ export default function SeedingPage() {
         </div>
     );
 }
-
-    
