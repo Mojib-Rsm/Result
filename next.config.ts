@@ -1,3 +1,4 @@
+
 import type {NextConfig} from 'next';
 
 const nextConfig: NextConfig = {
@@ -36,6 +37,9 @@ const nextConfig: NextConfig = {
       }
     ],
   },
+  env: {
+    NEXT_PUBLIC_ADMIN_PHONE_NUMBER: process.env.ADMIN_PHONE_NUMBER,
+  }
 };
 
 export default nextConfig;

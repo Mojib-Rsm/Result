@@ -73,7 +73,6 @@ export default function ResultAlertForm() {
     try {
       const subscriptionsRef = collection(db, 'subscriptions');
       
-      // Check for existing subscription
       const q = query(subscriptionsRef, 
         where('phone', '==', values.phone),
         where('roll', '==', values.roll),
@@ -92,7 +91,6 @@ export default function ResultAlertForm() {
         return;
       }
       
-      // Add new subscription
       await addDoc(subscriptionsRef, {
         ...values,
         createdAt: new Date(),
@@ -103,8 +101,15 @@ export default function ResultAlertForm() {
         description: 'ফলাফল প্রকাশিত হলে আপনাকে জানানো হবে। একটি কনফার্মেশন SMS পাঠানো হয়েছে।',
       });
       
-      // Send confirmation SMS
-      await sendBulkSms([values.phone], "BD Edu Result-এ স্বাগতম! আপনার পরীক্ষার ফলাফল প্রকাশিত হলে আপনাকে SMS-এর মাধ্যমে জানানো হবে। ধন্যবাদ। - bdedu.me");
+      // Send confirmation SMS to user
+      await sendBulkSms([values.phone], `BD Edu Result-এ স্বাগতম! আপনার পরীক্ষার ফলাফল প্রকাশিত হলে আপনাকে SMS-এর মাধ্যমে জানানো হবে। ধন্যবাদ। - www.bdedu.me`);
+
+      // Send notification SMS to admin
+      const adminPhoneNumber = process.env.NEXT_PUBLIC_ADMIN_PHONE_NUMBER;
+      if (adminPhoneNumber) {
+          const adminMessage = `New Subscription on BD Edu Result: Roll: ${values.roll}, Exam: ${values.exam.toUpperCase()}, Year: ${values.year}, Board: ${values.board}. - www.bdedu.me`;
+          await sendBulkSms([adminPhoneNumber], adminMessage);
+      }
 
       form.reset();
     } catch (error: any) {
