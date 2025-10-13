@@ -76,6 +76,11 @@ export default function Home() {
 
     try {
       const searchResult = await searchResultLegacy(valuesWithCookie);
+      
+      if ('error' in searchResult) {
+          throw new Error(searchResult.error);
+      }
+
       setResult(searchResult);
       addHistoryItem({
           roll: values.roll,
@@ -129,10 +134,10 @@ export default function Home() {
       </Dialog>
 
        <div className="flex flex-col items-center text-center mb-12 no-print">
-        <h1 className="text-4xl md:text-5xl font-bold tracking-tight bg-gradient-to-br from-primary to-accent bg-clip-text text-transparent">
+        <h1 className="text-4xl md:text-5xl font-bold tracking-tight bg-gradient-to-br from-primary to-accent bg-clip-text text-transparent animate-fade-in-up">
           আপনার ফলাফল দেখুন
         </h1>
-        <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
+        <p className="mt-4 max-w-2xl text-lg text-muted-foreground animate-fade-in-up animation-delay-200">
            যেকোনো শিক্ষাবোর্ডের ফলাফল দেখুন খুব সহজে।
         </p>
       </div>

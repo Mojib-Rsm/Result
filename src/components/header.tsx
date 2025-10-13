@@ -70,7 +70,7 @@ export default function Header({ className }: { className?: string }) {
           </nav>
         )}
         
-        {isAdminPage && <div className="flex-1" />}
+        <div className="flex-1" />
 
         <div className="flex items-center justify-end">
             {isAdminPage && user ? (
@@ -78,10 +78,11 @@ export default function Header({ className }: { className?: string }) {
                     <LogOut className="mr-2 h-4 w-4" />
                     লগআউট
                 </Button>
-            ) : !isAdminPage && (
+            ) : (
+              <div className="md:hidden">
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="md:hidden">
+                        <Button variant="ghost" size="icon">
                             <MoreVertical className="h-5 w-5" />
                             <span className="sr-only">Open menu</span>
                         </Button>
@@ -97,6 +98,16 @@ export default function Header({ className }: { className?: string }) {
                         ))}
                     </DropdownMenuContent>
                 </DropdownMenu>
+              </div>
+            )}
+
+            {!isAdminPage && (
+               <Button variant="ghost" size="icon" asChild>
+                  <Link href="/admin">
+                    <User className="h-5 w-5" />
+                     <span className="sr-only">Admin Login</span>
+                  </Link>
+               </Button>
             )}
         </div>
       </div>
