@@ -104,7 +104,7 @@ export default function ResultAlertForm() {
       });
       
       // Send confirmation SMS
-      await sendBulkSms([values.phone], "BD Edu Result-এ স্বাগতম! আপনার পরীক্ষার ফলাফল প্রকাশিত হলে আপনাকে SMS-এর মাধ্যমে জানানো হবে। ধন্যবাদ।");
+      await sendBulkSms([values.phone], "BD Edu Result-এ স্বাগতম! আপনার পরীক্ষার ফলাফল প্রকাশিত হলে আপনাকে SMS-এর মাধ্যমে জানানো হবে। ধন্যবাদ। - bdedu.me");
 
       form.reset();
     } catch (error: any) {

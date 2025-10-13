@@ -259,7 +259,7 @@ export default function AdminPage() {
             setSingleSmsMessage(message);
         } catch (error: any) {
             setCheckError(error.message);
-            const message = `দুঃখিত, আপনার ${selectedSub.exam.toUpperCase()} পরীক্ষার জন্য দেওয়া রোল (${selectedSub.roll}) ও বোর্ডের তথ্যে কোনো ফলাফল পাওয়া যায়নি। তথ্য সঠিক কিনা যাচাই করুন। -bdedu.me`;
+            const message = `দুঃখিত, আপনার ${selectedSub.exam.toUpperCase()} পরীক্ষার জন্য দেওয়া রোল (${selectedSub.roll}) ও বোর্ডের তথ্যে কোনো ফলাফল পাওয়া যায়নি। তথ্য সঠিক কিনা যাচাই করুন। - bdedu.me`;
             setSingleSmsMessage(message);
             refreshCaptcha();
         } finally {
