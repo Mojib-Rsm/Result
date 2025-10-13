@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
+import { sendBulkSms } from '@/lib/sms';
 
 const adminFeatures = [
     {
@@ -145,16 +146,39 @@ export default function AdminPage() {
             });
             return;
         }
+
         setIsSendingSms(true);
-        // TODO: Implement actual SMS sending logic here
-        await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate network delay
-        
-        setIsSendingSms(false);
-        setSmsMessage('');
-        toast({
-            title: 'সাফল্য',
-            description: `"${smsMessage}" বার্তাটি ${subscriptions.length} জন সাবস্ক্রাইবারকে পাঠানোর জন্য প্রক্রিয়া করা হয়েছে।`,
-        });
+        try {
+            const phoneNumbers = subscriptions.map(sub => sub.phone);
+            if(phoneNumbers.length === 0) {
+                toast({
+                    title: 'কোনো সাবস্ক্রাইবার নেই',
+                    description: 'SMS পাঠানোর জন্য কোনো সাবস্ক্রাইবার পাওয়া যায়নি।',
+                    variant: 'destructive',
+                });
+                return;
+            }
+
+            const result = await sendBulkSms(phoneNumbers, smsMessage);
+
+            if (result.success) {
+                toast({
+                    title: 'সাফল্য',
+                    description: `${phoneNumbers.length} জন সাবস্ক্রাইবারকে SMS পাঠানোর জন্য প্রক্রিয়া করা হয়েছে।`,
+                });
+                setSmsMessage('');
+            } else {
+                 throw new Error(result.error || 'SMS পাঠাতে একটি অজানা সমস্যা হয়েছে।');
+            }
+        } catch (error: any) {
+             toast({
+                title: 'SMS পাঠাতে ব্যর্থ',
+                description: error.message,
+                variant: 'destructive',
+            });
+        } finally {
+            setIsSendingSms(false);
+        }
     }
 
     const TableSkeleton = () => (
