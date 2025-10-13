@@ -20,6 +20,7 @@ import { Separator } from '@/components/ui/separator';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { app } from '@/lib/firebase';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 
 export default function Home() {
   const [result, setResult] = useState<ExamResult | null>(null);
@@ -204,5 +205,3 @@ export default function Home() {
     </div>
   );
 }
-
-    
