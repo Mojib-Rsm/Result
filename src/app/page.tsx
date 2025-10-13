@@ -17,6 +17,9 @@ import Link from 'next/link';
 import { formSchema } from '@/lib/schema';
 import ResultAlertForm from '@/components/result-alert-form';
 import { Separator } from '@/components/ui/separator';
+import { getFirestore, doc, getDoc } from 'firebase/firestore';
+import { app } from '@/lib/firebase';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function Home() {
   const [result, setResult] = useState<ExamResult | null>(null);
@@ -26,6 +29,10 @@ export default function Home() {
   const [showNotice, setShowNotice] = useState(false);
   const [captchaUrl, setCaptchaUrl] = useState('');
   const [captchaCookie, setCaptchaCookie] = useState('');
+  const [showSubscriptionForm, setShowSubscriptionForm] = useState(false);
+  const [loadingSettings, setLoadingSettings] = useState(true);
+
+  const db = getFirestore(app);
 
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -65,7 +72,26 @@ export default function Home() {
       sessionStorage.setItem('noticeSeen', 'true');
     }
     refreshCaptcha();
-  }, [refreshCaptcha]);
+    
+    const fetchSettings = async () => {
+        try {
+            const settingsRef = doc(db, 'settings', 'config');
+            const settingsSnap = await getDoc(settingsRef);
+            if (settingsSnap.exists()) {
+                setShowSubscriptionForm(settingsSnap.data().showSubscriptionForm);
+            } else {
+                setShowSubscriptionForm(true); // Default to true if not set
+            }
+        } catch (error) {
+            console.error("Error fetching site settings: ", error);
+            setShowSubscriptionForm(true); // Default to true on error
+        } finally {
+            setLoadingSettings(false);
+        }
+    };
+
+    fetchSettings();
+  }, [refreshCaptcha, db]);
 
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
@@ -154,7 +180,18 @@ export default function Home() {
               />
           </div>
            <Separator />
-          <ResultAlertForm />
+           {loadingSettings ? (
+              <Card className="border-dashed">
+                  <CardHeader className="text-center">
+                       <Skeleton className="h-12 w-12 rounded-full mx-auto" />
+                       <Skeleton className="h-7 w-64 mx-auto mt-4" />
+                       <Skeleton className="h-5 w-80 mx-auto mt-2" />
+                  </CardHeader>
+                  <CardContent>
+                      <Skeleton className="h-40 w-full" />
+                  </CardContent>
+              </Card>
+            ) : showSubscriptionForm && <ResultAlertForm />}
         </div>
       ) : (
         <>
@@ -167,3 +204,5 @@ export default function Home() {
     </div>
   );
 }
+
+    

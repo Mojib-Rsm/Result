@@ -117,6 +117,13 @@ export default function SeedingPage() {
                 boardWisePassRate,
             });
 
+            // For site settings
+            const settingsRef = doc(db, 'settings', 'config');
+            await setDoc(settingsRef, {
+                showSubscriptionForm: true,
+            }, { merge: true });
+
+
             toast({
                 title: 'সাফল্য',
                 description: 'ডাটাবেস সফলভাবে সিড করা হয়েছে!',
@@ -149,7 +156,7 @@ export default function SeedingPage() {
                 </CardHeader>
                 <CardContent>
                     <p className="mb-4 text-sm text-muted-foreground">
-                        এই প্রক্রিয়াটি নিম্নলিখিত কালেকশনগুলো তৈরি বা আপডেট করবে: <code className="bg-muted px-1 py-0.5 rounded">users</code>, <code className="bg-muted px-1 py-0.5 rounded">results</code>, <code className="bg-muted px-1 py-0.5 rounded">engineering-colleges</code>, <code className="bg-muted px-1 py-0.5 rounded">medical-colleges</code>, <code className="bg-muted px-1 py-0.5 rounded">public-universities</code>, <code className="bg-muted px-1 py-0.5 rounded">private-universities</code>, <code className="bg-muted px-1 py-0.5 rounded">national-colleges</code>, <code className="bg-muted px-1 py-0.5 rounded">polytechnic-institutes</code>, <code className="bg-muted px-1 py-0.5 rounded">news</code>, এবং <code className="bg-muted px-1 py-0.5 rounded">statistics</code>। এটি নিরাপদে একাধিকবার চালানো যেতে পারে।
+                        এই প্রক্রিয়াটি নিম্নলিখিত কালেকশনগুলো তৈরি বা আপডেট করবে: <code className="bg-muted px-1 py-0.5 rounded">users</code>, <code className="bg-muted px-1 py-0.5 rounded">results</code>, <code className="bg-muted px-1 py-0.5 rounded">engineering-colleges</code>, <code className="bg-muted px-1 py-0.5 rounded">medical-colleges</code>, <code className="bg-muted px-1 py-0.5 rounded">public-universities</code>, <code className="bg-muted px-1 py-0.5 rounded">private-universities</code>, <code className="bg-muted px-1 py-0.5 rounded">national-colleges</code>, <code className="bg-muted px-1 py-0.5 rounded">polytechnic-institutes</code>, <code className="bg-muted px-1 py-0.5 rounded">news</code>, <code className="bg-muted px-1 py-0.5 rounded">statistics</code>, এবং <code className="bg-muted px-1 py-0.5 rounded">settings</code>। এটি নিরাপদে একাধিকবার চালানো যেতে পারে।
                     </p>
                     <Button onClick={handleSeed} disabled={isSeeding} className="w-full">
                         {isSeeding && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -160,3 +167,5 @@ export default function SeedingPage() {
         </div>
     );
 }
+
+    

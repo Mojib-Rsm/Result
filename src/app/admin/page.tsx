@@ -2,7 +2,7 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react';
-import { getFirestore, collection, query, orderBy, getDocs, where, getCountFromServer, doc, deleteDoc } from 'firebase/firestore';
+import { getFirestore, collection, query, orderBy, getDocs, where, getCountFromServer, doc, deleteDoc, getDoc, setDoc } from 'firebase/firestore';
 import { startOfDay, subDays } from 'date-fns';
 import { app } from '@/lib/firebase';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -22,6 +22,8 @@ import type { ExamResult } from '@/types';
 import { Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import Image from 'next/image';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 
 
 const adminFeatures = [
@@ -65,7 +67,7 @@ const adminFeatures = [
         title: 'সেটিংস ও SEO',
         description: 'সাইটের SEO, অ্যানালিটিক্স এবং অন্যান্য সেটিংস পরিচালনা করুন।',
         icon: Settings,
-        href: '#'
+        href: '#site-settings'
     },
     {
         title: 'বিজ্ঞাপন ম্যানেজমেন্ট',
@@ -108,6 +110,10 @@ export default function AdminPage() {
     const [captchaUrl, setCaptchaUrl] = useState('');
     const [captchaCookie, setCaptchaCookie] = useState('');
     const [captchaInput, setCaptchaInput] = useState('');
+    
+    // Site settings state
+    const [showSubscriptionForm, setShowSubscriptionForm] = useState(true);
+    const [loadingSettings, setLoadingSettings] = useState(true);
 
 
     const db = getFirestore(app);
@@ -134,6 +140,7 @@ export default function AdminPage() {
     useEffect(() => {
         const fetchAllData = async () => {
             setLoading(true);
+            setLoadingSettings(true);
             try {
                 const today = new Date();
                 const startOfToday = startOfDay(today);
@@ -143,6 +150,7 @@ export default function AdminPage() {
                 const searchesRef = collection(db, 'search-history');
                 const usersRef = collection(db, 'users');
                 const subscriptionsRef = collection(db, 'subscriptions');
+                const settingsRef = doc(db, 'settings', 'config');
                 
                 const [
                     totalUsersSnap,
@@ -153,7 +161,8 @@ export default function AdminPage() {
                     totalSubscriptionsSnap,
                     recentSearchesSnap,
                     allUsersSnap,
-                    allSubsSnap
+                    allSubsSnap,
+                    settingsSnap
                 ] = await Promise.all([
                     getCountFromServer(query(usersRef)),
                     getCountFromServer(query(searchesRef)),
@@ -163,7 +172,8 @@ export default function AdminPage() {
                     getCountFromServer(query(subscriptionsRef)),
                     getDocs(query(searchesRef, orderBy('timestamp', 'desc'))),
                     getDocs(query(usersRef, orderBy('name'))),
-                    getDocs(query(subscriptionsRef, orderBy('createdAt', 'desc')))
+                    getDocs(query(subscriptionsRef, orderBy('createdAt', 'desc'))),
+                    getDoc(settingsRef)
                 ]);
                 
                 setStats({
@@ -178,6 +188,11 @@ export default function AdminPage() {
                 setRecentSearches(recentSearchesSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
                 setUsers(allUsersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
                 setSubscriptions(allSubsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+                
+                if (settingsSnap.exists()) {
+                    setShowSubscriptionForm(settingsSnap.data().showSubscriptionForm);
+                }
+
 
             } catch (error) {
                 console.error("Error fetching admin data: ", error);
@@ -188,11 +203,31 @@ export default function AdminPage() {
                 });
             } finally {
                 setLoading(false);
+                setLoadingSettings(false);
             }
         };
 
         fetchAllData();
     }, [db, toast]);
+    
+    const handleSubscriptionFormToggle = async (checked: boolean) => {
+        setShowSubscriptionForm(checked);
+        try {
+            const settingsRef = doc(db, 'settings', 'config');
+            await setDoc(settingsRef, { showSubscriptionForm: checked }, { merge: true });
+            toast({
+                title: 'সেটিং সংরক্ষিত হয়েছে',
+                description: `ফলাফল অ্যালার্ট ফর্ম এখন ${checked ? 'দৃশ্যমান' : 'লুকানো'}।`,
+            });
+        } catch (error: any) {
+            toast({
+                title: 'ত্রুটি',
+                description: 'সেটিং সংরক্ষণ করা যায়নি।',
+                variant: 'destructive',
+            });
+        }
+    };
+
 
     const handleBulkSendSms = async () => {
         if (!smsMessage.trim()) {
@@ -215,8 +250,14 @@ export default function AdminPage() {
                 });
                 return;
             }
+            
+            const response = await fetch('/api/notify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: smsMessage, type: 'sms-bulk', recipients: phoneNumbers }),
+            });
+            const result = await response.json();
 
-            const result = await sendBulkSms(phoneNumbers, smsMessage);
 
             if (result.success) {
                 toast({
@@ -290,7 +331,12 @@ export default function AdminPage() {
 
         setIsSendingSingleSms(true);
         try {
-            const result = await sendBulkSms([selectedSub.phone], singleSmsMessage);
+            const response = await fetch('/api/notify', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: singleSmsMessage, type: 'sms', recipient: selectedSub.phone }),
+            });
+            const result = await response.json();
             if (result.success) {
                 toast({
                     title: 'SMS পাঠানো হয়েছে',
@@ -416,6 +462,32 @@ export default function AdminPage() {
                                 {isSendingSms ? 'পাঠানো হচ্ছে...' : `সকল ${subscriptions.length} সাবস্ক্রাইবারকে SMS পাঠান`}
                             </Button>
                         </div>
+                    </CardContent>
+                </Card>
+                
+                 <Card id="site-settings">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <Settings className="h-6 w-6" />
+                            সাইট সেটিংস
+                        </CardTitle>
+                        <CardDescription>
+                            সাইটের বিভিন্ন ফিচার চালু বা বন্ধ করুন।
+                        </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        {loadingSettings ? (
+                            <Skeleton className="h-8 w-48" />
+                        ) : (
+                            <div className="flex items-center space-x-2">
+                                <Switch
+                                    id="subscription-form-toggle"
+                                    checked={showSubscriptionForm}
+                                    onCheckedChange={handleSubscriptionFormToggle}
+                                />
+                                <Label htmlFor="subscription-form-toggle">ফলাফল অ্যালার্ট ফর্ম দেখান</Label>
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
             </div>
