@@ -154,20 +154,20 @@ export default function Home() {
                       মাধ্যমিক ও উচ্চমাধ্যমিক শিক্ষা বোর্ডসমূহের এইচএসসি ও সমমান পরীক্ষা ২০২৫-এর ফলাফল আগামী <strong className="text-primary">১৬ অক্টোবর ২০২৫</strong> তারিখ সকাল ১০:০০ টায় একযোগে প্রকাশ করা হবে।
                   </p>
                   <ul className="list-decimal pl-5 space-y-2">
-                      <li>
-                          সংশ্লিষ্ট প্রতিষ্ঠানসমূহ <a href="http://www.educationboardresults.gov.bd" target="_blank" rel="noopener noreferrer" className="font-semibold text-primary">www.educationboardresults.gov.bd</a> ওয়েবসাইটের Result কর্ণার থেকে EIIN ব্যবহার করে ফলাফল ডাউনলোড করতে পারবে।
+                       <li>
+                          সংশ্লিষ্ট প্রতিষ্ঠানসমূহ <a href="#main-content" onClick={() => setShowNotice(false)} className="font-semibold text-primary">এই ওয়েবসাইট (bdedu.me)</a> থেকে EIIN ব্যবহার করে ফলাফল ডাউনলোড করতে পারবে।
                       </li>
                       <li>
                           সকল শিক্ষা বোর্ডের ওয়েবসাইটে Result কর্ণারে ক্লিক করে শিক্ষা প্রতিষ্ঠানের EIIN এন্ট্রি করে স্ব স্ব প্রতিষ্ঠান Result sheet download করতে পারবে।
                       </li>
                       <li>
-                          পরীক্ষার্থীরা <a href="http://www.educationboardresults.gov.bd" target="_blank" rel="noopener noreferrer" className="font-semibold text-primary">www.educationboardresults.gov.bd</a> এবং সংশ্লিষ্ট বোর্ডের ওয়েবসাইটের মাধ্যমে ফলাফল সংগ্রহ করতে পারবে।
+                          পরীক্ষার্থীরা <a href="#main-content" onClick={() => setShowNotice(false)} className="font-semibold text-primary">এই ওয়েবসাইট (bdedu.me)</a> এবং সংশ্লিষ্ট বোর্ডের ওয়েবসাইটের মাধ্যমে ফলাফল সংগ্রহ করতে পারবে।
                       </li>
                       <li>
                           নির্ধারিত Short Code <strong className="text-primary">16222</strong>-এ SMS এর মাধ্যমে ফল পাওয়া যাবে।
                       </li>
                        <li>
-                          পুনঃনিরীক্ষণের জন্য <a href="https://rescrutiny.eduboardresults.gov.bd" target="_blank" rel="noopener noreferrer" className="font-semibold text-primary">rescrutiny.eduboardresults.gov.bd</a>-এর মাধ্যমে ১৭/১০/২০২৫ তারিখ থেকে ২৩/১০/২০২৫ তারিখ পর্যন্ত আবেদন গ্রহণ করা হবে।
+                          পুনঃনিরীক্ষণের জন্য <a href="https://rescrutiny.eduboardresults.gov.bd" target="_blank" rel="noopener noreferrer" className="font-semibold text-primary">এই লিঙ্কের মাধ্যমে</a> ১৭/১০/২০২৫ তারিখ থেকে ২৩/১০/২০২৫ তারিখ পর্যন্ত আবেদন গ্রহণ করা হবে।
                       </li>
                   </ul>
               </div>
