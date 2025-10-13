@@ -71,16 +71,6 @@ export default function ResultAlertForm() {
   const onSubmit = async (values: z.infer<typeof alertSchema>) => {
     setIsSubmitting(true);
     try {
-
-      if (parseInt(values.year) < 2024) {
-        toast({
-            title: 'শুধুমাত্র ভবিষ্যতের জন্য',
-            description: 'ফলাফলের বিজ্ঞপ্তির জন্য শুধুমাত্র ২০২৪ বা তার পরবর্তী বছরের জন্য সাবস্ক্রাইব করা যাবে।',
-            variant: 'destructive',
-        });
-        return;
-      }
-
       const subscriptionsRef = collection(db, 'subscriptions');
       
       // Check for existing subscription
@@ -136,7 +126,7 @@ export default function ResultAlertForm() {
         </div>
         <CardTitle className="text-2xl mt-4">ফলাফল প্রকাশিত হলে সবার আগে জানুন!</CardTitle>
         <CardDescription>
-          ফলাফল প্রকাশিত হলে আপনাকে SMS-এর মাধ্যমে জানানো হবে। (শুধুমাত্র ২০২৪ সাল ও তার পরবর্তী পরীক্ষার জন্য প্রযোজ্য)
+          ফলাফল প্রকাশিত হলে আপনাকে SMS-এর মাধ্যমে জানানো হবে।
         </CardDescription>
       </CardHeader>
       <CardContent>
