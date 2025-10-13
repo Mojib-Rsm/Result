@@ -228,33 +228,13 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
           const canvas = await html2canvas(element, { 
               scale: 2, 
               useCORS: true,
-              backgroundColor: null, // Use transparent background
+              backgroundColor: null,
           });
 
-          const fileName = `result-${result.roll}.png`;
-
-          if (navigator.share) {
-              canvas.toBlob(async (blob) => {
-                  if (blob) {
-                      const file = new File([blob], fileName, { type: 'image/png' });
-                      try {
-                          await navigator.share({
-                              title: 'My Exam Result',
-                              text: `I got GPA ${gpa} in ${result.exam.toUpperCase()} ${result.year}! 🎉`,
-                              files: [file],
-                          });
-                      } catch (error) {
-                         console.info("User cancelled share or something went wrong", error);
-                      }
-                  }
-              }, 'image/png');
-          } else {
-              // Fallback for desktop/browsers without share API
-              const link = document.createElement('a');
-              link.download = fileName;
-              link.href = canvas.toDataURL("image/png");
-              link.click();
-          }
+          const link = document.createElement('a');
+          link.download = `result-${result.roll}.png`;
+          link.href = canvas.toDataURL("image/png");
+          link.click();
 
       } catch (error) {
           console.error("Could not generate share image", error);
@@ -313,7 +293,7 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
             </div>
         </div>
 
-       <div className={cn("flex justify-end gap-2", !isDialog && "no-print")}>
+       <div className={cn("flex flex-wrap justify-end gap-2", !isDialog && "no-print")}>
           {!isDialog && onReset && (
               <Button variant="outline" onClick={onReset} disabled={isDownloading || isSharing}>
                   <Search className="mr-2 h-4 w-4" />
@@ -323,7 +303,7 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
 
            <Button onClick={handleShare} disabled={isSharing || isDownloading}>
                 {isSharing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Share2 className="mr-2 h-4 w-4" />}
-                শেয়ার করুন
+                শেয়ার কার্ড
            </Button>
 
           <Button onClick={handleDownload} disabled={isDownloading || isSharing}>
@@ -417,7 +397,7 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
             )}
              <Button onClick={handleShare} disabled={isSharing || isDownloading}>
                 {isSharing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Share2 className="mr-2 h-4 w-4" />}
-                শেয়ার করুন
+                শেয়ার কার্ড
             </Button>
             <Button onClick={handleDownload} disabled={isDownloading || isSharing}>
                {isDownloading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
