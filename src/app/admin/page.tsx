@@ -1,4 +1,3 @@
-
 'use client'
 
 import { useState, useEffect } from 'react';
@@ -15,6 +14,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 import { sendBulkSms } from '@/lib/sms';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { searchResultLegacy } from '@/lib/actions';
+import type { ExamResult, HistoryItem } from '@/types';
+import { Loader2 } from 'lucide-react';
+
 
 const adminFeatures = [
     {
@@ -70,6 +74,14 @@ export default function AdminPage() {
     const [loading, setLoading] = useState(true);
     const [isSendingSms, setIsSendingSms] = useState(false);
     const [smsMessage, setSmsMessage] = useState('');
+
+    // State for individual subscriber result check
+    const [selectedSub, setSelectedSub] = useState<any | null>(null);
+    const [isCheckingResult, setIsCheckingResult] = useState(false);
+    const [checkedResult, setCheckedResult] = useState<ExamResult | null>(null);
+    const [checkError, setCheckError] = useState<string | null>(null);
+    const [isSendingSingleSms, setIsSendingSingleSms] = useState(false);
+    const [singleSmsMessage, setSingleSmsMessage] = useState('');
 
     const db = getFirestore(app);
     const { toast } = useToast();
@@ -137,7 +149,7 @@ export default function AdminPage() {
         fetchAllData();
     }, [db, toast]);
 
-    const handleSendSms = async () => {
+    const handleBulkSendSms = async () => {
         if (!smsMessage.trim()) {
             toast({
                 title: 'ত্রুটি',
@@ -180,11 +192,68 @@ export default function AdminPage() {
             setIsSendingSms(false);
         }
     }
+    
+    const handleCheckResult = async (sub: any) => {
+        setSelectedSub(sub);
+        setIsCheckingResult(true);
+        setCheckedResult(null);
+        setCheckError(null);
+        setSingleSmsMessage('');
+        
+        try {
+            const result = await searchResultLegacy({
+                exam: sub.exam,
+                year: sub.year,
+                board: sub.board,
+                roll: sub.roll,
+                reg: sub.reg,
+                captcha: '12345', // Dummy captcha, might need adjustment
+                cookie: '',
+            });
+            setCheckedResult(result);
+            const message = result.status === 'Pass'
+                ? `অভিনন্দন! আপনার ${result.exam.toUpperCase()} পরীক্ষার ফলাফল প্রকাশিত হয়েছে। আপনার GPA: ${result.gpa.toFixed(2)}. বিস্তারিত দেখুন: www.bdedu.me`
+                : `আপনার ${sub.exam.toUpperCase()} পরীক্ষার ফলাফল প্রকাশিত হয়েছে। স্ট্যাটাস: Fail. বিস্তারিত দেখুন: www.bdedu.me`;
+            setSingleSmsMessage(message);
+        } catch (error: any) {
+            setCheckError(error.message);
+            const message = `দুঃখিত, আপনার ${sub.exam.toUpperCase()} পরীক্ষার জন্য দেওয়া রোল (${sub.roll}) ও বোর্ডের তথ্যে কোনো ফলাফল পাওয়া যায়নি। তথ্য সঠিক কিনা যাচাই করুন। -bdedu.me`;
+            setSingleSmsMessage(message);
+        } finally {
+            setIsCheckingResult(false);
+        }
+    };
+    
+    const handleSendSingleSms = async () => {
+        if (!singleSmsMessage || !selectedSub?.phone) return;
+
+        setIsSendingSingleSms(true);
+        try {
+            const result = await sendBulkSms([selectedSub.phone], singleSmsMessage);
+            if (result.success) {
+                toast({
+                    title: 'SMS পাঠানো হয়েছে',
+                    description: `${selectedSub.phone} নম্বরে SMS সফলভাবে পাঠানো হয়েছে।`,
+                });
+            } else {
+                throw new Error(result.error || 'SMS পাঠাতে একটি অজানা সমস্যা হয়েছে।');
+            }
+        } catch (error: any) {
+            toast({
+                title: 'SMS পাঠাতে ব্যর্থ',
+                description: error.message,
+                variant: 'destructive',
+            });
+        } finally {
+            setIsSendingSingleSms(false);
+        }
+    };
+
 
     const TableSkeleton = () => (
         [...Array(5)].map((_, i) => (
             <TableRow key={i}>
-                {[...Array(4)].map((_, j) => (
+                {[...Array(5)].map((_, j) => (
                      <TableCell key={j}><Skeleton className="h-4 w-full" /></TableCell>
                 ))}
             </TableRow>
@@ -250,7 +319,7 @@ export default function AdminPage() {
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                              <MessageSquare className="h-6 w-6" />
-                            নোটিফিকেশন এবং অ্যালার্ট সিস্টেম
+                            বাল্ক নোটিফিকেশন সিস্টেম
                         </CardTitle>
                         <CardDescription>
                             এখান থেকে সকল সাবস্ক্রাইবারদের একসাথে SMS পাঠান। ({loading ? '...' : stats.totalSubscriptions.toLocaleString()} জন সাবস্ক্রাইবার)
@@ -264,7 +333,7 @@ export default function AdminPage() {
                                 onChange={(e) => setSmsMessage(e.target.value)}
                                 rows={4}
                             />
-                             <Button onClick={handleSendSms} disabled={isSendingSms || subscriptions.length === 0}>
+                             <Button onClick={handleBulkSendSms} disabled={isSendingSms || subscriptions.length === 0}>
                                 {isSendingSms ? 'পাঠানো হচ্ছে...' : `সকল ${subscriptions.length} সাবস্ক্রাইবারকে SMS পাঠান`}
                             </Button>
                         </div>
@@ -370,6 +439,7 @@ export default function AdminPage() {
                                     <TableHead>রোল</TableHead>
                                     <TableHead>পরীক্ষা</TableHead>
                                     <TableHead>বছর</TableHead>
+                                    <TableHead className="text-right">কার্যকলাপ</TableHead>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
@@ -382,10 +452,62 @@ export default function AdminPage() {
                                         <TableCell>{sub.roll}</TableCell>
                                         <TableCell className="uppercase">{sub.exam}</TableCell>
                                         <TableCell>{sub.year}</TableCell>
+                                        <TableCell className="text-right">
+                                           <Dialog>
+                                                <DialogTrigger asChild>
+                                                    <Button variant="outline" size="sm" onClick={() => handleCheckResult(sub)}>
+                                                        ফলাফল দেখুন ও পাঠান
+                                                    </Button>
+                                                </DialogTrigger>
+                                                {selectedSub?.id === sub.id && (
+                                                     <DialogContent>
+                                                        <DialogHeader>
+                                                            <DialogTitle>ফলাফল এবং SMS</DialogTitle>
+                                                            <DialogDescription>
+                                                                রোল: {selectedSub.roll}, ফোন: {selectedSub.phone}
+                                                            </DialogDescription>
+                                                        </DialogHeader>
+                                                        <div className="py-4 space-y-4">
+                                                             {isCheckingResult ? (
+                                                                <div className="flex items-center justify-center">
+                                                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                                                    <span>ফলাফল চেক করা হচ্ছে...</span>
+                                                                </div>
+                                                            ) : checkError ? (
+                                                                <p className="text-destructive text-sm">ত্রুটি: {checkError}</p>
+                                                            ) : checkedResult ? (
+                                                                 <div className="space-y-1">
+                                                                    <p><strong>নাম:</strong> {checkedResult.studentInfo.name}</p>
+                                                                    <p><strong>স্ট্যাটাস:</strong> <span className={checkedResult.status === 'Pass' ? 'text-green-600' : 'text-destructive'}>{checkedResult.status}</span></p>
+                                                                    {checkedResult.status === 'Pass' && <p><strong>GPA:</strong> {checkedResult.gpa.toFixed(2)}</p>}
+                                                                </div>
+                                                            ) : null}
+                                                            
+                                                             <Textarea
+                                                                placeholder="SMS বার্তা..."
+                                                                value={singleSmsMessage}
+                                                                onChange={(e) => setSingleSmsMessage(e.target.value)}
+                                                                rows={4}
+                                                                disabled={isCheckingResult}
+                                                            />
+                                                        </div>
+                                                        <DialogFooter>
+                                                            <Button
+                                                                onClick={handleSendSingleSms}
+                                                                disabled={isCheckingResult || isSendingSingleSms || !singleSmsMessage}
+                                                            >
+                                                                {isSendingSingleSms && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                                                                SMS পাঠান
+                                                            </Button>
+                                                        </DialogFooter>
+                                                    </DialogContent>
+                                                )}
+                                            </Dialog>
+                                        </TableCell>
                                     </TableRow>
                                 ))) : (
                                      <TableRow>
-                                        <TableCell colSpan={4} className="text-center">কোনো সাবস্ক্রিপশন নেই।</TableCell>
+                                        <TableCell colSpan={5} className="text-center">কোনো সাবস্ক্রিপশন নেই।</TableCell>
                                     </TableRow>
                                 )}
                             </TableBody>
@@ -396,5 +518,3 @@ export default function AdminPage() {
         </div>
     );
 }
-
-    
