@@ -31,7 +31,7 @@ function parseGrades(displayDetails: string, subDetails: SubjectDetail[]): Grade
 }
 
 
-async function searchResultLegacy(values: z.infer<typeof formSchemaWithCookie>): Promise<ExamResult> {
+async function searchResultLegacy(values: z.infer<typeof formSchemaWithCookie>): Promise<ExamResult | { error: string }> {
     const { exam, year, board, roll, reg, captcha, cookie } = values;
 
     const payload = new URLSearchParams({
@@ -65,13 +65,13 @@ async function searchResultLegacy(values: z.infer<typeof formSchemaWithCookie>):
         });
         
         if (!response.ok) {
-            throw new Error(`সার্ভার থেকে একটি ত্রুটিপূর্ণ প্রতিক্রিয়া এসেছে: ${response.status} ${response.statusText}`);
+            return { error: `সার্ভার থেকে একটি ত্রুটিপূর্ণ প্রতিক্রিয়া এসেছে: ${response.status} ${response.statusText}` };
         }
 
         const data = await response.json();
 
         if (data.status !== 0 || !data.res) {
-             throw new Error(data.msg || "ফলাফল খুঁজে পাওয়া যায়নি। অনুগ্রহ করে আপনার রোল, রেজিস্ট্রেশন, বোর্ড, বছর এবং ক্যাপচা পরীক্ষা করে আবার চেষ্টা করুন।");
+             return { error: data.msg || "ফলাফল খুঁজে পাওয়া যায়নি। অনুগ্রহ করে আপনার রোল, রেজিস্ট্রেশন, বোর্ড, বছর এবং ক্যাপচা পরীক্ষা করে আবার চেষ্টা করুন।" };
         }
         
         const res = data.res;
@@ -114,14 +114,10 @@ async function searchResultLegacy(values: z.infer<typeof formSchemaWithCookie>):
 
     } catch (error) {
         console.error("Error in searchResultLegacy:", error);
-        if (error instanceof Error) {
-            // Re-throw specific, user-facing errors from the API or our checks
-            if (error.message.includes('Incorrect registration number') || error.message.includes('You need to provide a valid Security Key') || error.message.includes('ফলাফল খুঁজে পাওয়া যায়নি') || error.message.includes('সার্ভার থেকে একটি ত্রুটিপূর্ণ প্রতিক্রিয়া এসেছে')) {
-                 throw error;
-            }
+        if (error instanceof Error && (error.message.includes('Incorrect registration number') || error.message.includes('You need to provide a valid Security Key') || error.message.includes('ফলাফল খুঁজে পাওয়া যায়নি'))) {
+             return { error: error.message };
         }
-        // Throw a generic error for unexpected issues (e.g., network problems)
-        throw new Error('ফলাফল আনতে একটি অপ্রত্যাশিত সমস্যা হয়েছে। আপনার ইন্টারনেট সংযোগ পরীক্ষা করুন এবং কিছুক্ষণ পর আবার চেষ্টা করুন।');
+        return { error: 'ফলাফল আনতে একটি অপ্রত্যাশিত সমস্যা হয়েছে। আপনার ইন্টারনেট সংযোগ পরীক্ষা করুন এবং কিছুক্ষণ পর আবার চেষ্টা করুন।' };
     }
 }
 
