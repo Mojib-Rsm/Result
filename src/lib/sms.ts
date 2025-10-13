@@ -15,7 +15,7 @@ const smsStatusMessages: { [key: number]: string } = {
     1005: 'Internal Error',
     1006: 'Balance Validity Not Available',
     1007: 'Insufficient Balance',
-    1011: 'User ID not found',
+    1011: 'User Id not found',
     1012: 'Masking SMS must be in Bengali',
     1013: 'Gateway not found for API key',
     1014: 'Sender Type Name not found',
@@ -53,26 +53,28 @@ export async function sendBulkSms(
             cache: 'no-store'
         });
         
-        let responseData: SmsApiResponse;
-        try {
-            responseData = await response.json();
-        } catch (jsonError) {
-             // Handle cases where response is not JSON (e.g., plain text error from API)
-            const textResponse = await response.text();
-            console.error("SMS API non-JSON response:", textResponse);
-            return { success: false, error: `API থেকে একটি অপ্রত্যাশিত প্রতিক্রিয়া এসেছে: ${textResponse}` };
+        const responseText = await response.text();
+        console.log("SMS API Raw Response:", responseText);
+
+        if (responseText.includes("202 SMS Submitted Successfully")) {
+            return { success: true };
         }
 
-        console.log("SMS API Response:", responseData);
+        try {
+            const responseData: SmsApiResponse = JSON.parse(responseText);
 
-        const statusCode = responseData.status_code ? parseInt(responseData.status_code.toString(), 10) : 0;
+            const statusCode = responseData.status_code ? parseInt(responseData.status_code.toString(), 10) : 0;
 
-        if (statusCode === 202) {
-             return { success: true };
-        } else {
-             const errorMessage = smsStatusMessages[statusCode] || responseData.status_text || `An unknown error occurred (Code: ${statusCode})`;
-             console.error("SMS API Error:", errorMessage);
-             return { success: false, error: errorMessage };
+            if (statusCode === 202) {
+                 return { success: true };
+            } else {
+                 const errorMessage = smsStatusMessages[statusCode] || responseData.status_text || `An unknown error occurred (Code: ${statusCode})`;
+                 console.error("SMS API Error:", errorMessage);
+                 return { success: false, error: errorMessage };
+            }
+        } catch (jsonError) {
+             console.error("SMS API non-JSON response:", responseText);
+             return { success: false, error: `API থেকে একটি অপ্রত্যাশিত প্রতিক্রিয়া এসেছে: ${responseText}` };
         }
 
     } catch (error: any) {
