@@ -178,10 +178,8 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
 
     try {
         const canvas = await html2canvas(element, { 
-            scale: 2,
+            scale: 2, // Higher scale for better quality
             useCORS: true,
-            allowTaint: true,
-            logging: false,
         });
         const imgData = canvas.toDataURL('image/png');
 
@@ -194,12 +192,11 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
         const imgHeight = imgProps.height;
         
         const ratio = imgWidth / imgHeight;
-        
-        let newImgWidth = pdfWidth - 20; // with some margin
+        let newImgWidth = pdfWidth;
         let newImgHeight = newImgWidth / ratio;
-        
-        if (newImgHeight > pdfHeight - 20) {
-            newImgHeight = pdfHeight - 20;
+
+        if (newImgHeight > pdfHeight) {
+            newImgHeight = pdfHeight;
             newImgWidth = newImgHeight * ratio;
         }
         
@@ -232,7 +229,7 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
           });
 
           const link = document.createElement('a');
-          link.download = `result-${result.roll}.png`;
+          link.download = `BD_Edu_Result_${result.roll}.png`;
           link.href = canvas.toDataURL("image/png");
           link.click();
 
@@ -272,25 +269,23 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
   return (
     <div className={containerClasses}>
        {/* Hidden card for sharing */}
-        <div id="share-card" className="fixed top-0 left-[200vw] w-[600px] h-[315px] bg-gradient-to-br from-primary to-accent p-8 text-white font-sans">
-             <div className="flex flex-col justify-between h-full">
-                <div>
-                     <div className="flex items-center gap-3">
-                         <Image src="/logo.png" alt="Logo" width={48} height={48} className="h-12 w-12 rounded-full" />
-                        <p className="text-2xl font-bold">BD Edu Result</p>
-                    </div>
-                     <p className="mt-4 text-lg">Congratulations, {result.studentInfo.name}!</p>
+        <div id="share-card" className="fixed top-0 left-[200vw] w-[600px] h-[315px] bg-gradient-to-br from-primary via-green-500 to-accent p-8 text-white font-sans flex flex-col justify-between">
+             <div>
+                 <div className="flex items-center gap-3">
+                     <Image src="/logo.png" alt="Logo" width={48} height={48} className="h-12 w-12 rounded-full border-2 border-white/50" />
+                    <p className="text-2xl font-bold tracking-wider">BD Edu Result</p>
                 </div>
-
-                <div className="text-center">
-                    <p className="text-3xl font-bold leading-tight">
-                        I have passed the <span className="uppercase">{result.exam}</span> - {result.year} exam
-                    </p>
-                    {isPass && gpa && <p className="text-5xl font-extrabold mt-2">with GPA {gpa} 🎉</p>}
-                </div>
-
-                 <p className="text-sm text-right opacity-80">Check your result at bdedu.me</p>
+                 <p className="mt-4 text-lg opacity-90">Congratulations, {result.studentInfo.name}!</p>
             </div>
+
+            <div className="text-center">
+                <p className="text-3xl font-bold leading-tight">
+                    Passed the <span className="uppercase">{result.exam}</span> - {result.year} exam
+                </p>
+                {isPass && gpa && <p className="text-5xl font-extrabold mt-2 text-white/90 drop-shadow-lg">GPA: {gpa} 🎉</p>}
+            </div>
+
+             <p className="text-sm text-right opacity-80 font-medium">Check your result at bdedu.me</p>
         </div>
 
        <div className={cn("flex flex-wrap justify-end gap-2", !isDialog && "no-print")}>
