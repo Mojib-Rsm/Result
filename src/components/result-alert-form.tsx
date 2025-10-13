@@ -47,7 +47,8 @@ const boards = [
 ];
 
 const currentYear = new Date().getFullYear();
-const years = Array.from({ length: 5 }, (_, i) => currentYear + i).map(String);
+const years = Array.from({ length: 5 }, (_, i) => currentYear - 2 + i).map(String);
+
 
 export default function ResultAlertForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -61,7 +62,7 @@ export default function ResultAlertForm() {
       roll: '',
       reg: '',
       exam: '',
-      year: '2025',
+      year: currentYear.toString(),
       board: '',
     },
   });
