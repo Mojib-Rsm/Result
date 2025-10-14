@@ -144,30 +144,21 @@ export default function Home() {
                   <div className="mx-auto bg-primary/10 p-3 rounded-full w-fit mb-4">
                       <Megaphone className="h-8 w-8 text-primary" />
                   </div>
-                  <DialogTitle className="text-center">এইচএসসি ও সমমান পরীক্ষা ২০২৫-এর ফলাফল সংক্রান্ত বিজ্ঞপ্তি</DialogTitle>
+                  <DialogTitle className="text-center">এইচএসসি ফলাফল ২০২৫ সংক্রান্ত বিজ্ঞপ্তি</DialogTitle>
                   <DialogDescription className="text-center">
-                      মাধ্যমিক ও উচ্চমাধ্যমিক শিক্ষা বোর্ডের একটি গুরুত্বপূর্ণ প্রেস বিজ্ঞপ্তি।
+                      ফলাফল প্রকাশের গুরুত্বপূর্ণ তথ্য।
                   </DialogDescription>
               </DialogHeader>
               <div className="prose prose-sm dark:prose-invert max-w-full">
-                  <p className="font-semibold">
-                      মাধ্যমিক ও উচ্চমাধ্যমিক শিক্ষা বোর্ডসমূহের এইচএসসি ও সমমান পরীক্ষা ২০২৫-এর ফলাফল আগামী <strong className="text-primary">১৬ অক্টোবর ২০২৫</strong> তারিখ সকাল ১০:০০ টায় একযোগে প্রকাশ করা হবে।
+                  <p>
+                      এইচএসসি ও সমমান পরীক্ষা ২০২৫-এর ফলাফল আগামী <strong className="text-primary">১৬ অক্টোবর ২০২৫</strong> সকাল ১০:০০ টায় একযোগে প্রকাশ করা হবে।
                   </p>
-                  <ul className="list-decimal pl-5 space-y-2">
-                       <li>
-                          সংশ্লিষ্ট প্রতিষ্ঠানসমূহ <a href="#main-content" onClick={() => setShowNotice(false)} className="font-semibold text-primary">এই ওয়েবসাইট (bdedu.me)</a> থেকে EIIN ব্যবহার করে ফলাফল ডাউনলোড করতে পারবে।
+                  <ul className="list-decimal pl-5 space-y-1">
+                      <li>
+                          ফলাফল দেখতে <a href="#main-content" onClick={() => setShowNotice(false)} className="font-semibold text-primary">এই ওয়েবসাইটে (bdedu.me)</a> আপনার রোল ও রেজিস্ট্রেশন নম্বর ব্যবহার করুন।
                       </li>
                       <li>
-                          সকল শিক্ষা বোর্ডের ওয়েবসাইটে Result কর্ণারে ক্লিক করে শিক্ষা প্রতিষ্ঠানের EIIN এন্ট্রি করে স্ব স্ব প্রতিষ্ঠান Result sheet download করতে পারবে।
-                      </li>
-                      <li>
-                          পরীক্ষার্থীরা <a href="#main-content" onClick={() => setShowNotice(false)} className="font-semibold text-primary">এই ওয়েবসাইট (bdedu.me)</a> এবং সংশ্লিষ্ট বোর্ডের ওয়েবসাইটের মাধ্যমে ফলাফল সংগ্রহ করতে পারবে।
-                      </li>
-                      <li>
-                          নির্ধারিত Short Code <strong className="text-primary">16222</strong>-এ SMS এর মাধ্যমে ফল পাওয়া যাবে।
-                      </li>
-                       <li>
-                          পুনঃনিরীক্ষণের জন্য <a href="https://rescrutiny.eduboardresults.gov.bd" target="_blank" rel="noopener noreferrer" className="font-semibold text-primary">এই লিঙ্কের মাধ্যমে</a> ১৭/১০/২০২৫ তারিখ থেকে ২৩/১০/২০২৫ তারিখ পর্যন্ত আবেদন গ্রহণ করা হবে।
+                          SMS-এর মাধ্যমে ফল পেতে <strong className="text-primary">HSC &lt;Board&gt; &lt;Roll&gt; &lt;Year&gt;</strong> লিখে <strong className="text-primary">16222</strong> নম্বরে পাঠান।
                       </li>
                   </ul>
               </div>
