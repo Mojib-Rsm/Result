@@ -43,24 +43,22 @@ function parseInstituteNameFromHtml(htmlContent: string): string {
 
 function parseInstituteResultsFromHtml(htmlContent: string): StudentResult[] {
     const results: StudentResult[] = [];
-    const dom = new JSDOM(htmlContent);
-    const bodyText = dom.window.document.body.textContent || '';
-    
+    const textContent = new JSDOM(htmlContent).window.document.body.textContent || '';
+
+    // Regex to find all occurrences of "PASSED=[...]"
     const passedSectionsRegex = /PASSED=\s*\[\s*([^\]]*)\s*\]/g;
     let match;
 
-    while ((match = passedSectionsRegex.exec(bodyText)) !== null) {
+    while ((match = passedSectionsRegex.exec(textContent)) !== null) {
         const studentListStr = match[1];
         if (studentListStr) {
-            const studentEntries = studentListStr.split(',').map(s => s.trim()).filter(Boolean);
-
-            for (const entry of studentEntries) {
-                const studentMatch = entry.match(/(\d+)\s*\((.*?)\)/);
-                if (studentMatch) {
-                    const roll = studentMatch[1];
-                    const gpa = studentMatch[2];
-                    results.push({ roll, gpa });
-                }
+            // Regex to find all "roll(gpa)" pairs within the list
+            const studentEntriesRegex = /(\d+)\s*\((.*?)\)/g;
+            let studentMatch;
+            while((studentMatch = studentEntriesRegex.exec(studentListStr)) !== null) {
+                const roll = studentMatch[1];
+                const gpa = studentMatch[2];
+                 results.push({ roll, gpa });
             }
         }
     }
@@ -75,6 +73,8 @@ async function searchResultLegacy(values: z.infer<typeof formSchemaWithCookie> &
     if (exam === 'hsc_bm' || exam === 'hsc_voc') {
         board = 'tec';
         exam = 'hsc';
+    } else if (exam === 'hsc' && board === 'tec') {
+        exam = 'hsc_bm';
     }
 
     const payload = new URLSearchParams();
