@@ -44,12 +44,12 @@ function parseInstituteNameFromHtml(htmlContent: string): string {
 function parseInstituteResultsFromHtml(htmlContent: string): StudentResult[] {
     const results: StudentResult[] = [];
     const dom = new JSDOM(htmlContent);
-    const textContent = dom.window.document.body.textContent || '';
+    const bodyText = dom.window.document.body.textContent || '';
     
     const passedSectionsRegex = /PASSED=\s*\[\s*([^\]]*)\s*\]/g;
     let match;
 
-    while ((match = passedSectionsRegex.exec(textContent)) !== null) {
+    while ((match = passedSectionsRegex.exec(bodyText)) !== null) {
         const studentListStr = match[1];
         if (studentListStr) {
             const studentEntries = studentListStr.split(',').map(s => s.trim()).filter(Boolean);

@@ -48,6 +48,19 @@ export default function Home() {
       captcha: '',
     },
   });
+  
+  const selectedExam = form.watch('exam');
+
+  useEffect(() => {
+    if (selectedExam === 'hsc_bm' || selectedExam === 'hsc_voc') {
+      form.setValue('board', 'tec');
+    } else {
+      // Don't reset if it's already set by the user for other exams
+      if (form.getValues('board') === 'tec') {
+        form.setValue('board', '');
+      }
+    }
+  }, [selectedExam, form]);
 
   const refreshCaptcha = useCallback(async () => {
     form.setValue('captcha', '');
@@ -186,6 +199,7 @@ export default function Home() {
                 isSubmitting={isSubmitting}
                 captchaUrl={captchaUrl}
                 onCaptchaRefresh={refreshCaptcha}
+                selectedExam={selectedExam}
               />
           </div>
            <Separator />

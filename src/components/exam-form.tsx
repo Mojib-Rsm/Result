@@ -36,7 +36,7 @@ const exams = [
     { value: 'hsc', label: 'HSC/Alim' },
     { value: 'ssc_voc', label: 'SSC(Vocational)' },
     { value: 'hsc_voc', label: 'HSC(Vocational)' },
-    { value: 'hsc_bm', label: 'HSC(BM/Vocational)' },
+    { value: 'hsc_bm', label: 'HSC(BM)' },
     { value: 'dibs', label: 'Diploma in Business Studies' },
 ];
 
@@ -47,9 +47,12 @@ interface ExamFormProps {
   isSubmitting: boolean;
   captchaUrl: string;
   onCaptchaRefresh: () => void;
+  selectedExam: string;
 }
 
-export function ExamForm({ form, onSubmit, isSubmitting, captchaUrl, onCaptchaRefresh }: ExamFormProps) {
+export function ExamForm({ form, onSubmit, isSubmitting, captchaUrl, onCaptchaRefresh, selectedExam }: ExamFormProps) {
+  const showBoardField = selectedExam !== 'hsc_bm' && selectedExam !== 'hsc_voc';
+  
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6" id="exam-form-component">
@@ -90,24 +93,26 @@ export function ExamForm({ form, onSubmit, isSubmitting, captchaUrl, onCaptchaRe
               </FormItem>
             )}
           />
-           <FormField
-            control={form.control}
-            name="board"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>বোর্ড</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value}>
-                  <FormControl>
-                    <SelectTrigger><SelectValue placeholder="বোর্ড নির্বাচন করুন" /></SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    {boards.map(b => <SelectItem key={b.value} value={b.value}>{b.label}</SelectItem>)}
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+           {showBoardField && (
+              <FormField
+                control={form.control}
+                name="board"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>বোর্ড</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger><SelectValue placeholder="বোর্ড নির্বাচন করুন" /></SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {boards.map(b => <SelectItem key={b.value} value={b.value}>{b.label}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+           )}
           </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
