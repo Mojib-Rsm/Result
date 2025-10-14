@@ -132,7 +132,7 @@ const newsItems = [
         id: 'news8',
         title: "Education, innovation, and celebration: Agami Fest 2025",
         description: "গুলশানে আয়োজিত Agami Fest ২০২৫-এ নিম্নবিত্ত সম্প্রদায় থেকে আগত শিক্ষার্থীদের জন্য শিক্ষামূলক কার্যক্রম ও উদ্ভাবনী উপস্থাপন করা হয়েছে।",
-        imageUrl: "https://www.dhakatribune.com/uploads/media/2025/10/14/agami_fest_2025.jpg",
+        imageUrl: "https://picsum.photos/seed/agami/600/400",
         source: 'Dhaka Tribune',
         date: 'অক্টোবর ১৪, ২০২৪',
         link: "https://www.dhakatribune.com/bangladesh/education/393812/education-innovation-and-celebration-agami-fest",
