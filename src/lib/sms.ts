@@ -17,8 +17,9 @@ export async function sendBulkSms(
         return { success: false, error: "SMS সার্ভিসটি কনফিগার করা হয়নি।" };
     }
 
-    // The new API seems to send to one recipient at a time.
-    // We will loop through the numbers and send one by one.
+    let allSuccessful = true;
+    let firstError: string | undefined = undefined;
+
     for (const number of phoneNumbers) {
         try {
             const response = await fetch('https://sms.anbuinfosec.live/api/v1/sms/send', {
@@ -38,21 +39,28 @@ export async function sendBulkSms(
             
             if (response.ok && data.status === 'success') {
                 console.log(`SMS sent successfully to ${number}`);
-                // Continue to the next number
             } else {
+                allSuccessful = false;
                 const errorMessage = data.message || data.error || 'An unknown error occurred from SMS API.';
                 console.error(`SMS API Error for ${number}:`, errorMessage);
-                // We can decide if we want to stop on first error or continue.
-                // For now, let's return on the first error.
-                return { success: false, error: errorMessage };
+                if (!firstError) {
+                    firstError = errorMessage;
+                }
             }
 
         } catch (error: any) {
+            allSuccessful = false;
+            const networkError = 'SMS পাঠানোর সময় একটি নেটওয়ার্ক সমস্যা হয়েছে।';
             console.error(`Failed to send SMS to ${number}:`, error);
-            return { success: false, error: 'SMS পাঠানোর সময় একটি নেটওয়ার্ক সমস্যা হয়েছে।' };
+            if (!firstError) {
+                firstError = networkError;
+            }
         }
     }
 
-    // If the loop completes without returning an error, it means all were successful.
-    return { success: true };
+    if (allSuccessful) {
+        return { success: true };
+    } else {
+        return { success: false, error: firstError || "এক বা একাধিক SMS পাঠাতে সমস্যা হয়েছে।" };
+    }
 }
