@@ -14,6 +14,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/gpa-calculator',
     '/login',
     '/admin',
+    '/admin/api-logs',
     '/suggestions/public-universities',
     '/suggestions/private-universities',
     '/suggestions/medical-colleges',
@@ -31,3 +32,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return sitemapEntries;
 }
+
+    

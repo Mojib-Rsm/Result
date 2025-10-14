@@ -6,7 +6,7 @@ import { getFirestore, collection, query, orderBy, getDocs, where, getCountFromS
 import { startOfDay, subDays } from 'date-fns';
 import { app } from '@/lib/firebase';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText, Users, MailCheck, DatabaseZap, Search, BellRing, MessageSquare, Bookmark, Trash2, RefreshCw, Settings, BadgeDollarSign, FileCog } from 'lucide-react';
+import { FileText, Users, MailCheck, DatabaseZap, Search, BellRing, MessageSquare, Bookmark, Trash2, RefreshCw, Settings, BadgeDollarSign, FileCog, History } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -58,10 +58,10 @@ const adminFeatures = [
         href: '/admin/news'
     },
     {
-        title: 'ডাটাবেস সিডিং',
-        description: 'প্রাথমিক ডেটা দিয়ে ডাটাবেস প্রস্তুত করুন।',
-        icon: DatabaseZap,
-        href: '/seeding'
+        title: 'API লগ',
+        description: 'SMS API থেকে আসা রেসপন্স লগ দেখুন।',
+        icon: History,
+        href: '/admin/api-logs'
     },
     {
         title: 'সেটিংস ও SEO',
@@ -743,3 +743,5 @@ export default function AdminPage() {
         </div>
     );
 }
+
+    
