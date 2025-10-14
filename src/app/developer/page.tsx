@@ -5,13 +5,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, Mail, Phone, Globe, Send, Facebook, Code, ShoppingBag } from 'lucide-react';
+import { ArrowLeft, Mail, Phone, Globe, Send, Facebook, Code, ShoppingBag, Newspaper } from 'lucide-react';
 
 const developerInfo = {
     name: 'Mojibur Rahman (Mojib Rsm)',
     role: 'Junior Web Developer, Creative Designer, CEO',
     bio: 'একজন সৃজনশীল ডিজাইনার এবং ওয়েব ডেভেলপার হিসেবে, আমি প্রযুক্তি এবং ডিজাইনের সমন্বয়ে ব্যবহারকারী-বান্ধব এবং আকর্ষণীয় ডিজিটাল অভিজ্ঞতা তৈরি করতে আগ্রহী। আমি Oftern IT এবং Oftern Shop-এর প্রতিষ্ঠাতা, যেখানে আমরা উদ্ভাবনী সমাধান সরবরাহ করি।',
-    imageUrl: 'https://avatars.githubusercontent.com/u/87042570?v=4',
+    imageUrl: 'https://avatars.githubusercontent.com/u/85434839?s=400&u=7eac013dc3bd8535a13bdca8754198976d95dd44&v=4',
     links: [
         { label: 'ইমেইল', value: 'mojibrsm@gmail.com', icon: Mail, href: 'mailto:mojibrsm@gmail.com' },
         { label: 'ফোন', value: '+8801601519007', icon: Phone, href: 'tel:+8801601519007' },
@@ -19,7 +19,8 @@ const developerInfo = {
         { label: 'টেলিগ্রাম', value: '@MrTools_BD', icon: Send, href: 'https://t.me/MrTools_BD' },
         { label: 'ফেসবুক', value: 'Mojib Rsm', icon: Facebook, href: 'https://www.facebook.com/MojibRsm' },
         { label: 'Oftern IT', value: 'IT Solutions', icon: Code, href: 'https://www.oftern.com' },
-        { label: 'Oftern Shop', value: 'E-commerce', icon: ShoppingBag, href: 'https://www.oftern.shop' }
+        { label: 'Oftern Shop', value: 'E-commerce', icon: ShoppingBag, href: 'https://www.oftern.shop' },
+        { label: 'BartaNow', value: 'News Portal', icon: Newspaper, href: 'https://www.bartanow.com' }
     ]
 };
 
