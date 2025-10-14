@@ -39,8 +39,6 @@ export default function LoginPage() {
   const onSubmit = async (values: z.infer<typeof loginSchema>) => {
     setIsSubmitting(true);
     try {
-      // In a real app, you would verify password against a hash.
-      // Here, we just check if the user exists and assume password is correct for demo.
       const usersRef = collection(db, 'users');
       const q = query(usersRef, where('email', '==', values.email));
       const querySnapshot = await getDocs(q);
@@ -50,7 +48,15 @@ export default function LoginPage() {
       }
 
       const userDoc = querySnapshot.docs[0];
-      const user = { uid: userDoc.id, ...userDoc.data() };
+      const userData = userDoc.data();
+
+      // IMPORTANT: In a real-world app, passwords should be hashed.
+      // This is a plain-text comparison for demo purposes only.
+      if (userData.password !== values.password) {
+        throw new Error('আপনার ইমেইল বা পাসওয়ার্ড ভুল।');
+      }
+
+      const user = { uid: userDoc.id, ...userData };
       
       login(user);
 
