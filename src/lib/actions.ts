@@ -42,33 +42,27 @@ function parseInstituteNameFromHtml(htmlContent: string): string {
 
 
 function parseInstituteResultsFromHtml(htmlContent: string): StudentResult[] {
-    const dom = new JSDOM(htmlContent);
-    const body = dom.window.document.body;
-    const lines = body.innerHTML.split('<br>').map(line => line.replace(/&nbsp;/g, ' ').trim());
-    
     const results: StudentResult[] = [];
-    let currentGroup = '';
+    const dom = new JSDOM(htmlContent);
+    const textContent = dom.window.document.body.textContent || '';
+    
+    // Regex to find all occurrences of PASSED=[roll(gpa), roll(gpa), ...]
+    const passedSectionsRegex = /PASSED=.*?\[\s*(.*?)\s*\]/g;
+    let match;
 
-    for (const line of lines) {
-        const fontTagMatch = line.match(/<font color=red>(.*?)<\/font>/);
-        if (fontTagMatch) {
-            currentGroup = fontTagMatch[1].trim();
-            continue;
-        }
+    while ((match = passedSectionsRegex.exec(textContent)) !== null) {
+        const studentListStr = match[1];
+        if (studentListStr) {
+            // Split by comma, but handle potential spaces
+            const studentEntries = studentListStr.split(',').map(s => s.trim()).filter(Boolean);
 
-        if (line.includes('PASSED=')) {
-            const passedStudentsMatch = line.match(/PASSED=.*?\[ (.*?) \]/);
-            if (passedStudentsMatch) {
-                const studentList = passedStudentsMatch[1].split(',');
-                studentList.forEach(studentStr => {
-                    const [roll, gpa] = studentStr.trim().split('(');
-                    if (roll && gpa) {
-                        results.push({
-                            roll: roll.trim(),
-                            gpa: gpa.replace(')', '').trim(),
-                        });
-                    }
-                });
+            for (const entry of studentEntries) {
+                const studentMatch = entry.match(/(\d+)\s*\((.*?)\)/);
+                if (studentMatch) {
+                    const roll = studentMatch[1];
+                    const gpa = studentMatch[2];
+                    results.push({ roll, gpa });
+                }
             }
         }
     }
