@@ -46,14 +46,12 @@ function parseInstituteResultsFromHtml(htmlContent: string): StudentResult[] {
     const dom = new JSDOM(htmlContent);
     const textContent = dom.window.document.body.textContent || '';
     
-    // Regex to find all occurrences of PASSED=[roll(gpa), roll(gpa), ...]
-    const passedSectionsRegex = /PASSED=.*?\[\s*(.*?)\s*\]/g;
+    const passedSectionsRegex = /PASSED=\s*\[\s*([^\]]*)\s*\]/g;
     let match;
 
     while ((match = passedSectionsRegex.exec(textContent)) !== null) {
         const studentListStr = match[1];
         if (studentListStr) {
-            // Split by comma, but handle potential spaces
             const studentEntries = studentListStr.split(',').map(s => s.trim()).filter(Boolean);
 
             for (const entry of studentEntries) {
@@ -72,7 +70,12 @@ function parseInstituteResultsFromHtml(htmlContent: string): StudentResult[] {
 
 
 async function searchResultLegacy(values: z.infer<typeof formSchemaWithCookie> & {result_type?: '1' | '2', eiin?: string}): Promise<ExamResult | InstituteResult | { error: string }> {
-    const { exam, year, board, roll, reg, captcha, cookie, result_type = '1', eiin } = values;
+    let { exam, year, board, roll, reg, captcha, cookie, result_type = '1', eiin } = values;
+
+    if (exam === 'hsc_bm' || exam === 'hsc_voc') {
+        board = 'tec';
+        exam = 'hsc';
+    }
 
     const payload = new URLSearchParams();
     payload.append('exam', exam);
