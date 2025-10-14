@@ -49,7 +49,6 @@ export async function sendAnbuSms(
     if (!apiKey) {
         const errorMsg = "ANBU SMS সার্ভিসটি কনফিগার করা হয়নি।";
         console.error("ANBU SMS API Key is not configured.");
-        // Log a single failure for the entire batch
         await logSmsAttempt('anbu', phoneNumbers.join(','), message, 'error', { error: 'API Key not configured' });
         return { success: false, error: errorMsg };
     }
@@ -113,12 +112,12 @@ export async function sendBulkSmsBd(
     message: string
 ): Promise<{ success: boolean; error?: string }> {
     const apiKey = process.env.SMS_API_KEY_BULKSMSBD;
-    const senderId = process.env.SMS_SENDER_ID_BULKSMSBD;
+    const senderId = '8809617614208'; // This is a constant value as per the API spec
 
-    if (!apiKey || !senderId) {
+    if (!apiKey) {
         const errorMsg = "BulkSMSBD সার্ভিসটি কনফিগার করা হয়নি।";
-        console.error("BulkSMSBD API Key or Sender ID is not configured.");
-        await logSmsAttempt('bulksmsbd', phoneNumbers.join(','), message, 'error', { error: 'API Key or Sender ID not configured' });
+        console.error("BulkSMSBD API Key is not configured.");
+        await logSmsAttempt('bulksmsbd', phoneNumbers.join(','), message, 'error', { error: 'API Key not configured' });
         return { success: false, error: errorMsg };
     }
 
@@ -168,5 +167,3 @@ export async function sendBulkSmsBd(
         return { success: false, error: firstError || "এক বা একাধিক BulkSMSBD পাঠাতে সমস্যা হয়েছে।" };
     }
 }
-
-    
