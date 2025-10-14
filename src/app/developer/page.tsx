@@ -17,7 +17,7 @@ const developerInfo = {
         { label: 'ফোন', value: '+8801601519007', icon: Phone, href: 'tel:+8801601519007' },
         { label: 'পোর্টফোলিও', value: 'www.mojib.me', icon: Globe, href: 'https://www.mojib.me' },
         { label: 'টেলিগ্রাম', value: '@MrTools_BD', icon: Send, href: 'https://t.me/MrTools_BD' },
-        { label: 'ফেসবুক', value: 'Mojib Rsm', icon: Facebook, href: 'https://www.facebook.com/MojibRsm' },
+        { label: 'ফেসবুক', value: 'Mojiibrsm', icon: Facebook, href: 'https://www.facebook.com/Mojiibrsm' },
         { label: 'Oftern IT', value: 'IT Solutions', icon: Code, href: 'https://www.oftern.com' },
         { label: 'Oftern Shop', value: 'E-commerce', icon: ShoppingBag, href: 'https://www.oftern.shop' },
         { label: 'BartaNow', value: 'News Portal', icon: Newspaper, href: 'https://www.bartanow.com' }
