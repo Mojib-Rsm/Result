@@ -6,13 +6,15 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Loader2, Search, Download, BarChart, ArrowUp, ArrowDown, Star, Sparkles, Share2, Building } from 'lucide-react';
+import { Loader2, Search, Download, BarChart, ArrowUp, ArrowDown, Star, Sparkles, Share2, Building, Link as LinkIcon, Copy } from 'lucide-react';
 import type { ExamResult, GradeInfo } from '@/types';
 import { Separator } from './ui/separator';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { useToast } from '@/hooks/use-toast';
+
 
 interface ResultsDisplayProps {
   result: ExamResult;
@@ -166,6 +168,7 @@ const GradesTable = ({ grades, showMarks }: { grades: GradeInfo[], showMarks: bo
 export default function ResultsDisplay({ result, onReset, isDialog = false }: ResultsDisplayProps) {
   const [isDownloading, setIsDownloading] = useState(false);
   const [isSharing, setIsSharing] = useState(false);
+  const { toast } = useToast();
 
   
   const handleDownload = async () => {
@@ -240,6 +243,16 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
       }
   };
 
+  const handleCopyLink = () => {
+    if (result.pdfId) {
+        const url = `${window.location.origin}/result/${result.pdfId}`;
+        navigator.clipboard.writeText(url);
+        toast({
+            title: "লিঙ্ক কপি হয়েছে",
+            description: "শেয়ারযোগ্য লিঙ্কটি আপনার ক্লিপবোর্ডে কপি করা হয়েছে।",
+        });
+    }
+  };
 
   const gpa = result.gpa?.toFixed(2);
   const isPass = result.status === 'Pass';
@@ -300,6 +313,21 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
                 {isSharing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Share2 className="mr-2 h-4 w-4" />}
                 শেয়ার কার্ড
            </Button>
+
+            {result.pdfId && (
+                <>
+                    <Button variant="outline" asChild>
+                        <Link href={`/result/${result.pdfId}`} target="_blank">
+                            <LinkIcon className="mr-2 h-4 w-4" />
+                            শেয়ারযোগ্য লিঙ্ক
+                        </Link>
+                    </Button>
+                     <Button variant="outline" onClick={handleCopyLink}>
+                        <Copy className="mr-2 h-4 w-4" />
+                        লিঙ্ক কপি করুন
+                    </Button>
+                </>
+            )}
 
           <Button onClick={handleDownload} disabled={isDownloading || isSharing}>
               {isDownloading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
@@ -400,6 +428,20 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
                 {isSharing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Share2 className="mr-2 h-4 w-4" />}
                 শেয়ার কার্ড
             </Button>
+             {result.pdfId && (
+                <>
+                    <Button variant="outline" asChild>
+                        <Link href={`/result/${result.pdfId}`} target="_blank">
+                            <LinkIcon className="mr-2 h-4 w-4" />
+                            শেয়ারযোগ্য লিঙ্ক
+                        </Link>
+                    </Button>
+                     <Button variant="outline" onClick={handleCopyLink}>
+                        <Copy className="mr-2 h-4 w-4" />
+                        লিঙ্ক কপি করুন
+                    </Button>
+                </>
+            )}
             <Button onClick={handleDownload} disabled={isDownloading || isSharing}>
                {isDownloading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
                 ডাউনলোড করুন

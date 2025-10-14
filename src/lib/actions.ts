@@ -4,6 +4,8 @@
 import type { ExamResult, GradeInfo, InstituteResult, StudentResult } from '@/types';
 import { z } from 'zod';
 import { formSchemaWithCookie } from '@/lib/schema';
+import { db } from '@/lib/firebase';
+import { doc, setDoc } from 'firebase/firestore';
 
 type SubjectDetail = {
     SUB_CODE: string;
@@ -132,8 +134,10 @@ async function searchResultLegacy(values: z.infer<typeof formSchemaWithCookie> &
             eiin: res.eiin_code || 'N/A',
             session: calculatedSession,
         };
-
-        return {
+        
+        const resultId = `${year}-${board}-${roll}`;
+        const finalResult: ExamResult = {
+            pdfId: resultId,
             roll: res.roll_no,
             reg: (res.regno && /^\d+$/.test(res.regno)) ? res.regno : values.reg,
             board: res.board_name,
@@ -144,6 +148,18 @@ async function searchResultLegacy(values: z.infer<typeof formSchemaWithCookie> &
             studentInfo: studentInfo,
             grades: allGrades,
         };
+
+        if (status === 'Pass') {
+            try {
+                const resultDocRef = doc(db, 'results', resultId);
+                await setDoc(resultDocRef, finalResult);
+            } catch (dbError) {
+                console.error("Failed to save result to Firestore:", dbError);
+                // We don't return an error to the user, just log it. The result is still displayed.
+            }
+        }
+
+        return finalResult;
 
     } catch (error) {
         console.error("Error in searchResultLegacy:", error);

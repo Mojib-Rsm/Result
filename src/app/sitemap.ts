@@ -30,6 +30,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     changeFrequency: 'weekly',
     priority: path === '/' ? 1 : 0.8,
   }));
+  
+  // We can't dynamically generate result pages here easily without
+  // querying Firestore, which is complex in this context.
+  // We will rely on Google to crawl the links from the main page.
 
   return sitemapEntries;
 }
