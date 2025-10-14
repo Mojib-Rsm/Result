@@ -315,18 +315,9 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
            </Button>
 
             {result.pdfId && (
-                <>
-                    <Button variant="outline" asChild>
-                        <Link href={`/result/${result.pdfId}`} target="_blank">
-                            <LinkIcon className="mr-2 h-4 w-4" />
-                            শেয়ারযোগ্য লিঙ্ক
-                        </Link>
-                    </Button>
-                     <Button variant="outline" onClick={handleCopyLink}>
-                        <Copy className="mr-2 h-4 w-4" />
-                        লিঙ্ক কপি করুন
-                    </Button>
-                </>
+                <Button variant="outline" size="icon" onClick={handleCopyLink} aria-label="Copy shareable link">
+                    <Copy className="h-4 w-4" />
+                </Button>
             )}
 
           <Button onClick={handleDownload} disabled={isDownloading || isSharing}>
@@ -429,18 +420,9 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
                 শেয়ার কার্ড
             </Button>
              {result.pdfId && (
-                <>
-                    <Button variant="outline" asChild>
-                        <Link href={`/result/${result.pdfId}`} target="_blank">
-                            <LinkIcon className="mr-2 h-4 w-4" />
-                            শেয়ারযোগ্য লিঙ্ক
-                        </Link>
-                    </Button>
-                     <Button variant="outline" onClick={handleCopyLink}>
-                        <Copy className="mr-2 h-4 w-4" />
-                        লিঙ্ক কপি করুন
-                    </Button>
-                </>
+                <Button variant="outline" size="icon" onClick={handleCopyLink} aria-label="Copy shareable link">
+                    <Copy className="h-4 w-4" />
+                </Button>
             )}
             <Button onClick={handleDownload} disabled={isDownloading || isSharing}>
                {isDownloading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
@@ -452,3 +434,5 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
     </div>
   );
 }
+
+    
