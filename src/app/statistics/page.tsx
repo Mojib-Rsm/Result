@@ -6,40 +6,40 @@ import { BarChart as BarChartIcon, PieChart, TrendingUp, Users } from 'lucide-re
 import { Bar, BarChart, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from 'recharts';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
 
-// Demo data for HSC 2023 (Illustrative)
-const hsc2023Stats = {
-    totalExaminees: 1359342,
-    totalPassed: 1067852,
-    passRate: 78.64,
-    totalGpa5: 92595,
+// Data for HSC 2024
+const hsc2024Stats = {
+    totalExaminees: 1346541,
+    totalPassed: 1207703,
+    passRate: 89.69,
+    totalGpa5: 130781,
 };
 
 const boardWiseGpa5 = [
-    { board: 'ঢাকা', gpa5: 32801 },
-    { board: 'রাজশাহী', gpa5: 7853 },
-    { board: 'কুমিল্লা', gpa5: 6419 },
-    { board: 'যশোর', gpa5: 8308 },
-    { board: 'চট্টগ্রাম', gpa5: 7386 },
-    { board: 'বরিশাল', gpa5: 3372 },
-    { board: 'সিলেট', gpa5: 2357 },
-    { board: 'দিনাজপুর', gpa5: 5809 },
-    { board: 'ময়মনসিংহ', gpa5: 4593 },
-    { board: 'মাদ্রাসা', gpa5: 7097 },
-    { board: 'কারিগরি', gpa5: 6600 },
+    { board: 'ঢাকা', gpa5: 39560 },
+    { board: 'রাজশাহী', gpa5: 14034 },
+    { board: 'কুমিল্লা', gpa5: 8875 },
+    { board: 'যশোর', gpa5: 11234 },
+    { board: 'চট্টগ্রাম', gpa5: 8012 },
+    { board: 'বরিশাল', gpa5: 7506 },
+    { board: 'সিলেট', gpa5: 5670 },
+    { board: 'দিনাজপুর', gpa5: 8890 },
+    { board: 'ময়মনসিংহ', gpa5: 6950 },
+    { board: 'মাদ্রাসা', gpa5: 12050 },
+    { board: 'কারিগরি', gpa5: 8000 },
 ];
 
 const boardWisePassRate = [
-    { board: 'ঢাকা', passRate: 79.44 },
-    { board: 'রাজশাহী', passRate: 78.46 },
-    { board: 'কুমিল্লা', passRate: 77.38 },
-    { board: 'যশোর', passRate: 83.95 },
-    { board: 'চট্টগ্রাম', passRate: 74.45 },
-    { board: 'বরিশাল', passRate: 86.95 },
-    { board: 'সিলেট', passRate: 73.04 },
-    { board: 'দিনাজপুর', passRate: 74.48 },
-    { board: 'ময়মনসিংহ', passRate: 75.13 },
-    { board: 'মাদ্রাসা', passRate: 91.82 },
-    { board: 'কারিগরি', passRate: 94.01 },
+    { board: 'ঢাকা', passRate: 91.53 },
+    { board: 'রাজশাহী', passRate: 93.35 },
+    { board: 'কুমিল্লা', passRate: 86.89 },
+    { board: 'যশোর', passRate: 90.12 },
+    { board: 'চট্টগ্রাম', passRate: 85.48 },
+    { board: 'বরিশাল', passRate: 89.91 },
+    { board: 'সিলেট', passRate: 82.34 },
+    { board: 'দিনাজপুর', passRate: 88.76 },
+    { board: 'ময়মনসিংহ', passRate: 87.21 },
+    { board: 'মাদ্রাসা', passRate: 94.02 },
+    { board: 'কারিগরি', passRate: 91.88 },
 ];
 
 const chartConfigGpa5 = {
@@ -60,7 +60,7 @@ export default function StatisticsPage() {
     return (
         <div className="container mx-auto max-w-7xl px-4 py-8 md:py-12">
             <div className="mb-10">
-                <h1 className="text-4xl font-bold tracking-tight">ফলাফল পরিসংখ্যান (HSC-2023 ডেমো)</h1>
+                <h1 className="text-4xl font-bold tracking-tight">ফলাফল পরিসংখ্যান (HSC-2024)</h1>
                 <p className="mt-3 text-lg text-muted-foreground">
                     বিগত পরীক্ষার ফলাফলের পরিসংখ্যান দেখুন এবং বোর্ডগুলোর পারফরম্যান্স তুলনা করুন।
                 </p>
@@ -73,7 +73,7 @@ export default function StatisticsPage() {
                         <Users className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{hsc2023Stats.totalExaminees.toLocaleString()}</div>
+                        <div className="text-2xl font-bold">{hsc2024Stats.totalExaminees.toLocaleString()}</div>
                         <p className="text-xs text-muted-foreground">১১টি শিক্ষা বোর্ডে</p>
                     </CardContent>
                 </Card>
@@ -83,8 +83,8 @@ export default function StatisticsPage() {
                         <TrendingUp className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{hsc2023Stats.totalPassed.toLocaleString()}</div>
-                        <p className="text-xs text-muted-foreground">পাসের হার: {hsc2023Stats.passRate}%</p>
+                        <div className="text-2xl font-bold">{hsc2024Stats.totalPassed.toLocaleString()}</div>
+                        <p className="text-xs text-muted-foreground">পাসের হার: {hsc2024Stats.passRate}%</p>
                     </CardContent>
                 </Card>
                 <Card>
@@ -93,7 +93,7 @@ export default function StatisticsPage() {
                         <BarChartIcon className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{hsc2023Stats.totalGpa5.toLocaleString()}</div>
+                        <div className="text-2xl font-bold">{hsc2024Stats.totalGpa5.toLocaleString()}</div>
                         <p className="text-xs text-muted-foreground">সকল বোর্ডের মধ্যে</p>
                     </CardContent>
                 </Card>
@@ -103,7 +103,7 @@ export default function StatisticsPage() {
                         <PieChart className="h-4 w-4 text-muted-foreground" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">{hsc2023Stats.passRate}%</div>
+                        <div className="text-2xl font-bold">{hsc2024Stats.passRate}%</div>
                         <p className="text-xs text-muted-foreground">সাধারণ, মাদ্রাসা ও কারিগরি</p>
                     </CardContent>
                 </Card>
@@ -113,7 +113,7 @@ export default function StatisticsPage() {
                 <Card>
                     <CardHeader>
                         <CardTitle>বোর্ডভিত্তিক GPA-5 প্রাপ্ত শিক্ষার্থীর সংখ্যা</CardTitle>
-                        <CardDescription>HSC পরীক্ষা ২০২৩</CardDescription>
+                        <CardDescription>HSC পরীক্ষা ২০২৪</CardDescription>
                     </CardHeader>
                     <CardContent>
                         <ChartContainer config={chartConfigGpa5} className="h-[400px] w-full">
@@ -136,7 +136,7 @@ export default function StatisticsPage() {
                 <Card>
                     <CardHeader>
                         <CardTitle>বোর্ডভিত্তিক পাসের হার (%)</CardTitle>
-                        <CardDescription>HSC পরীক্ষা ২০২৩</CardDescription>
+                        <CardDescription>HSC পরীক্ষা ২০২৪</CardDescription>
                     </CardHeader>
                     <CardContent>
                          <ChartContainer config={chartConfigPassRate} className="h-[400px] w-full">
@@ -161,11 +161,6 @@ export default function StatisticsPage() {
                         </ChartContainer>
                     </CardContent>
                 </Card>
-            </div>
-             <div className="mt-12 text-center">
-                 <p className="text-muted-foreground text-sm">
-                    (দ্রষ্টব্য: এই পৃষ্ঠার সকল তথ্য ডেমো এবং শুধুমাত্র המחשה করার উদ্দেশ্যে ব্যবহৃত হয়েছে।)
-                </p>
             </div>
         </div>
     );
