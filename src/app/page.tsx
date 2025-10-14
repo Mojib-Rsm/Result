@@ -40,8 +40,8 @@ export default function Home() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      exam: '',
-      year: '',
+      exam: 'hsc',
+      year: '2025',
       board: '',
       roll: '',
       reg: '',
