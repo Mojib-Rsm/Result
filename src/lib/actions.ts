@@ -73,8 +73,6 @@ async function searchResultLegacy(values: z.infer<typeof formSchemaWithCookie> &
     if (exam === 'hsc_bm') {
         board = 'tec';
         exam = 'hsc';
-    } else if (exam === 'hsc' && board === 'tec') {
-        exam = 'hsc_bm';
     }
 
     const payload = new URLSearchParams();
@@ -199,7 +197,7 @@ async function searchResultLegacy(values: z.infer<typeof formSchemaWithCookie> &
             reg: (res.regno && /^\d+$/.test(res.regno)) ? res.regno : values.reg,
             board: res.board_name,
             year: year,
-            exam: exam,
+            exam: values.exam, // Use original exam value for display
             gpa: gpa,
             status: status,
             studentInfo: studentInfo,
