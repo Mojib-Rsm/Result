@@ -322,10 +322,16 @@ export default function AdminPage() {
                 throw new Error(result.error);
             }
             setCheckedResult(result);
-            const message = result.status === 'Pass'
-                ? `অভিনন্দন! আপনার ${result.exam.toUpperCase()} পরীক্ষার ফলাফল প্রকাশিত হয়েছে। আপনার GPA: ${result.gpa.toFixed(2)}. বিস্তারিত দেখুন: www.bdedu.me`
-                : `আপনার ${selectedSub.exam.toUpperCase()} পরীক্ষার ফলাফল প্রকাশিত হয়েছে। স্ট্যাটাস: Fail. বিস্তারিত দেখুন: www.bdedu.me`;
+            
+            let message = '';
+            if (result.status === 'Pass') {
+                const resultUrl = result.pdfId ? `www.bdedu.me/results/${result.pdfId}` : 'www.bdedu.me';
+                message = `অভিনন্দন! আপনার ${result.exam.toUpperCase()} পরীক্ষার ফলাফল প্রকাশিত হয়েছে। আপনার GPA: ${result.gpa.toFixed(2)}. বিস্তারিত দেখুন: ${resultUrl}`;
+            } else {
+                message = `আপনার ${selectedSub.exam.toUpperCase()} পরীক্ষার ফলাফল প্রকাশিত হয়েছে। স্ট্যাটাস: Fail. বিস্তারিত দেখুন: www.bdedu.me`;
+            }
             setSingleSmsMessage(message);
+
         } catch (error: any) {
             setCheckError(error.message);
             const message = `দুঃখিত, আপনার ${selectedSub.exam.toUpperCase()} পরীক্ষার জন্য দেওয়া রোল (${selectedSub.roll}) ও বোর্ডের তথ্যে কোনো ফলাফল পাওয়া যায়নি। তথ্য সঠিক কিনা যাচাই করুন। - bdedu.me`;
@@ -743,5 +749,7 @@ export default function AdminPage() {
         </div>
     );
 }
+
+    
 
     
