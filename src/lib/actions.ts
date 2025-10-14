@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { formSchemaWithCookie } from '@/lib/schema';
 import { db } from '@/lib/firebase';
 import { doc, setDoc } from 'firebase/firestore';
+import { JSDOM } from 'jsdom';
 
 type SubjectDetail = {
     SUB_CODE: string;
@@ -30,6 +31,49 @@ function parseGrades(displayDetails: string, subDetails: SubjectDetail[]): Grade
             grade: grade,
         };
     });
+}
+
+function parseInstituteNameFromHtml(htmlContent: string): string {
+    const dom = new JSDOM(htmlContent);
+    const bodyText = dom.window.document.body.textContent || '';
+    const match = bodyText.match(/Institution: (.*?)\(EIIN: \d+\)/);
+    return match ? match[1].trim() : 'Unknown Institute';
+}
+
+
+function parseInstituteResultsFromHtml(htmlContent: string): StudentResult[] {
+    const dom = new J_SDOM(htmlContent);
+    const body = dom.window.document.body;
+    const lines = body.innerHTML.split('<br>').map(line => line.replace(/&nbsp;/g, ' ').trim());
+    
+    const results: StudentResult[] = [];
+    let currentGroup = '';
+
+    for (const line of lines) {
+        const fontTagMatch = line.match(/<font color=red>(.*?)<\/font>/);
+        if (fontTagMatch) {
+            currentGroup = fontTagMatch[1].trim();
+            continue;
+        }
+
+        if (line.includes('PASSED=')) {
+            const passedStudentsMatch = line.match(/PASSED=.*?\[ (.*?) \]/);
+            if (passedStudentsMatch) {
+                const studentList = passedStudentsMatch[1].split(',');
+                studentList.forEach(studentStr => {
+                    const [roll, gpa] = studentStr.trim().split('(');
+                    if (roll && gpa) {
+                        results.push({
+                            roll: roll.trim(),
+                            gpa: gpa.replace(')', '').trim(),
+                        });
+                    }
+                });
+            }
+        }
+    }
+    
+    return results;
 }
 
 
@@ -79,9 +123,8 @@ async function searchResultLegacy(values: z.infer<typeof formSchemaWithCookie> &
 
         const data = await response.json();
         
-        if (data.status !== 0 || !data.res) {
+        if (data.status !== 0) {
              const defaultError = "ফলাফল খুঁজে পাওয়া যায়নি। অনুগ্রহ করে আপনার দেওয়া তথ্য এবং ক্যাপচা পরীক্ষা করে আবার চেষ্টা করুন।";
-             // The API sometimes returns HTML in the 'msg' field for captcha errors
              if (data.msg && (data.msg.includes('<') || data.msg.includes('>'))) {
                  return { error: "ক্যাপচা ভুল হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।" }
              }
@@ -89,15 +132,27 @@ async function searchResultLegacy(values: z.infer<typeof formSchemaWithCookie> &
         }
         
         if (result_type === '2') {
-            const res = data.res;
-            const results: StudentResult[] = res.map((item: any) => ({
-                roll: item.roll_no,
-                reg: item.regno,
-                gpa: item.gpa,
-            }));
+            let results: StudentResult[] = [];
+            let instituteName = "Unknown Institute";
+
+            if (data.res && Array.isArray(data.res)) {
+                 results = data.res.map((item: any) => ({
+                    roll: item.roll_no,
+                    reg: item.regno,
+                    gpa: item.gpa,
+                }));
+                instituteName = data.institute_name || "Unknown Institute";
+            } else if (data.extra && data.extra.content) {
+                results = parseInstituteResultsFromHtml(data.extra.content);
+                instituteName = parseInstituteNameFromHtml(data.extra.content);
+            }
+            
+             if (results.length === 0) {
+                 return { error: 'প্রতিষ্ঠানের কোনো শিক্ষার্থীর ফলাফল পাওয়া যায়নি।' };
+            }
 
             return {
-                instituteName: data.institute_name || "Unknown Institute",
+                instituteName: instituteName,
                 eiin: eiin || "N/A",
                 exam: exam,
                 year: year,
@@ -109,6 +164,9 @@ async function searchResultLegacy(values: z.infer<typeof formSchemaWithCookie> &
 
         // Individual result processing
         const res = data.res;
+        if (!res) {
+            return { error: data.msg || 'ফলাফল পাওয়া যায়নি। API থেকে কোনো ডেটা আসেনি।' };
+        }
 
         const gpaMatch = res.res_detail?.match(/([0-9\.]+)/);
         const gpa = gpaMatch ? parseFloat(gpaMatch[1]) : 0;
@@ -157,7 +215,6 @@ async function searchResultLegacy(values: z.infer<typeof formSchemaWithCookie> &
                 await setDoc(resultDocRef, finalResult);
             } catch (dbError) {
                 console.error("Failed to save result to Firestore:", dbError);
-                // We don't return an error to the user, just log it. The result is still displayed.
             }
         }
 
@@ -178,11 +235,8 @@ async function searchInstituteResult(values: { eiin: string; exam: string; year:
         result_type: '2',
     });
     
-    // Type assertion because we expect an institute result or an error
     return result as InstituteResult | { error: string };
 }
 
 
 export { searchResultLegacy, searchInstituteResult };
-
-    

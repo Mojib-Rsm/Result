@@ -51,8 +51,9 @@ export interface CaptchaResponse {
 
 export interface StudentResult {
     roll: string;
-    reg: string;
+    reg?: string;
     gpa: string;
+    name?: string;
 }
 
 export interface InstituteResult {
