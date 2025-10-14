@@ -36,7 +36,7 @@ function parseGrades(displayDetails: string, subDetails: SubjectDetail[]): Grade
 function parseInstituteNameFromHtml(htmlContent: string): string {
     const dom = new JSDOM(htmlContent);
     const bodyText = dom.window.document.body.textContent || '';
-    const match = bodyText.match(/Institution: (.*?)\(EIIN: \d+\)/);
+    const match = bodyText.match(/Institution: (.*?)\s*\(EIIN: \d+\)/);
     return match ? match[1].trim() : 'Unknown Institute';
 }
 
