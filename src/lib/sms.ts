@@ -1,16 +1,8 @@
 
-
-interface SmsApiResult {
-    error: number; // 0 for success
-    sent?: string;
-    id?: string;
-    note?: string;
-    errormsg?: string;
-    [key: string]: any;
-}
-
 interface SmsApiResponse {
-    result: SmsApiResult;
+    status?: string;
+    message?: string;
+    error?: string;
 }
 
 export async function sendBulkSms(
@@ -25,40 +17,42 @@ export async function sendBulkSms(
         return { success: false, error: "SMS সার্ভিসটি কনফিগার করা হয়নি।" };
     }
 
-    const recipients = phoneNumbers.join(',');
-    const encodedMessage = encodeURIComponent(message);
-    
-    const apiUrl = `https://api.smsmobileapi.com/sendsms/?apikey=${apiKey}&recipients=${recipients}&message=${encodedMessage}`;
-
-    try {
-        const response = await fetch(apiUrl, {
-            method: 'GET',
-            cache: 'no-store'
-        });
-        
-        const responseText = await response.text();
-        console.log("SMS API Raw Response:", responseText);
-
+    // The new API seems to send to one recipient at a time.
+    // We will loop through the numbers and send one by one.
+    for (const number of phoneNumbers) {
         try {
-            const data: SmsApiResponse = JSON.parse(responseText);
+            const response = await fetch('https://sms.anbuinfosec.live/api/v1/sms/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    apiKey: apiKey,
+                    recipient: number,
+                    message: message,
+                }),
+                cache: 'no-store'
+            });
 
-            if (data.result && data.result.error === 0) {
-                return { success: true };
+            const data: SmsApiResponse = await response.json();
+            
+            if (response.ok && data.status === 'success') {
+                console.log(`SMS sent successfully to ${number}`);
+                // Continue to the next number
             } else {
-                const errorMessage = data.result?.note || data.result?.errormsg || 'An unknown error occurred from SMS API.';
-                console.error("SMS API Error:", errorMessage);
+                const errorMessage = data.message || data.error || 'An unknown error occurred from SMS API.';
+                console.error(`SMS API Error for ${number}:`, errorMessage);
+                // We can decide if we want to stop on first error or continue.
+                // For now, let's return on the first error.
                 return { success: false, error: errorMessage };
             }
-        } catch (jsonError) {
-             if (responseText.toLowerCase().includes('success')) {
-                 return { success: true };
-             }
-             console.error("SMS API non-JSON or unexpected response:", responseText);
-             return { success: false, error: `API থেকে একটি অপ্রত্যাশিত প্রতিক্রিয়া এসেছে: ${responseText}` };
-        }
 
-    } catch (error: any) {
-        console.error("Failed to send SMS:", error);
-        return { success: false, error: 'SMS পাঠানোর সময় একটি নেটওয়ার্ক সমস্যা হয়েছে।' };
+        } catch (error: any) {
+            console.error(`Failed to send SMS to ${number}:`, error);
+            return { success: false, error: 'SMS পাঠানোর সময় একটি নেটওয়ার্ক সমস্যা হয়েছে।' };
+        }
     }
+
+    // If the loop completes without returning an error, it means all were successful.
+    return { success: true };
 }
