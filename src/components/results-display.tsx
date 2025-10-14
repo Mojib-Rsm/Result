@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Loader2, Search, Download, BarChart, ArrowUp, ArrowDown, Star, Sparkles, Share2, Building, Link as LinkIcon, Copy } from 'lucide-react';
+import { Loader2, Search, Download, BarChart, ArrowUp, ArrowDown, Star, Sparkles, Share2, Building, Copy } from 'lucide-react';
 import type { ExamResult, GradeInfo } from '@/types';
 import { Separator } from './ui/separator';
 import { cn } from '@/lib/utils';
@@ -245,7 +245,7 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
 
   const handleCopyLink = () => {
     if (result.pdfId) {
-        const url = `${window.location.origin}/result/${result.pdfId}`;
+        const url = `${window.location.origin}/results/${result.pdfId}`;
         navigator.clipboard.writeText(url);
         toast({
             title: "লিঙ্ক কপি হয়েছে",
@@ -434,5 +434,3 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
     </div>
   );
 }
-
-    

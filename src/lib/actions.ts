@@ -135,7 +135,9 @@ async function searchResultLegacy(values: z.infer<typeof formSchemaWithCookie> &
             session: calculatedSession,
         };
         
-        const resultId = `${year}-${board}-${roll}`;
+        const boardShortName = board.substring(0, 3).toLowerCase();
+        const resultId = `${boardShortName}-${roll}`;
+
         const finalResult: ExamResult = {
             pdfId: resultId,
             roll: res.roll_no,
