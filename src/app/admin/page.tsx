@@ -394,7 +394,7 @@ export default function AdminPage() {
     const TableSkeleton = () => (
         [...Array(5)].map((_, i) => (
             <TableRow key={i}>
-                {[...Array(5)].map((_, j) => (
+                {[...Array(7)].map((_, j) => (
                      <TableCell key={j}><Skeleton className="h-4 w-full" /></TableCell>
                 ))}
             </TableRow>
@@ -628,7 +628,9 @@ export default function AdminPage() {
                                     <TableRow>
                                         <TableHead>ফোন নম্বর</TableHead>
                                         <TableHead>রোল</TableHead>
+                                        <TableHead>রেজি. নম্বর</TableHead>
                                         <TableHead>পরীক্ষা</TableHead>
+                                        <TableHead>বোর্ড</TableHead>
                                         <TableHead>বছর</TableHead>
                                         <TableHead className="text-right">কার্যকলাপ</TableHead>
                                     </TableRow>
@@ -641,7 +643,9 @@ export default function AdminPage() {
                                         <TableRow key={sub.id}>
                                             <TableCell>{sub.phone}</TableCell>
                                             <TableCell>{sub.roll}</TableCell>
+                                            <TableCell>{sub.reg}</TableCell>
                                             <TableCell className="uppercase">{sub.exam}</TableCell>
+                                            <TableCell className="capitalize">{sub.board}</TableCell>
                                             <TableCell>{sub.year}</TableCell>
                                             <TableCell className="text-right">
                                                 <div className="flex justify-end gap-2">
@@ -676,7 +680,7 @@ export default function AdminPage() {
                                         </TableRow>
                                     ))) : (
                                         <TableRow>
-                                            <TableCell colSpan={5} className="text-center">কোনো সাবস্ক্রিপশন নেই।</TableCell>
+                                            <TableCell colSpan={7} className="text-center">কোনো সাবস্ক্রিপশন নেই।</TableCell>
                                         </TableRow>
                                     )}
                                 </TableBody>
@@ -686,7 +690,7 @@ export default function AdminPage() {
                                         <DialogHeader>
                                             <DialogTitle>ফলাফল এবং SMS</DialogTitle>
                                             <DialogDescription>
-                                                রোল: {selectedSub.roll}, ফোন: {selectedSub.phone}
+                                                রোল: {selectedSub.roll}, রেজি: {selectedSub.reg}, বোর্ড: <span className="capitalize">{selectedSub.board}</span>
                                             </DialogDescription>
                                         </DialogHeader>
                                         <div className="py-4 space-y-4">
