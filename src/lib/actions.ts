@@ -172,8 +172,7 @@ async function searchResultLegacy(values: z.infer<typeof formSchemaWithCookie> &
     }
 }
 
-async function searchInstituteResult(values: { eiin: string; exam: string; year: string; board: string; }): Promise<InstituteResult | { error: string }> {
-     // We don't need captcha for institute results via this API endpoint apparently
+async function searchInstituteResult(values: { eiin: string; exam: string; year: string; board: string; captcha: string; cookie?: string; }): Promise<InstituteResult | { error: string }> {
     const result = await searchResultLegacy({
         ...values,
         result_type: '2',
@@ -185,3 +184,5 @@ async function searchInstituteResult(values: { eiin: string; exam: string; year:
 
 
 export { searchResultLegacy, searchInstituteResult };
+
+    

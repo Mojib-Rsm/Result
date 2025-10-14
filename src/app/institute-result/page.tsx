@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -11,17 +11,19 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Loader2, Search, Building } from 'lucide-react';
+import { Loader2, Search, Building, RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { searchInstituteResult } from '@/lib/actions';
 import type { InstituteResult } from '@/types';
 import { Separator } from '@/components/ui/separator';
+import Image from 'next/image';
 
 const instituteFormSchema = z.object({
   eiin: z.string().length(6, 'EIIN অবশ্যই ৬ সংখ্যার হতে হবে।'),
   exam: z.string().min(1, 'পরীক্ষা নির্বাচন আবশ্যক।'),
   year: z.string().min(1, 'বছর নির্বাচন আবশ্যক।'),
   board: z.string().min(1, 'বোর্ড নির্বাচন আবশ্যক।'),
+  captcha: z.string().min(1, 'ক্যাপচা আবশ্যক।'),
 });
 
 const exams = [
@@ -51,6 +53,8 @@ const years = Array.from({ length: currentYear - 1995 }, (_, i) => currentYear -
 export default function InstituteResultPage() {
   const [result, setResult] = useState<InstituteResult | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [captchaUrl, setCaptchaUrl] = useState('');
+  const [captchaCookie, setCaptchaCookie] = useState('');
   const { toast } = useToast();
 
   const form = useForm<z.infer<typeof instituteFormSchema>>({
@@ -60,15 +64,40 @@ export default function InstituteResultPage() {
       exam: '',
       year: '',
       board: '',
+      captcha: '',
     },
   });
+
+  const refreshCaptcha = useCallback(async () => {
+    form.setValue('captcha', '');
+    try {
+        const res = await fetch('/api/captcha');
+        const data = await res.json();
+        setCaptchaUrl(data.img);
+        setCaptchaCookie(data.cookie);
+    } catch(e) {
+        console.error("Failed to refresh captcha", e);
+        toast({
+            title: "ত্রুটি",
+            description: "ক্যাপচা লোড করা যায়নি। অনুগ্রহ করে পৃষ্ঠাটি রিফ্রেশ করুন।",
+            variant: "destructive"
+        });
+    }
+  }, [form, toast]);
+
+  useEffect(() => {
+    refreshCaptcha();
+  }, [refreshCaptcha]);
+
 
   const onSubmit = async (values: z.infer<typeof instituteFormSchema>) => {
     setIsSubmitting(true);
     setResult(null);
 
+    const valuesWithCookie = { ...values, cookie: captchaCookie };
+
     try {
-      const searchResult = await searchInstituteResult(values);
+      const searchResult = await searchInstituteResult(valuesWithCookie);
       
       if ('error' in searchResult) {
           throw new Error(searchResult.error);
@@ -81,6 +110,7 @@ export default function InstituteResultPage() {
         description: e.message,
         variant: "destructive"
        });
+       refreshCaptcha();
     } finally {
         setIsSubmitting(false);
     }
@@ -89,6 +119,7 @@ export default function InstituteResultPage() {
    const resetSearch = () => {
     setResult(null);
     form.reset();
+    refreshCaptcha();
   };
 
 
@@ -179,6 +210,46 @@ export default function InstituteResultPage() {
                           </FormItem>
                         )}
                       />
+
+                    <div className="space-y-2 rounded-md border p-4 bg-muted/50">
+                        <FormLabel>রোবট নন তা প্রমাণ করুন</FormLabel>
+                        <div className="flex flex-wrap items-end gap-2">
+                            <div className="flex items-center gap-2">
+                                <div className="relative w-24 h-9 flex-shrink-0">
+                                    {captchaUrl && <Image src={captchaUrl} alt="ক্যাপচা" layout="fill" objectFit="contain" unoptimized />}
+                                </div>
+                                <Button type="button" variant="outline" size="icon" onClick={refreshCaptcha} className="h-9 w-9 flex-shrink-0">
+                                    <RefreshCw className="h-4 w-4" />
+                                    <span className="sr-only">অন্য ছবি</span>
+                                </Button>
+                            </div>
+                            <FormField
+                                control={form.control}
+                                name="captcha"
+                                render={({ field }) => (
+                                    <FormItem className="flex-grow min-w-[200px]">
+                                        <FormControl>
+                                            <Input 
+                                                placeholder="ছবিতে দেখানো সংখ্যাগুলো লিখুন" 
+                                                {...field}
+                                                autoComplete="off"
+                                                className="h-9 py-1"
+                                                value={field.value || ''}
+                                                onChange={(e) => {
+                                                    const value = e.target.value;
+                                                    if (/^\d*$/.test(value)) {
+                                                        field.onChange(value);
+                                                    }
+                                                }}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+                        </div>
+                    </div>
+
                     <div className="flex justify-end pt-4">
                       <Button type="submit" disabled={isSubmitting} className="w-full md:w-auto">
                         {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
@@ -231,3 +302,5 @@ export default function InstituteResultPage() {
     </div>
   );
 }
+
+    
