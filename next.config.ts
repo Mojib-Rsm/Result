@@ -37,9 +37,7 @@ const nextConfig: NextConfig = {
       }
     ],
   },
-  env: {
-    NEXT_PUBLIC_ADMIN_PHONE_NUMBER: process.env.ADMIN_PHONE_NUMBER,
-  }
+  env: {}
 };
 
 export default nextConfig;
