@@ -45,6 +45,7 @@ export async function sendAnbuSms(
 ): Promise<{ success: boolean; error?: string }> {
     
     const apiKey = process.env.SMS_API_KEY_ANBU;
+    const senderId = 'ANBUSMS';
 
     if (!apiKey) {
         const errorMsg = "ANBU SMS সার্ভিসটি কনফিগার করা হয়নি।";
@@ -68,7 +69,7 @@ export async function sendAnbuSms(
                     apiKey: apiKey,
                     recipient: number,
                     message: message,
-                    senderId: 'ANBUSMS'
+                    senderId: senderId
                 }),
                 cache: 'no-store'
             });
