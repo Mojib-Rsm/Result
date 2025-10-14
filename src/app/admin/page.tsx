@@ -23,6 +23,7 @@ import { Input } from '@/components/ui/input';
 import Image from 'next/image';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 
 const adminFeatures = [
@@ -112,6 +113,7 @@ export default function AdminPage() {
     
     // Site settings state
     const [showSubscriptionForm, setShowSubscriptionForm] = useState(true);
+    const [activeSmsApi, setActiveSmsApi] = useState('anbu');
     const [loadingSettings, setLoadingSettings] = useState(true);
 
 
@@ -189,7 +191,9 @@ export default function AdminPage() {
                 setSubscriptions(allSubsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
                 
                 if (settingsSnap.exists()) {
-                    setShowSubscriptionForm(settingsSnap.data().showSubscriptionForm);
+                    const settingsData = settingsSnap.data();
+                    setShowSubscriptionForm(settingsData.showSubscriptionForm);
+                    setActiveSmsApi(settingsData.activeSmsApi || 'anbu');
                 }
 
 
@@ -209,14 +213,12 @@ export default function AdminPage() {
         fetchAllData();
     }, [db, toast]);
     
-    const handleSubscriptionFormToggle = async (checked: boolean) => {
-        setShowSubscriptionForm(checked);
+    const handleSettingsChange = async (key: string, value: any) => {
         try {
             const settingsRef = doc(db, 'settings', 'config');
-            await setDoc(settingsRef, { showSubscriptionForm: checked }, { merge: true });
+            await setDoc(settingsRef, { [key]: value }, { merge: true });
             toast({
                 title: 'সেটিং সংরক্ষিত হয়েছে',
-                description: `ফলাফল অ্যালার্ট ফর্ম এখন ${checked ? 'দৃশ্যমান' : 'লুকানো'}।`,
             });
         } catch (error: any) {
             toast({
@@ -226,7 +228,16 @@ export default function AdminPage() {
             });
         }
     };
+    
+    const handleSubscriptionFormToggle = (checked: boolean) => {
+        setShowSubscriptionForm(checked);
+        handleSettingsChange('showSubscriptionForm', checked);
+    };
 
+    const handleSmsApiChange = (value: string) => {
+        setActiveSmsApi(value);
+        handleSettingsChange('activeSmsApi', value);
+    };
 
     const handleBulkSendSms = async () => {
         if (!smsMessage.trim()) {
@@ -471,21 +482,44 @@ export default function AdminPage() {
                             সাইট সেটিংস
                         </CardTitle>
                         <CardDescription>
-                            সাইটের বিভিন্ন ফিচার চালু বা বন্ধ করুন।
+                            সাইটের বিভিন্ন ফিচার ও কনফিগারেশন পরিচালনা করুন।
                         </CardDescription>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="space-y-6">
                         {loadingSettings ? (
-                            <Skeleton className="h-8 w-48" />
+                           <div className="space-y-4">
+                               <Skeleton className="h-8 w-48" />
+                               <Skeleton className="h-10 w-full" />
+                           </div>
                         ) : (
-                            <div className="flex items-center space-x-2">
-                                <Switch
-                                    id="subscription-form-toggle"
-                                    checked={showSubscriptionForm}
-                                    onCheckedChange={handleSubscriptionFormToggle}
-                                />
-                                <Label htmlFor="subscription-form-toggle">ফলাফল অ্যালার্ট ফর্ম দেখান</Label>
-                            </div>
+                            <>
+                                <div className="flex items-center space-x-2">
+                                    <Switch
+                                        id="subscription-form-toggle"
+                                        checked={showSubscriptionForm}
+                                        onCheckedChange={handleSubscriptionFormToggle}
+                                    />
+                                    <Label htmlFor="subscription-form-toggle">ফলাফল অ্যালার্ট ফর্ম দেখান</Label>
+                                </div>
+                                <Separator />
+                                <div>
+                                    <Label className="mb-2 block">সক্রিয় SMS গেটওয়ে</Label>
+                                    <RadioGroup
+                                        value={activeSmsApi}
+                                        onValueChange={handleSmsApiChange}
+                                        className="flex flex-col space-y-1"
+                                    >
+                                        <div className="flex items-center space-x-2">
+                                            <RadioGroupItem value="anbu" id="anbu" />
+                                            <Label htmlFor="anbu">ANBU SMS</Label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <RadioGroupItem value="bulksmsbd" id="bulksmsbd" />
+                                            <Label htmlFor="bulksmsbd">BulkSMSBD</Label>
+                                        </div>
+                                    </RadioGroup>
+                                </div>
+                            </>
                         )}
                     </CardContent>
                 </Card>
@@ -709,5 +743,3 @@ export default function AdminPage() {
         </div>
     );
 }
-
-    

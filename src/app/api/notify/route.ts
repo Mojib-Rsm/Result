@@ -1,7 +1,25 @@
 
 import { NextResponse } from 'next/server';
 import { sendTelegramNotification } from '@/lib/telegram';
-import { sendBulkSms } from '@/lib/sms';
+import { sendAnbuSms, sendBulkSmsBd } from '@/lib/sms';
+import { getFirestore, doc, getDoc } from 'firebase/firestore';
+import { app } from '@/lib/firebase';
+
+async function getActiveSmsApi(): Promise<'anbu' | 'bulksmsbd'> {
+    try {
+        const db = getFirestore(app);
+        const settingsRef = doc(db, 'settings', 'config');
+        const settingsSnap = await getDoc(settingsRef);
+        if (settingsSnap.exists() && settingsSnap.data().activeSmsApi) {
+            return settingsSnap.data().activeSmsApi;
+        }
+    } catch (error) {
+        console.error("Error fetching active SMS API from Firestore:", error);
+    }
+    // Default to 'anbu' if not set or on error
+    return 'anbu';
+}
+
 
 export async function POST(request: Request) {
   try {
@@ -19,24 +37,28 @@ export async function POST(request: Request) {
       } else {
         return NextResponse.json({ success: false, error: result.error }, { status: 500 });
       }
-    } else if (type === 'sms') {
-      const targetRecipient = recipient || process.env.NEXT_PUBLIC_ADMIN_PHONE_NUMBER;
-      if (!targetRecipient) {
-         return NextResponse.json({ success: false, error: 'Recipient not specified and admin phone number is not configured' }, { status: 400 });
-      }
-      const result = await sendBulkSms([targetRecipient], message);
-      if (result.success) {
-        return NextResponse.json({ success: true });
-      } else {
-        return NextResponse.json({ success: false, error: result.error }, { status: 500 });
-      }
-    } else if (type === 'sms-bulk') {
-        if (!recipients || !Array.isArray(recipients) || recipients.length === 0) {
-            return NextResponse.json({ success: false, error: 'Recipients array is missing or empty for sms-bulk' }, { status: 400 });
+    } else if (type === 'sms' || type === 'sms-bulk') {
+        const numbersToSend: string[] = type === 'sms-bulk' 
+            ? recipients 
+            : [recipient || process.env.ADMIN_PHONE_NUMBER];
+
+        if (!numbersToSend || numbersToSend.length === 0 || !numbersToSend[0]) {
+             return NextResponse.json({ success: false, error: 'Recipient not specified.' }, { status: 400 });
         }
-        const result = await sendBulkSms(recipients, message);
+
+        const activeApi = await getActiveSmsApi();
+        
+        let result;
+        if (activeApi === 'bulksmsbd') {
+            console.log(`Using BulkSMSBD for ${numbersToSend.length} numbers.`);
+            result = await sendBulkSmsBd(numbersToSend, message);
+        } else {
+            console.log(`Using ANBU SMS for ${numbersToSend.length} numbers.`);
+            result = await sendAnbuSms(numbersToSend, message);
+        }
+        
         if (result.success) {
-            return NextResponse.json({ success: true, message: "Bulk SMS process initiated." });
+            return NextResponse.json({ success: true, message: "SMS process initiated." });
         } else {
             return NextResponse.json({ success: false, error: result.error }, { status: 500 });
         }

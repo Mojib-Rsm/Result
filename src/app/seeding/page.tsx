@@ -121,6 +121,7 @@ export default function SeedingPage() {
             const settingsRef = doc(db, 'settings', 'config');
             await setDoc(settingsRef, {
                 showSubscriptionForm: true,
+                activeSmsApi: 'anbu', // Set a default SMS API
             }, { merge: true });
 
 
@@ -167,5 +168,3 @@ export default function SeedingPage() {
         </div>
     );
 }
-
-    
