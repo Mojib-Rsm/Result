@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Loader2, Search, Download, BarChart, ArrowUp, ArrowDown, Star, Sparkles, Share2 } from 'lucide-react';
+import { Loader2, Search, Download, BarChart, ArrowUp, ArrowDown, Star, Sparkles, Share2, Building } from 'lucide-react';
 import type { ExamResult, GradeInfo } from '@/types';
 import { Separator } from './ui/separator';
 import { cn } from '@/lib/utils';
@@ -368,11 +368,17 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
                         <CardTitle>পরবর্তী ধাপ</CardTitle>
                         <CardDescription>আপনার ফলাফলের উপর ভিত্তি করে ভর্তির জন্য সেরা প্রতিষ্ঠানগুলো সম্পর্কে জানুন।</CardDescription>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <Link href={`/suggestions?gpa=${gpa}`}>
                             <Button className="w-full" size="lg">
                                 <Sparkles className="mr-2 h-4 w-4" />
                                 ভর্তি পরামর্শ দেখুন
+                            </Button>
+                        </Link>
+                        <Link href={`/institute-result?eiin=${result.studentInfo.eiin}&exam=${result.exam}&year=${result.year}&board=${result.board.toLowerCase()}`}>
+                            <Button className="w-full" size="lg" variant="outline">
+                                <Building className="mr-2 h-4 w-4" />
+                                প্রতিষ্ঠানের ফলাফল দেখুন
                             </Button>
                         </Link>
                     </CardContent>
@@ -383,7 +389,7 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
       </div>
       
       {!isDialog && (
-         <CardFooter className="flex justify-end gap-2 no-print">
+         <CardFooter className="flex flex-wrap justify-end gap-2 no-print">
             {onReset && (
                 <Button variant="outline" onClick={onReset} disabled={isDownloading || isSharing}>
                     <Search className="mr-2 h-4 w-4" />

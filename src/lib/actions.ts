@@ -1,7 +1,7 @@
 
 'use server';
 
-import type { ExamResult, GradeInfo } from '@/types';
+import type { ExamResult, GradeInfo, InstituteResult, StudentResult } from '@/types';
 import { z } from 'zod';
 import { formSchemaWithCookie } from '@/lib/schema';
 
@@ -31,18 +31,25 @@ function parseGrades(displayDetails: string, subDetails: SubjectDetail[]): Grade
 }
 
 
-async function searchResultLegacy(values: z.infer<typeof formSchemaWithCookie>): Promise<ExamResult | { error: string }> {
-    const { exam, year, board, roll, reg, captcha, cookie } = values;
+async function searchResultLegacy(values: z.infer<typeof formSchemaWithCookie> & {result_type?: '1' | '2', eiin?: string}): Promise<ExamResult | InstituteResult | { error: string }> {
+    const { exam, year, board, roll, reg, captcha, cookie, result_type = '1', eiin } = values;
 
-    const payload = new URLSearchParams({
-        exam,
-        year,
-        board,
-        roll,
-        reg,
-        result_type: '1',
-        captcha,
-    });
+    const payload = new URLSearchParams();
+    payload.append('exam', exam);
+    payload.append('year', year);
+    payload.append('board', board);
+    payload.append('result_type', result_type);
+    
+    if (result_type === '1') {
+        payload.append('roll', roll || '');
+        payload.append('reg', reg || '');
+    } else {
+        payload.append('eiin', eiin || '');
+    }
+
+    if (captcha) {
+       payload.append('captcha', captcha);
+    }
     
     const headers = new Headers();
     headers.append('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
@@ -69,11 +76,36 @@ async function searchResultLegacy(values: z.infer<typeof formSchemaWithCookie>):
         }
 
         const data = await response.json();
-
+        
         if (data.status !== 0 || !data.res) {
-             return { error: data.msg || "ফলাফল খুঁজে পাওয়া যায়নি। অনুগ্রহ করে আপনার রোল, রেজিস্ট্রেশন, বোর্ড, বছর এবং ক্যাপচা পরীক্ষা করে আবার চেষ্টা করুন।" };
+             const defaultError = "ফলাফল খুঁজে পাওয়া যায়নি। অনুগ্রহ করে আপনার দেওয়া তথ্য এবং ক্যাপচা পরীক্ষা করে আবার চেষ্টা করুন।";
+             // The API sometimes returns HTML in the 'msg' field for captcha errors
+             if (data.msg && (data.msg.includes('<') || data.msg.includes('>'))) {
+                 return { error: "ক্যাপচা ভুল হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।" }
+             }
+             return { error: data.msg || defaultError };
         }
         
+        if (result_type === '2') {
+            const res = data.res;
+            const results: StudentResult[] = res.map((item: any) => ({
+                roll: item.roll_no,
+                reg: item.regno,
+                gpa: item.gpa,
+            }));
+
+            return {
+                instituteName: data.institute_name || "Unknown Institute",
+                eiin: eiin || "N/A",
+                exam: exam,
+                year: year,
+                board: board,
+                results: results
+            };
+        }
+
+
+        // Individual result processing
         const res = data.res;
 
         const gpaMatch = res.res_detail?.match(/([0-9\.]+)/);
@@ -97,6 +129,7 @@ async function searchResultLegacy(values: z.infer<typeof formSchemaWithCookie>):
             group: res.stud_group || 'N/A',
             dob: res.dob || 'N/A',
             institute: res.inst_name || 'N/A',
+            eiin: res.eiin_code || 'N/A',
             session: calculatedSession,
         };
 
@@ -121,4 +154,16 @@ async function searchResultLegacy(values: z.infer<typeof formSchemaWithCookie>):
     }
 }
 
-export { searchResultLegacy };
+async function searchInstituteResult(values: { eiin: string; exam: string; year: string; board: string; }): Promise<InstituteResult | { error: string }> {
+     // We don't need captcha for institute results via this API endpoint apparently
+    const result = await searchResultLegacy({
+        ...values,
+        result_type: '2',
+    });
+    
+    // Type assertion because we expect an institute result or an error
+    return result as InstituteResult | { error: string };
+}
+
+
+export { searchResultLegacy, searchInstituteResult };

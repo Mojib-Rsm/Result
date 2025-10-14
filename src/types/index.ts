@@ -14,6 +14,7 @@ export interface StudentInfo {
   group: string;
   dob: string;
   institute: string;
+  eiin?: string;
   session?: string;
 }
 
@@ -46,4 +47,19 @@ export interface HistoryItem {
 export interface CaptchaResponse {
     img: string;
     key: string;
+}
+
+export interface StudentResult {
+    roll: string;
+    reg: string;
+    gpa: string;
+}
+
+export interface InstituteResult {
+    instituteName: string;
+    eiin: string;
+    exam: string;
+    year: string;
+    board: string;
+    results: StudentResult[];
 }
