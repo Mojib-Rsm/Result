@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { getFirestore, collection, addDoc, query, where, getDocs } from 'firebase/firestore';
 import { app } from '@/lib/firebase';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Loader2, MailCheck } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
 
@@ -80,24 +80,47 @@ export default function ResultAlertForm() {
       phone: '',
       roll: '',
       reg: '',
-      exam: '',
-      year: currentYear.toString(),
+      exam: 'hsc',
+      year: '2024',
       board: '',
     },
   });
 
+  const selectedExam = form.watch('exam');
+
+  useEffect(() => {
+    if (selectedExam === 'hsc_bm') {
+      form.setValue('board', 'tec');
+    } else {
+      // Don't reset if it's already set by the user for other exams
+      if (form.getValues('board') === 'tec') {
+        form.setValue('board', '');
+      }
+    }
+  }, [selectedExam, form]);
+  
+  const showBoardField = selectedExam !== 'hsc_bm';
+
+
   const onSubmit = async (values: z.infer<typeof alertSchema>) => {
     setIsSubmitting(true);
     let smsError = '';
+    
+    const submissionValues = {...values};
+    if (submissionValues.exam === 'hsc_bm') {
+        submissionValues.board = 'tec';
+    }
+
+
     try {
       const subscriptionsRef = collection(db, 'subscriptions');
       
       const q = query(subscriptionsRef, 
-        where('phone', '==', values.phone),
-        where('roll', '==', values.roll),
-        where('exam', '==', values.exam),
-        where('year', '==', values.year),
-        where('board', '==', values.board)
+        where('phone', '==', submissionValues.phone),
+        where('roll', '==', submissionValues.roll),
+        where('exam', '==', submissionValues.exam),
+        where('year', '==', submissionValues.year),
+        where('board', '==', submissionValues.board)
       );
       const querySnapshot = await getDocs(q);
 
@@ -111,20 +134,20 @@ export default function ResultAlertForm() {
       }
       
       await addDoc(subscriptionsRef, {
-        ...values,
+        ...submissionValues,
         createdAt: new Date(),
       });
       
       // Send confirmation SMS to user
       const userMessage = `BD Edu Result-এ স্বাগতম! আপনার পরীক্ষার ফলাফল প্রকাশিত হলে আপনাকে SMS-এর মাধ্যমে জানানো হবে। ধন্যবাদ। - www.bdedu.me`;
-      const userSmsResult = await sendNotification({ message: userMessage, type: 'sms', recipient: values.phone });
+      const userSmsResult = await sendNotification({ message: userMessage, type: 'sms', recipient: submissionValues.phone });
 
       if (!userSmsResult.success) {
         smsError = userSmsResult.error || 'কনফার্মেশন SMS পাঠানো যায়নি।';
       }
 
       // Prepare admin notification message
-      const adminMessage = `New Subscription on BD Edu Result:\nRoll: ${values.roll}\nExam: ${values.exam.toUpperCase()}\nYear: ${values.year}\nBoard: ${values.board}\nPhone: ${values.phone}`;
+      const adminMessage = `New Subscription on BD Edu Result:\nRoll: ${submissionValues.roll}\nExam: ${submissionValues.exam.toUpperCase()}\nYear: ${submissionValues.year}\nBoard: ${submissionValues.board}\nPhone: ${submissionValues.phone}`;
       
       // Send notification SMS to admin
       await sendNotification({ message: `${adminMessage} - www.bdedu.me`, type: 'sms' });
@@ -206,24 +229,6 @@ export default function ResultAlertForm() {
                   </FormItem>
                 )}
               />
-               <FormField
-                control={form.control}
-                name="board"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>বোর্ড</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
-                      <FormControl>
-                        <SelectTrigger><SelectValue placeholder="বোর্ড নির্বাচন করুন" /></SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {boards.map(b => <SelectItem key={b.value} value={b.value}>{b.label}</SelectItem>)}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
               <FormField
                 control={form.control}
                 name="exam"
@@ -260,6 +265,26 @@ export default function ResultAlertForm() {
                   </FormItem>
                 )}
               />
+              {showBoardField && (
+                 <FormField
+                  control={form.control}
+                  name="board"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>বোর্ড</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger><SelectValue placeholder="বোর্ড নির্বাচন করুন" /></SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {boards.map(b => <SelectItem key={b.value} value={b.value}>{b.label}</SelectItem>)}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
               </div>
                <div className="pt-4">
                 <Button type="submit" disabled={isSubmitting} className="w-full">
