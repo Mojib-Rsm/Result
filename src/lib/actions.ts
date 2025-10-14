@@ -42,7 +42,7 @@ function parseInstituteNameFromHtml(htmlContent: string): string {
 
 
 function parseInstituteResultsFromHtml(htmlContent: string): StudentResult[] {
-    const dom = new J_SDOM(htmlContent);
+    const dom = new JSDOM(htmlContent);
     const body = dom.window.document.body;
     const lines = body.innerHTML.split('<br>').map(line => line.replace(/&nbsp;/g, ' ').trim());
     
@@ -135,7 +135,7 @@ async function searchResultLegacy(values: z.infer<typeof formSchemaWithCookie> &
             let results: StudentResult[] = [];
             let instituteName = "Unknown Institute";
 
-            if (data.res && Array.isArray(data.res)) {
+            if (data.res && Array.isArray(data.res) && data.res.length > 0) {
                  results = data.res.map((item: any) => ({
                     roll: item.roll_no,
                     reg: item.regno,
