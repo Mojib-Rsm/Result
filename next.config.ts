@@ -34,6 +34,12 @@ const nextConfig: NextConfig = {
         hostname: 'picsum.photos',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'avatars.githubusercontent.com',
+        port: '',
+        pathname: '/**',
       }
     ],
   },
@@ -41,3 +47,4 @@ const nextConfig: NextConfig = {
 };
 
 export default nextConfig;
+

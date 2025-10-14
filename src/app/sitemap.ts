@@ -15,6 +15,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/login',
     '/admin',
     '/admin/api-logs',
+    '/developer',
     '/suggestions/public-universities',
     '/suggestions/private-universities',
     '/suggestions/medical-colleges',

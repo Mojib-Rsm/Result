@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Toaster } from '@/components/ui/toaster';
@@ -28,7 +29,7 @@ function Footer() {
         </div>
         <div className="text-center">
             <p className="text-sm text-muted-foreground">
-              Developed & Maintained by <Link href="https://www.mojib.me" target="_blank" rel="noopener noreferrer" className="font-medium text-foreground hover:underline">Mojib Rsm</Link>
+              Developed & Maintained by <Link href="/developer" className="font-medium text-foreground hover:underline">Mojib Rsm</Link>
             </p>
             <p className="text-xs text-muted-foreground mt-1">All rights reserved.</p>
         </div>
@@ -90,3 +91,4 @@ export default function AppProvider({
     </AuthProvider>
   );
 }
+
