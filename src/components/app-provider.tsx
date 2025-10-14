@@ -8,6 +8,8 @@ import Image from 'next/image';
 import Link from 'next/link';
 import React, { useState, useEffect, ReactNode, useCallback } from 'react';
 import { AuthContext, AuthUser } from '@/hooks/use-auth';
+import { Button } from './ui/button';
+import { Code } from 'lucide-react';
 
 function Footer() {
   return (
@@ -33,6 +35,12 @@ function Footer() {
             </p>
             <p className="text-xs text-muted-foreground mt-1">All rights reserved.</p>
         </div>
+         <Button asChild variant="outline" size="sm">
+            <Link href="/developer">
+              <Code className="mr-2 h-4 w-4" />
+              About Developer
+            </Link>
+          </Button>
       </div>
     </footer>
   )

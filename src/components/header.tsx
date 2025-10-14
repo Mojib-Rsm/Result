@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { GraduationCap, History, Calculator, MoreVertical, Sparkles, LogOut, User, Bookmark, BarChart, Building } from 'lucide-react';
+import { GraduationCap, History, Calculator, MoreVertical, Sparkles, LogOut, User, Bookmark, BarChart, Building, Code } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -30,6 +30,7 @@ export default function Header({ className }: { className?: string }) {
     { href: '/statistics', label: 'পরিসংখ্যান', icon: BarChart },
     { href: '/history', label: 'ইতিহাস', icon: History },
     { href: '/gpa-calculator', label: 'GPA ক্যালকুলেটর', icon: Calculator },
+    { href: '/developer', label: 'ডেভেলপার', icon: Code },
   ];
 
   const handleLogout = () => {
