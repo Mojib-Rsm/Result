@@ -41,7 +41,7 @@ export default function Home() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       exam: 'hsc',
-      year: '2024',
+      year: '2025',
       board: '',
       roll: '',
       reg: '',

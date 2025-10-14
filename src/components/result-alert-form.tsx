@@ -81,7 +81,7 @@ export default function ResultAlertForm() {
       roll: '',
       reg: '',
       exam: 'hsc',
-      year: '2024',
+      year: '2025',
       board: '',
     },
   });

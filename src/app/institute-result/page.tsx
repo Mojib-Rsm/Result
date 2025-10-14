@@ -61,8 +61,8 @@ export default function InstituteResultPage() {
     resolver: zodResolver(instituteFormSchema),
     defaultValues: {
       eiin: '',
-      exam: '',
-      year: '',
+      exam: 'hsc',
+      year: '2025',
       board: '',
       captcha: '',
     },
@@ -302,5 +302,3 @@ export default function InstituteResultPage() {
     </div>
   );
 }
-
-    
