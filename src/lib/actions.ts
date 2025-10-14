@@ -70,7 +70,7 @@ function parseInstituteResultsFromHtml(htmlContent: string): StudentResult[] {
 async function searchResultLegacy(values: z.infer<typeof formSchemaWithCookie> & {result_type?: '1' | '2', eiin?: string}): Promise<ExamResult | InstituteResult | { error: string }> {
     let { exam, year, board, roll, reg, captcha, cookie, result_type = '1', eiin } = values;
 
-    if (exam === 'hsc_bm' || exam === 'hsc_voc') {
+    if (exam === 'hsc_bm') {
         board = 'tec';
         exam = 'hsc';
     } else if (exam === 'hsc' && board === 'tec') {

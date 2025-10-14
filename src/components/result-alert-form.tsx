@@ -28,9 +28,7 @@ const exams = [
     { value: 'jsc', label: 'JSC/JDC' },
     { value: 'ssc', label: 'SSC/Dakhil' },
     { value: 'hsc', label: 'HSC/Alim' },
-    { value: 'ssc_voc', label: 'SSC(Vocational)' },
-    { value: 'hsc_voc', label: 'HSC(Vocational)' },
-    { value: 'hsc_bm', label: 'HSC(BM/Vocational)' },
+    { value: 'hsc_bm', label: 'HSC(BM)' },
     { value: 'dibs', label: 'Diploma in Business Studies' },
 ];
 

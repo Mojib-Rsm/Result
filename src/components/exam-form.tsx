@@ -34,8 +34,6 @@ const exams = [
     { value: 'jsc', label: 'JSC/JDC' },
     { value: 'ssc', label: 'SSC/Dakhil' },
     { value: 'hsc', label: 'HSC/Alim' },
-    { value: 'ssc_voc', label: 'SSC(Vocational)' },
-    { value: 'hsc_voc', label: 'HSC(Vocational)' },
     { value: 'hsc_bm', label: 'HSC(BM)' },
     { value: 'dibs', label: 'Diploma in Business Studies' },
 ];
@@ -51,7 +49,7 @@ interface ExamFormProps {
 }
 
 export function ExamForm({ form, onSubmit, isSubmitting, captchaUrl, onCaptchaRefresh, selectedExam }: ExamFormProps) {
-  const showBoardField = selectedExam !== 'hsc_bm' && selectedExam !== 'hsc_voc';
+  const showBoardField = selectedExam !== 'hsc_bm';
   
   return (
     <Form {...form}>

@@ -41,7 +41,7 @@ export default function Home() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       exam: 'hsc',
-      year: '2025',
+      year: '2024',
       board: '',
       roll: '',
       reg: '',
@@ -52,7 +52,7 @@ export default function Home() {
   const selectedExam = form.watch('exam');
 
   useEffect(() => {
-    if (selectedExam === 'hsc_bm' || selectedExam === 'hsc_voc') {
+    if (selectedExam === 'hsc_bm') {
       form.setValue('board', 'tec');
     } else {
       // Don't reset if it's already set by the user for other exams
