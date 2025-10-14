@@ -49,15 +49,21 @@ const boards = [
 const currentYear = new Date().getFullYear();
 const years = Array.from({ length: 5 }, (_, i) => currentYear - 2 + i).map(String);
 
-async function sendNotification(payload: { message: string; type: 'sms' | 'telegram', recipient?: string }) {
+async function sendNotification(payload: { message: string; type: 'sms' | 'telegram', recipient?: string }): Promise<{success: boolean, error?: string}> {
     try {
-        await fetch('/api/notify', {
+        const response = await fetch('/api/notify', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
         });
+        const result = await response.json();
+        if(response.ok && result.success) {
+            return { success: true };
+        }
+        return { success: false, error: result.error || 'Unknown notification error' };
     } catch (error) {
         console.error(`Failed to send ${payload.type} notification:`, error);
+        return { success: false, error: 'Network error during notification.' };
     }
 }
 
@@ -81,6 +87,7 @@ export default function ResultAlertForm() {
 
   const onSubmit = async (values: z.infer<typeof alertSchema>) => {
     setIsSubmitting(true);
+    let smsError = '';
     try {
       const subscriptionsRef = collection(db, 'subscriptions');
       
@@ -106,15 +113,14 @@ export default function ResultAlertForm() {
         ...values,
         createdAt: new Date(),
       });
-
-      toast({
-        title: 'সাবস্ক্রিপশন সফল',
-        description: 'ফলাফল প্রকাশিত হলে আপনাকে জানানো হবে। একটি কনফার্মেশন SMS পাঠানো হয়েছে।',
-      });
       
       // Send confirmation SMS to user
       const userMessage = `BD Edu Result-এ স্বাগতম! আপনার পরীক্ষার ফলাফল প্রকাশিত হলে আপনাকে SMS-এর মাধ্যমে জানানো হবে। ধন্যবাদ। - www.bdedu.me`;
-      await sendNotification({ message: userMessage, type: 'sms', recipient: values.phone });
+      const userSmsResult = await sendNotification({ message: userMessage, type: 'sms', recipient: values.phone });
+
+      if (!userSmsResult.success) {
+        smsError = userSmsResult.error || 'কনফার্মেশন SMS পাঠানো যায়নি।';
+      }
 
       // Prepare admin notification message
       const adminMessage = `New Subscription on BD Edu Result:\nRoll: ${values.roll}\nExam: ${values.exam.toUpperCase()}\nYear: ${values.year}\nBoard: ${values.board}\nPhone: ${values.phone}`;
@@ -124,6 +130,13 @@ export default function ResultAlertForm() {
       
       // Send Telegram notification
       await sendNotification({ message: adminMessage, type: 'telegram' });
+
+      toast({
+        title: 'সাবস্ক্রিপশন সফল',
+        description: smsError ? `কিন্তু, কনফার্মেশন SMS পাঠানো যায়নি: ${smsError}` : 'ফলাফল প্রকাশিত হলে আপনাকে জানানো হবে। একটি কনফার্মেশন SMS পাঠানো হয়েছে।',
+        variant: smsError ? 'default' : 'default', // could be different style
+        duration: smsError ? 10000 : 5000,
+      });
 
 
       form.reset();

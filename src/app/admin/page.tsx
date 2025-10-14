@@ -14,7 +14,6 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
-import { sendBulkSms } from '@/lib/sms';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { searchResultLegacy } from '@/lib/actions';
@@ -259,7 +258,7 @@ export default function AdminPage() {
             const result = await response.json();
 
 
-            if (result.success) {
+            if (response.ok && result.success) {
                 toast({
                     title: 'সাফল্য',
                     description: `${phoneNumbers.length} জন সাবস্ক্রাইবারকে SMS পাঠানোর জন্য প্রক্রিয়া করা হয়েছে।`,
@@ -337,7 +336,7 @@ export default function AdminPage() {
                 body: JSON.stringify({ message: singleSmsMessage, type: 'sms', recipient: selectedSub.phone }),
             });
             const result = await response.json();
-            if (result.success) {
+            if (response.ok && result.success) {
                 toast({
                     title: 'SMS পাঠানো হয়েছে',
                     description: `${selectedSub.phone} নম্বরে SMS সফলভাবে পাঠানো হয়েছে।`,
