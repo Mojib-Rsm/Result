@@ -19,11 +19,14 @@ import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { app } from '@/lib/firebase';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
-import { Bell, BookOpen, Briefcase, Calendar, FileText, Rss, ExternalLink, Calculator, MessageSquare, ListChecks, Phone } from 'lucide-react';
+import { Bell, BookOpen, Briefcase, Calendar, FileText, Rss, ExternalLink, Calculator, MessageSquare, ListChecks, Phone, Trash2, Plus } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Image from 'next/image';
 import { formatDistanceToNow } from 'date-fns';
 import { bn } from 'date-fns/locale';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 interface NewsArticle {
     title: string;
@@ -33,6 +36,102 @@ interface NewsArticle {
     publishedAt: string;
     source: { name: string };
 }
+
+const gradePoints: { [key: string]: number } = {
+  'A+': 5.0,
+  'A': 4.0,
+  'A-': 3.5,
+  'B': 3.0,
+  'C': 2.0,
+  'D': 1.0,
+  'F': 0.0,
+};
+
+const gradeOptions = Object.keys(gradePoints);
+
+interface Subject {
+  id: number;
+  name: string;
+  grade: string;
+}
+
+
+const GpaCalculatorCard = () => {
+  const [subjects, setSubjects] = useState<Subject[]>([{ id: 1, name: '', grade: '' }]);
+  const [gpa, setGpa] = useState<number | null>(null);
+
+  const handleAddSubject = () => {
+    setSubjects([...subjects, { id: Date.now(), name: '', grade: '' }]);
+  };
+
+  const handleRemoveSubject = (id: number) => {
+    setSubjects(subjects.filter(s => s.id !== id));
+  };
+
+  const handleSubjectChange = (id: number, field: 'name' | 'grade', value: string) => {
+    setSubjects(subjects.map(s => (s.id === id ? { ...s, [field]: value } : s)));
+    setGpa(null); // Reset GPA when subjects change
+  };
+
+  const calculateGpa = () => {
+    const validSubjects = subjects.filter(s => s.grade && gradePoints[s.grade] !== undefined);
+    if (validSubjects.length === 0) {
+      setGpa(0);
+      return;
+    }
+
+    const totalPoints = validSubjects.reduce((acc, subject) => {
+      return acc + gradePoints[subject.grade];
+    }, 0);
+
+    const averageGpa = totalPoints / validSubjects.length;
+    setGpa(averageGpa);
+  };
+
+  return (
+    <AccordionItem value="gpa-calculator">
+      <AccordionTrigger className="text-lg font-semibold">
+        <div className="flex items-center gap-3">
+          <Calculator className="h-6 w-6" /> GPA ক্যালকুলেটর
+        </div>
+      </AccordionTrigger>
+      <AccordionContent>
+        <div className="space-y-4 pt-2">
+          {subjects.map((subject, index) => (
+            <div key={subject.id} className="flex items-center gap-2">
+              <Input
+                placeholder={`বিষয় ${index + 1}`}
+                value={subject.name}
+                onChange={e => handleSubjectChange(subject.id, 'name', e.target.value)}
+                className="w-full"
+              />
+              <Select value={subject.grade} onValueChange={value => handleSubjectChange(subject.id, 'grade', value)}>
+                <SelectTrigger className="w-[180px]"><SelectValue placeholder="গ্রেড" /></SelectTrigger>
+                <SelectContent>
+                  {gradeOptions.map(grade => <SelectItem key={grade} value={grade}>{grade}</SelectItem>)}
+                </SelectContent>
+              </Select>
+              <Button variant="ghost" size="icon" onClick={() => handleRemoveSubject(subject.id)} disabled={subjects.length === 1}>
+                <Trash2 className="h-4 w-4 text-destructive" />
+              </Button>
+            </div>
+          ))}
+          <div className="flex justify-between items-center">
+            <Button variant="outline" onClick={handleAddSubject}><Plus className="mr-2 h-4 w-4" /> বিষয় যোগ করুন</Button>
+            <Button onClick={calculateGpa}><Calculator className="mr-2 h-4 w-4" /> গণনা করুন</Button>
+          </div>
+          {gpa !== null && (
+            <div className="mt-6 text-center p-4 bg-muted rounded-lg">
+              <p className="text-muted-foreground">আপনার গণনাকৃত GPA হলো:</p>
+              <p className="text-5xl font-bold text-primary">{gpa.toFixed(2)}</p>
+            </div>
+          )}
+        </div>
+      </AccordionContent>
+    </AccordionItem>
+  );
+};
+
 
 const NewsCard = ({ article }: { article: NewsArticle }) => (
     <Card className="flex flex-col overflow-hidden">
@@ -331,12 +430,55 @@ export default function Home() {
            {/* Tools & Features Section */}
           <section>
               <h2 className="text-2xl font-bold text-center mb-6">টুলস ও ফিচার</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <FeatureCard icon={Calculator} title="GPA ক্যালকুলেটর" description="আপনার বিষয়ভিত্তিক গ্রেড দিয়ে GPA গণনা করুন।" href="/gpa-calculator" />
-                  <FeatureCard icon={MessageSquare} title="রেজাল্ট SMS ফরম্যাট" description="যেকোনো অপারেটর থেকে SMS-এর মাধ্যমে ফলাফল জানুন।" href="#" />
-                  <FeatureCard icon={ListChecks} title="বোর্ড শর্ট কোড" description="সকল শিক্ষা বোর্ডের শর্ট কোড তালিকা দেখুন।" href="#" />
-                  <FeatureCard icon={Phone} title="শিক্ষা বোর্ড হেল্পলাইন" description="জরুরী প্রয়োজনে বোর্ড হেল্পলাইনের নম্বর খুঁজুন।" href="#" />
-              </div>
+              <Accordion type="single" collapsible className="w-full space-y-4">
+                <Card>
+                  <CardContent className="p-2">
+                    <GpaCalculatorCard />
+                  </CardContent>
+                </Card>
+                 <Card>
+                  <CardContent className="p-2">
+                    <AccordionItem value="sms-format">
+                        <AccordionTrigger className="text-lg font-semibold">
+                           <div className="flex items-center gap-3">
+                               <MessageSquare className="h-6 w-6" /> রেজাল্ট SMS ফরম্যাট
+                           </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="pt-4">
+                           <p className="text-muted-foreground">Coming soon...</p>
+                        </AccordionContent>
+                    </AccordionItem>
+                  </CardContent>
+                </Card>
+                 <Card>
+                  <CardContent className="p-2">
+                     <AccordionItem value="board-codes">
+                        <AccordionTrigger className="text-lg font-semibold">
+                           <div className="flex items-center gap-3">
+                               <ListChecks className="h-6 w-6" /> বোর্ড শর্ট কোড
+                           </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="pt-4">
+                            <p className="text-muted-foreground">Coming soon...</p>
+                        </AccordionContent>
+                    </AccordionItem>
+                  </CardContent>
+                </Card>
+                 <Card>
+                  <CardContent className="p-2">
+                    <AccordionItem value="board-helpline">
+                        <AccordionTrigger className="text-lg font-semibold">
+                           <div className="flex items-center gap-3">
+                               <Phone className="h-6 w-6" /> শিক্ষা বোর্ড হেল্পলাইন
+                           </div>
+                        </AccordionTrigger>
+                        <AccordionContent className="pt-4">
+                            <p className="text-muted-foreground">Coming soon...</p>
+                        </AccordionContent>
+                    </AccordionItem>
+                  </CardContent>
+                </Card>
+              </Accordion>
           </section>
 
            <Separator />
