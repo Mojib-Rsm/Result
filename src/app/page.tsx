@@ -167,7 +167,7 @@ const NewsCard = ({ article }: { article: NewsArticle }) => (
 
 const NewsSkeleton = () => (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {[...Array(3)].map((_, i) => (
+        {[...Array(6)].map((_, i) => (
             <Card key={i}>
                 <CardHeader className="p-0"><Skeleton className="aspect-video w-full rounded-t-lg" /></CardHeader>
                 <CardContent className="p-4"><Skeleton className="h-4 w-3/4 mb-2" /><Skeleton className="h-3 w-full" /></CardContent>
@@ -231,7 +231,7 @@ const NewsSection = () => {
                                 <NewsSkeleton />
                            ) : news[cat] && news[cat].length > 0 ? (
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                                   {news[cat].slice(0, 3).map((article, index) => (
+                                   {news[cat].slice(0, 6).map((article, index) => (
                                        <NewsCard key={index} article={article} />
                                    ))}
                                 </div>

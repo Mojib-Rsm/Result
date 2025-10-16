@@ -1,71 +1,62 @@
 
 import { NextResponse } from 'next/server';
+import xml2js from 'xml2js';
+
+// Helper function to extract image URL from HTML content
+function extractImageUrl(description: string): string | null {
+    const imgRegex = /<img[^>]+src="([^">]+)"/;
+    const match = description.match(imgRegex);
+    return match ? match[1] : null;
+}
 
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category') || 'education';
-    const apiKey = process.env.NEWS_API_KEY;
-
-    if (!apiKey) {
-        return NextResponse.json({ error: 'News API key is not configured.' }, { status: 500 });
-    }
     
-    // More specific queries based on category for Bengali news
-    let query;
-    switch(category) {
-        case 'ssc':
-            query = 'এসএসসি OR দাখিল';
-            break;
-        case 'hsc':
-            query = 'এইচএসসি OR আলিম';
-            break;
-        case 'admission':
-            query = 'বিশ্ববিদ্যালয় ভর্তি OR কলেজ ভর্তি';
-            break;
-        case 'jobs':
-            query = 'চাকরির খবর OR নিয়োগ বিজ্ঞপ্তি';
-            break;
-        case 'exam':
-            query = 'পরীক্ষা OR পরীক্ষার রুটিন';
-            break;
-        case 'all':
-        default:
-            query = 'শিক্ষা';
-            break;
-    }
-
-    const domains = [
-        'bdnews24.com',
-        'prothomalo.com',
-        'banglatribune.com',
-        'jugantor.com',
-        'kalerkantho.com',
-        'somoynews.tv',
-        'ittefaq.com.bd',
-        'tbsnews.net',
-        'dhakatribune.com',
-        'thedailystar.net'
-    ].join(',');
-
-    const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&domains=${domains}&sortBy=publishedAt&language=bn&pageSize=6&apiKey=${apiKey}`;
+    // We will use the provided RSS feed for all categories for now.
+    // The category parameter can be used in the future to switch between different feeds.
+    const url = 'https://gnewsbd24.com/category/%E0%A6%B6%E0%A6%BF%E0%A6%95%E0%A7%8D%E0%A6-B7%E0%A6%BE/feed/';
 
     try {
-        const newsResponse = await fetch(url, {
+        const rssResponse = await fetch(url, {
             next: { revalidate: 3600 } // Revalidate every hour
         });
-        const newsData = await newsResponse.json();
 
-        if (newsData.status !== 'ok') {
-            return NextResponse.json({ error: newsData.message || 'Failed to fetch news.' }, { status: 500 });
+        if (!rssResponse.ok) {
+            return NextResponse.json({ error: 'Failed to fetch RSS feed.' }, { status: 500 });
         }
 
-        return NextResponse.json(newsData.articles);
+        const xmlData = await rssResponse.text();
+        const parser = new xml2js.Parser({ explicitArray: false });
+        const result = await parser.parseStringPromise(xmlData);
+
+        const items = result.rss.channel.item;
+        if (!items) {
+            return NextResponse.json([]);
+        }
+
+        const articles = (Array.isArray(items) ? items : [items]).map((item: any) => {
+            const description = item.description || '';
+            const imageUrl = extractImageUrl(description);
+            // Clean up description by removing HTML tags for a plain text version
+            const plainDescription = description.replace(/<[^>]*>?/gm, '');
+
+            return {
+                title: item.title,
+                url: item.link,
+                description: plainDescription,
+                urlToImage: imageUrl,
+                publishedAt: item.pubDate,
+                source: { name: 'gnewsbd24.com' },
+            };
+        });
+
+        return NextResponse.json(articles);
+
     } catch (error) {
-        console.error('News API fetch error:', error);
-        return NextResponse.json({ error: 'Failed to connect to news source.' }, { status: 500 });
+        console.error('RSS Feed processing error:', error);
+        return NextResponse.json({ error: 'Failed to process RSS feed.' }, { status: 500 });
     }
 }
 
 export const dynamic = 'force-dynamic';
-
-    
