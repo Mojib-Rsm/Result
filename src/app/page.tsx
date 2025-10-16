@@ -11,17 +11,17 @@ import { z } from 'zod';
 import { searchResultLegacy } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
 import { useHistory } from '@/hooks/use-history';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import Link from 'next/link';
 import { formSchema } from '@/lib/schema';
 import ResultAlertForm from '@/components/result-alert-form';
 import { Separator } from '@/components/ui/separator';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { app } from '@/lib/firebase';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Card, CardContent, CardHeader } from '@/components/ui/card';
-import { Megaphone } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Bell, BookOpen, Briefcase, Calendar, FileText, Rss } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+
 
 export default function Home() {
   const [result, setResult] = useState<ExamResult | null>(null);
@@ -143,6 +143,23 @@ export default function Home() {
     refreshCaptcha();
   };
 
+  const FeatureCard = ({ icon, title, description, href }: { icon: React.ElementType, title: string, description: string, href: string }) => (
+    <Card className="hover:shadow-lg transition-shadow">
+        <CardHeader className="flex-row items-center gap-4 space-y-0 pb-2">
+            <div className="p-3 bg-primary/10 rounded-lg">
+                <icon className="h-6 w-6 text-primary" />
+            </div>
+            <div>
+                <CardTitle className="text-lg">{title}</CardTitle>
+                <CardDescription>{description}</CardDescription>
+            </div>
+        </CardHeader>
+        <CardContent>
+            <Button variant="link" asChild><a href={href}>আরও দেখুন...</a></Button>
+        </CardContent>
+    </Card>
+);
+
   return (
     <div className="container mx-auto max-w-4xl px-4 py-8 md:py-12" id="main-content">
        <div className="flex flex-col items-center text-center mb-12 no-print">
@@ -166,7 +183,53 @@ export default function Home() {
                 selectedExam={selectedExam}
               />
           </div>
+
+          <Separator />
+          
+          {/* Latest News Section */}
+          <section>
+              <h2 className="text-2xl font-bold text-center mb-6">সর্বশেষ শিক্ষা সংবাদ</h2>
+              <Tabs defaultValue="all" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5 mb-4">
+                      <TabsTrigger value="all">সব খবর</TabsTrigger>
+                      <TabsTrigger value="ssc">SSC</TabsTrigger>
+                      <TabsTrigger value="hsc">HSC</TabsTrigger>
+                      <TabsTrigger value="admission">ভর্তি</TabsTrigger>
+                      <TabsTrigger value="jobs">চাকরি</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="all">
+                      <Card><CardContent className="p-4">সকল খবর এখানে প্রদর্শিত হবে।</CardContent></Card>
+                  </TabsContent>
+                   <TabsContent value="ssc">
+                      <Card><CardContent className="p-4">SSC সম্পর্কিত খবর।</CardContent></Card>
+                  </TabsContent>
+                   <TabsContent value="hsc">
+                      <Card><CardContent className="p-4">HSC সম্পর্কিত খবর।</CardContent></Card>
+                  </TabsContent>
+                   <TabsContent value="admission">
+                      <Card><CardContent className="p-4">ভর্তি বিজ্ঞপ্তি।</CardContent></Card>
+                  </TabsContent>
+                   <TabsContent value="jobs">
+                      <Card><CardContent className="p-4">চাকরির বিজ্ঞপ্তি।</CardContent></Card>
+                  </TabsContent>
+              </Tabs>
+          </section>
+
+          <Separator />
+
+          {/* Features Section */}
+          <section>
+                <h2 className="text-2xl font-bold text-center mb-6">অন্যান্য ফিচারসমূহ</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FeatureCard icon={Calendar} title="ভর্তি ও পরীক্ষা আপডেট" description="বিশ্ববিদ্যালয় ও কলেজের ভর্তি বিজ্ঞপ্তি, পরীক্ষার রুটিন ইত্যাদি।" href="/education-news" />
+                    <FeatureCard icon={Briefcase} title="চাকরি ও ক্যারিয়ার কর্নার" description="শিক্ষকতা ও অন্যান্য চাকরির খবর এবং স্কলারশিপের তথ্য।" href="/education-news" />
+                    <FeatureCard icon={BookOpen} title="স্টাডি রিসোর্স" description="মডেল টেস্ট, সাজেশন এবং নোটস ডাউনলোড করুন।" href="/suggestions" />
+                    <FeatureCard icon={Rss} title="নোটিশ বোর্ড" description="শিক্ষা বোর্ড ও মন্ত্রণালয়ের সকল নোটিশ।" href="/education-news" />
+                </div>
+          </section>
+
            <Separator />
+
            {loadingSettings ? (
               <Card className="border-dashed">
                   <CardHeader className="text-center">
