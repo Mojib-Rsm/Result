@@ -317,7 +317,7 @@ export default function Home() {
                       <div className={`grid grid-cols-1 sm:grid-cols-2 ${section.items.length > 2 ? 'lg:grid-cols-' + Math.min(section.items.length, 4) : ''} gap-6`}>
                           {section.items.map(item => (
                               <Card key={item.title} className="hover:shadow-lg transition-shadow">
-                                  <CardHeader><CardTitle className="flex items-center gap-3"><item.icon className="h-6 w-6 text-primary" /> {item.title}</CardTitle></CardHeader>
+                                  <CardHeader><CardTitle className="flex items-center gap-3">{item.icon && <item.icon className="h-6 w-6 text-primary" />} {item.title}</CardTitle></CardHeader>
                                   <CardContent><CardDescription>{item.description}</CardDescription></CardContent>
                                   <CardFooter><Button variant="link" asChild><Link href={item.link}>আরও দেখুন...</Link></Button></CardFooter>
                               </Card>
