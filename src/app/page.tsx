@@ -19,13 +19,14 @@ import { getFirestore, doc, getDoc, collection, query, orderBy, getDocs } from '
 import { app } from '@/lib/firebase';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
-import { Bell, BookOpen, Briefcase, Calendar, FileText, Rss, ExternalLink, Calculator, Phone, Trash2, Plus, MessageCircleQuestion, MessagesSquare, UserPlus, Award, Sparkles } from 'lucide-react';
+import { Bell, BookOpen, Briefcase, Calendar, FileText, Rss, ExternalLink, Calculator, Phone, Trash2, Plus, MessageCircleQuestion, MessagesSquare, UserPlus, Award, Sparkles, TableIcon } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Image from 'next/image';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import Link from 'next/link';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 interface NewsArticle {
     id: string;
@@ -130,6 +131,71 @@ const GpaCalculatorCard = () => {
       </CardContent>
     </Card>
   );
+};
+
+const BoardShortCodesCard = () => {
+    const boardCodes = [
+        { name: 'ঢাকা', code: 'DHA' }, { name: 'কুমিল্লা', code: 'COM' },
+        { name: 'রাজশাহী', code: 'RAJ' }, { name: 'যশোর', code: 'JES' },
+        { name: 'চট্টগ্রাম', code: 'CHI' }, { name: 'বরিশাল', code: 'BAR' },
+        { name: 'সিলেট', code: 'SYL' }, { name: 'দিনাজপুর', code: 'DIN' },
+        { name: 'ময়মনসিংহ', code: 'MYM' }, { name: 'মাদ্রাসা', code: 'MAD' },
+        { name: 'কারিগরি', code: 'TEC' },
+    ];
+
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-3">
+                    <TableIcon className="h-6 w-6" /> বোর্ড শর্ট কোড
+                </CardTitle>
+            </CardHeader>
+            <CardContent>
+                <Table>
+                    <TableHeader>
+                        <TableRow>
+                            <TableHead>বোর্ডের নাম</TableHead>
+                            <TableHead className="text-right">শর্ট কোড</TableHead>
+                        </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                        {boardCodes.map(board => (
+                            <TableRow key={board.code}>
+                                <TableCell>{board.name}</TableCell>
+                                <TableCell className="text-right font-mono">{board.code}</TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </CardContent>
+        </Card>
+    );
+};
+
+const BoardHelplineCard = () => {
+    const helplines = [
+        { board: 'সকল বোর্ডের জন্য', number: '16222' },
+        { board: 'বাংলাদেশ পুলিশ হেল্পডেস্ক', number: '999' },
+    ];
+    return (
+        <Card>
+            <CardHeader>
+                <CardTitle className="flex items-center gap-3">
+                    <Phone className="h-6 w-6" /> শিক্ষা বোর্ড হেল্পলাইন
+                </CardTitle>
+            </CardHeader>
+            <CardContent>
+                <ul className="space-y-2">
+                    {helplines.map(line => (
+                        <li key={line.number} className="flex justify-between items-center p-2 bg-muted/50 rounded-md">
+                            <span>{line.board}</span>
+                            <a href={`tel:${line.number}`} className="font-bold text-primary">{line.number}</a>
+                        </li>
+                    ))}
+                </ul>
+            </CardContent>
+        </Card>
+    );
 };
 
 
@@ -549,41 +615,29 @@ export default function Home() {
           
            {/* Tools & Features Section */}
           <section>
-              <h2 className="text-3xl font-bold text-center mb-8">টুলস ও ফিচার</h2>
-              <div className="space-y-4">
-                  <GpaCalculatorCard />
-                  <Card>
-                      <CardHeader>
+            <h2 className="text-3xl font-bold text-center mb-8">টুলস ও ফিচার</h2>
+            <div className="space-y-4">
+                <GpaCalculatorCard />
+                <Card>
+                    <CardHeader>
                         <CardTitle className="flex items-center gap-3">
                             <Rss className="h-6 w-6" /> রেজাল্ট SMS ফরম্যাট
                         </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                          <p className="text-muted-foreground">Coming soon...</p>
-                      </CardContent>
-                  </Card>
-                   <Card>
-                      <CardHeader>
-                          <CardTitle className="flex items-center gap-3">
-                             <Rss className="h-6 w-6" /> বোর্ড শর্ট কোড
-                          </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                         <p className="text-muted-foreground">Coming soon...</p>
-                      </CardContent>
-                  </Card>
-                   <Card>
-                      <CardHeader>
-                           <CardTitle className="flex items-center gap-3">
-                               <Phone className="h-6 w-6" /> শিক্ষা বোর্ড হেল্পলাইন
-                           </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                         <p className="text-muted-foreground">Coming soon...</p>
-                      </CardContent>
-                  </Card>
-              </div>
-          </section>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="mb-4 text-muted-foreground">যেকোনো মোবাইল থেকে SMS-এর মাধ্যমে ফলাফল পেতে নিচের ফরম্যাট অনুসরণ করুন এবং 16222 নম্বরে পাঠান।</p>
+                        <div className="space-y-2">
+                            <p><strong>HSC:</strong> <code className="bg-muted px-2 py-1 rounded">HSC &lt;Space&gt; বোর্ডের নামের প্রথম ৩ অক্ষর &lt;Space&gt; রোল নম্বর &lt;Space&gt; বছর</code></p>
+                            <p><strong>SSC:</strong> <code className="bg-muted px-2 py-1 rounded">SSC &lt;Space&gt; বোর্ডের নামের প্রথম ৩ অক্ষর &lt;Space&gt; রোল নম্বর &lt;Space&gt; বছর</code></p>
+                            <p><strong>JSC:</strong> <code className="bg-muted px-2 py-1 rounded">JSC &lt;Space&gt; বোর্ডের নামের প্রথম ৩ অক্ষর &lt;Space&gt; রোল নম্বর &lt;Space&gt; বছর</code></p>
+                             <p><strong>Dakhil:</strong> <code className="bg-muted px-2 py-1 rounded">DAKHIL &lt;Space&gt; MAD &lt;Space&gt; রোল নম্বর &lt;Space&gt; বছর</code></p>
+                        </div>
+                    </CardContent>
+                </Card>
+                <BoardShortCodesCard />
+                <BoardHelplineCard />
+            </div>
+        </section>
 
           <Separator />
 
