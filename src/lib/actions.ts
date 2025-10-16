@@ -257,6 +257,7 @@ export async function uploadImage(formData: FormData): Promise<{ url?: string; e
 
         const responseText = await response.text();
         
+        // Try to parse as JSON first
         try {
             const result = JSON.parse(responseText);
              if (result.status === "success" && result.url) {
@@ -265,14 +266,19 @@ export async function uploadImage(formData: FormData): Promise<{ url?: string; e
                 throw new Error(result.error?.message || "ছবি আপলোড করার পর সার্ভার থেকে কোনো URL পাওয়া যায়নি।");
             }
         } catch(e) {
-            // If response is not JSON, it might be HTML with the URL.
-            const dom = new JSDOM(responseText);
-            const urlInput = dom.window.document.querySelector('input[data-action="copy-to-clipboard"]');
-            if(urlInput){
-                const url = (urlInput as HTMLInputElement).value;
-                if(url) return { url };
+            // If JSON parsing fails, it's likely HTML. Let's parse it.
+            try {
+                const dom = new JSDOM(responseText);
+                const urlInput = dom.window.document.querySelector('input[data-action="copy-to-clipboard"]');
+                if(urlInput){
+                    const url = (urlInput as HTMLInputElement).value;
+                    if(url) return { url };
+                }
+                 throw new Error("HTML response parsing failed to find the URL.");
+            } catch (htmlError) {
+                 console.error("Could not parse response as JSON or HTML:", responseText);
+                 throw new Error("সার্ভার থেকে একটি অপ্রত্যাশিত প্রতিক্রিয়া এসেছে।");
             }
-            throw new Error("সার্ভার থেকে একটি অপ্রত্যাশিত প্রতিক্রিয়া এসেছে।");
         }
 
     } catch (error: any) {
@@ -283,4 +289,5 @@ export async function uploadImage(formData: FormData): Promise<{ url?: string; e
 
 
 export { searchResultLegacy, searchInstituteResult };
+
 
