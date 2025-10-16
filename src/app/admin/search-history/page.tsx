@@ -66,7 +66,7 @@ export default function SearchHistoryPage() {
             headers.join(','),
             ...history.map(item => {
                 const row = [
-                    item.timestamp ? format(new Date(item.timestamp.seconds * 1000), 'yyyy-MM-dd HH:mm:ss') : 'N/A',
+                    item.timestamp && typeof item.timestamp.seconds === 'number' ? format(new Date(item.timestamp.seconds * 1000), 'yyyy-MM-dd HH:mm:ss') : 'N/A',
                     `"${item.result?.studentInfo?.name || 'N/A'}"`,
                     item.roll,
                     item.reg,
