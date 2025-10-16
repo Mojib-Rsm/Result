@@ -101,12 +101,19 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      {
+        protocol: 'http',
+        hostname: 'img.bdedu.me',
+        port: '',
+        pathname: '/**',
+      }
     ],
   },
   env: {}
 };
 
 export default nextConfig;
+
 
 
 
