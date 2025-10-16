@@ -19,7 +19,7 @@ import { getFirestore, doc, getDoc, collection, query, orderBy, getDocs } from '
 import { app } from '@/lib/firebase';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
-import { Bell, BookOpen, Briefcase, Calendar, FileText, Rss, ExternalLink, Calculator, MessageSquare, ListChecks, Phone, Trash2, Plus, MessageCircleQuestion, MessagesSquare, UserPlus, Award, Sparkles } from 'lucide-react';
+import { Bell, BookOpen, Briefcase, Calendar, FileText, Rss, ExternalLink, Calculator, Phone, Trash2, Plus, MessageCircleQuestion, MessagesSquare, UserPlus, Award, Sparkles } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Image from 'next/image';
 import { formatDistanceToNow } from 'date-fns';
@@ -409,6 +409,41 @@ export default function Home() {
           
           <Separator />
 
+          {/* Admission & Exam Update Section */}
+          <section>
+              <h2 className="text-3xl font-bold text-center mb-8">ভর্তি ও পরীক্ষার আপডেট</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <Card className="hover:shadow-lg transition-shadow">
+                      <CardHeader>
+                          <CardTitle className="flex items-center gap-3">
+                              <BookOpen className="h-6 w-6" /> ভর্তি তথ্য
+                          </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                          <CardDescription>বিশ্ববিদ্যালয় ও কলেজ ভর্তি সংক্রান্ত সকল তথ্য।</CardDescription>
+                      </CardContent>
+                      <CardFooter>
+                         <Button variant="link" asChild><Link href="#">আরও দেখুন...</Link></Button>
+                      </CardFooter>
+                  </Card>
+                  <Card className="hover:shadow-lg transition-shadow">
+                      <CardHeader>
+                          <CardTitle className="flex items-center gap-3">
+                              <Calendar className="h-6 w-6" /> পরীক্ষার সময়সূচী
+                          </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                         <CardDescription>সকল পাবলিক পরীক্ষার সময়সূচী ও রুটিন।</CardDescription>
+                      </CardContent>
+                       <CardFooter>
+                         <Button variant="link" asChild><Link href="#">আরও দেখুন...</Link></Button>
+                      </CardFooter>
+                  </Card>
+              </div>
+          </section>
+
+          <Separator />
+
            {/* Educational Resources Section */}
           <section>
               <h2 className="text-3xl font-bold text-center mb-8">শিক্ষামূলক রিসোর্স</h2>
@@ -460,7 +495,7 @@ export default function Home() {
           {/* Career Hub Section */}
           <section>
               <h2 className="text-3xl font-bold text-center mb-8">ক্যারিয়ার হাব</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                   <Card className="hover:shadow-lg transition-shadow">
                       <CardHeader>
                           <CardTitle className="flex items-center gap-3">
@@ -522,7 +557,7 @@ export default function Home() {
                   <Card>
                       <CardHeader>
                         <CardTitle className="flex items-center gap-3">
-                            <MessageSquare className="h-6 w-6" /> রেজাল্ট SMS ফরম্যাট
+                            <Rss className="h-6 w-6" /> রেজাল্ট SMS ফরম্যাট
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
@@ -532,7 +567,7 @@ export default function Home() {
                    <Card>
                       <CardHeader>
                           <CardTitle className="flex items-center gap-3">
-                             <ListChecks className="h-6 w-6" /> বোর্ড শর্ট কোড
+                             <Rss className="h-6 w-6" /> বোর্ড শর্ট কোড
                           </CardTitle>
                       </CardHeader>
                       <CardContent>
@@ -620,3 +655,5 @@ export default function Home() {
     </div>
   );
 }
+
+    
