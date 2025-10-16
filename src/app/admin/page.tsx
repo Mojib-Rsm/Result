@@ -1,4 +1,3 @@
-
 'use client'
 
 import { useState, useEffect, useCallback } from 'react';
@@ -173,7 +172,7 @@ export default function AdminPage() {
             setLoading(false);
             setLoadingSettings(false);
         }
-    }, [db]);
+    }, [db, toast]);
 
     useEffect(() => {
         fetchAllData();
