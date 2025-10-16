@@ -86,33 +86,7 @@ export default function Header({ className }: { className?: string }) {
         <div className="flex-1" />
 
         <div className="flex items-center justify-end">
-            {isAdminPage && user ? (
-                 <div className="md:hidden">
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                                <MoreVertical className="h-5 w-5" />
-                                <span className="sr-only">Open admin menu</span>
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            {adminNavLinks.map(link => (
-                                 <DropdownMenuItem key={link.href} asChild>
-                                     <Link href={link.href} className="flex items-center gap-2">
-                                        <link.icon className="h-4 w-4" />
-                                        <span>{link.label}</span>
-                                    </Link>
-                                 </DropdownMenuItem>
-                            ))}
-                            <DropdownMenuSeparator />
-                             <DropdownMenuItem onClick={handleLogout} className="text-destructive">
-                                <LogOut className="mr-2 h-4 w-4" />
-                                <span>লগআউট</span>
-                            </DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
-                  </div>
-            ) : (
+            {isAdminPage && user ? null : (
               <div className="md:hidden">
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
