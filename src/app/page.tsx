@@ -18,9 +18,21 @@ import { Separator } from '@/components/ui/separator';
 import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { app } from '@/lib/firebase';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Bell, BookOpen, Briefcase, Calendar, FileText, Rss } from 'lucide-react';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import { Bell, BookOpen, Briefcase, Calendar, FileText, Rss, ExternalLink } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import Image from 'next/image';
+import { formatDistanceToNow } from 'date-fns';
+import { bn } from 'date-fns/locale';
+
+interface NewsArticle {
+    title: string;
+    description: string;
+    url: string;
+    urlToImage: string;
+    publishedAt: string;
+    source: { name: string };
+}
 
 
 export default function Home() {
@@ -32,6 +44,9 @@ export default function Home() {
   const [captchaCookie, setCaptchaCookie] = useState('');
   const [showSubscriptionForm, setShowSubscriptionForm] = useState(false);
   const [loadingSettings, setLoadingSettings] = useState(true);
+
+  const [news, setNews] = useState<Record<string, NewsArticle[]>>({});
+  const [loadingNews, setLoadingNews] = useState<Record<string, boolean>>({ all: true });
 
   const db = getFirestore(app);
 
@@ -77,6 +92,35 @@ export default function Home() {
         });
     }
   }, [form, toast]);
+
+
+  const fetchNews = useCallback(async (category: string) => {
+    if (news[category]) return; // Don't re-fetch if already loaded
+
+    setLoadingNews(prev => ({ ...prev, [category]: true }));
+    try {
+      const response = await fetch(`/api/news?category=${category}`);
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      const articles: NewsArticle[] = await response.json();
+      setNews(prev => ({ ...prev, [category]: articles }));
+    } catch (error) {
+      console.error(`Failed to fetch ${category} news:`, error);
+      toast({
+        title: "সংবাদ আনতে ব্যর্থ",
+        description: "সংবাদ লোড করা যায়নি। অনুগ্রহ করে কিছুক্ষণ পর আবার চেষ্টা করুন।",
+        variant: "destructive"
+      })
+    } finally {
+      setLoadingNews(prev => ({ ...prev, [category]: false }));
+    }
+  }, [news, toast]);
+
+  useEffect(() => {
+    // Initially fetch the 'all' category
+    fetchNews('all');
+  }, [fetchNews]);
 
 
   useEffect(() => {
@@ -160,11 +204,55 @@ export default function Home() {
     </Card>
 );
 
+const NewsCard = ({ article }: { article: NewsArticle }) => (
+    <Card className="flex flex-col overflow-hidden">
+        <CardHeader className="p-0">
+            <div className="aspect-video relative">
+                <Image
+                    src={article.urlToImage || '/placeholder.png'}
+                    alt={article.title}
+                    layout="fill"
+                    objectFit="cover"
+                    className="rounded-t-lg"
+                    onError={(e) => { e.currentTarget.src = '/placeholder.png'; }}
+                />
+            </div>
+        </CardHeader>
+        <CardContent className="p-4 flex-grow">
+            <h3 className="font-semibold leading-snug line-clamp-2">{article.title}</h3>
+            <p className="text-xs text-muted-foreground mt-2 line-clamp-3">{article.description}</p>
+        </CardContent>
+        <CardFooter className="p-4 pt-0 flex justify-between items-center">
+            <p className="text-xs text-muted-foreground">
+                {formatDistanceToNow(new Date(article.publishedAt), { addSuffix: true, locale: bn })}
+            </p>
+            <Button asChild variant="secondary" size="sm">
+                <a href={article.url} target="_blank" rel="noopener noreferrer">
+                    বিস্তারিত <ExternalLink className="ml-1 h-3 w-3" />
+                </a>
+            </Button>
+        </CardFooter>
+    </Card>
+);
+
+const NewsSkeleton = () => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {[...Array(3)].map((_, i) => (
+            <Card key={i}>
+                <CardHeader className="p-0"><Skeleton className="aspect-video w-full rounded-t-lg" /></CardHeader>
+                <CardContent className="p-4"><Skeleton className="h-4 w-3/4 mb-2" /><Skeleton className="h-3 w-full" /></CardContent>
+                <CardFooter className="p-4 pt-0"><Skeleton className="h-8 w-24" /></CardFooter>
+            </Card>
+        ))}
+    </div>
+);
+
+
   return (
     <div className="container mx-auto max-w-4xl px-4 py-8 md:py-12" id="main-content">
        <div className="flex flex-col items-center text-center mb-12 no-print">
         <h1 className="text-4xl md:text-5xl font-bold tracking-tight bg-gradient-to-br from-primary to-accent bg-clip-text text-transparent animate-fade-in-up">
-          বাংলাদেশের শিক্ষা বিষয়ক সব তথ্য এক জায়গায়
+          BD Edu: Your Education & Career Hub
         </h1>
         <p className="mt-4 max-w-2xl text-lg text-muted-foreground animate-fade-in-up animation-delay-200">
            রেজাল্ট, ভর্তি, শিক্ষা সংবাদ ও গাইড — সব BD Edu তে।
@@ -189,7 +277,7 @@ export default function Home() {
           {/* Latest News Section */}
           <section>
               <h2 className="text-2xl font-bold text-center mb-6">সর্বশেষ শিক্ষা সংবাদ</h2>
-              <Tabs defaultValue="all" className="w-full">
+              <Tabs defaultValue="all" className="w-full" onValueChange={fetchNews}>
                   <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5 mb-4">
                       <TabsTrigger value="all">সব খবর</TabsTrigger>
                       <TabsTrigger value="ssc">SSC</TabsTrigger>
@@ -197,21 +285,21 @@ export default function Home() {
                       <TabsTrigger value="admission">ভর্তি</TabsTrigger>
                       <TabsTrigger value="jobs">চাকরি</TabsTrigger>
                   </TabsList>
-                  <TabsContent value="all">
-                      <Card><CardContent className="p-4">সকল খবর এখানে প্রদর্শিত হবে।</CardContent></Card>
-                  </TabsContent>
-                   <TabsContent value="ssc">
-                      <Card><CardContent className="p-4">SSC সম্পর্কিত খবর।</CardContent></Card>
-                  </TabsContent>
-                   <TabsContent value="hsc">
-                      <Card><CardContent className="p-4">HSC সম্পর্কিত খবর।</CardContent></Card>
-                  </TabsContent>
-                   <TabsContent value="admission">
-                      <Card><CardContent className="p-4">ভর্তি বিজ্ঞপ্তি।</CardContent></Card>
-                  </TabsContent>
-                   <TabsContent value="jobs">
-                      <Card><CardContent className="p-4">চাকরির বিজ্ঞপ্তি।</CardContent></Card>
-                  </TabsContent>
+                    {Object.keys(loadingNews).map(cat => (
+                        <TabsContent key={cat} value={cat}>
+                           {loadingNews[cat] ? (
+                                <NewsSkeleton />
+                           ) : news[cat] && news[cat].length > 0 ? (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                   {news[cat].slice(0, 3).map((article, index) => (
+                                       <NewsCard key={index} article={article} />
+                                   ))}
+                                </div>
+                           ) : (
+                               <p className="text-center text-muted-foreground py-8">এই বিভাগের জন্য কোনো সংবাদ পাওয়া যায়নি।</p>
+                           )}
+                        </TabsContent>
+                    ))}
               </Tabs>
           </section>
 

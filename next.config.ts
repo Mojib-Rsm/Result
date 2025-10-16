@@ -83,10 +83,15 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/**',
       },
+      { protocol: 'https', hostname: 'media.wired.com' },
+      { protocol: 'https', hostname: 'img-cdn.tnwcdn.com' },
+      { protocol: 'https', hostname: 'images.wsj.net' },
+      { protocol: 'https', hostname: 'i.kinja-img.com' },
     ],
   },
   env: {}
 };
 
 export default nextConfig;
+
 
