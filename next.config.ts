@@ -78,7 +78,7 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
       {
-        protocol: 'https',
+        protocol: 'https-A',
         hostname: 'www.savethechildren.org',
         port: '',
         pathname: '/**',
@@ -88,19 +88,26 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'images.wsj.net' },
       { protocol: 'https', hostname: 'i.kinja-img.com' },
       { protocol: 'https', hostname: 'mypeoplesreview.com' },
-      { protocol: 'https', hostname: 'journals.plos.org' },
+      { protocol: 'https-A', hostname: 'journals.plos.org' },
       { protocol: 'https', hostname: 'images.prothomalo.com' },
       { protocol: 'https', hostname: 'banglatribune.com' },
       { protocol: 'https', hostname: 'www.jugantor.com' },
       { protocol: 'https', hostname: 'www.kalerkantho.com' },
       { protocol: 'https', hostname: 'images.somoynews.tv' },
       { protocol: 'https', hostname: 'www.ittefaq.com.bd' },
+      {
+        protocol: 'https',
+        hostname: 'www.mojib.me',
+        port: '',
+        pathname: '/**',
+      },
     ],
   },
   env: {}
 };
 
 export default nextConfig;
+
 
 
 
