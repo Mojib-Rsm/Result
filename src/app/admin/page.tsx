@@ -394,7 +394,7 @@ export default function AdminPage() {
     const TableSkeleton = () => (
         [...Array(5)].map((_, i) => (
             <TableRow key={i}>
-                {[...Array(7)].map((_, j) => (
+                {[...Array(5)].map((_, j) => (
                      <TableCell key={j}><Skeleton className="h-4 w-full" /></TableCell>
                 ))}
             </TableRow>
@@ -585,6 +585,7 @@ export default function AdminPage() {
                             <TableHeader>
                                 <TableRow>
                                     <TableHead>রোল</TableHead>
+                                    <TableHead>রেজি. নম্বর</TableHead>
                                     <TableHead>পরীক্ষা</TableHead>
                                     <TableHead>বছর</TableHead>
                                     <TableHead>GPA</TableHead>
@@ -597,6 +598,7 @@ export default function AdminPage() {
                                     recentSearches.map(result => (
                                         <TableRow key={result.id}>
                                             <TableCell>{result.roll}</TableCell>
+                                            <TableCell>{result.reg}</TableCell>
                                             <TableCell className="uppercase">{result.exam}</TableCell>
                                             <TableCell>{result.year}</TableCell>
                                             <TableCell>{result.result?.gpa?.toFixed(2) || 'N/A'}</TableCell>
@@ -604,7 +606,7 @@ export default function AdminPage() {
                                     ))
                                 ) : (
                                     <TableRow>
-                                        <TableCell colSpan={4} className="text-center">কোনো সাম্প্রতিক অনুসন্ধান নেই।</TableCell>
+                                        <TableCell colSpan={5} className="text-center">কোনো সাম্প্রতিক অনুসন্ধান নেই।</TableCell>
                                     </TableRow>
                                 )}
                             </TableBody>
