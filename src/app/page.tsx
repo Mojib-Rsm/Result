@@ -6,7 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ExamForm } from '@/components/exam-form';
 import ResultsDisplay from '@/components/results-display';
-import type { ExamResult } from '@/types';
+import type { ExamResult, NewsPost } from '@/types';
 import { z } from 'zod';
 import { searchResultLegacy } from '@/lib/actions';
 import { useToast } from '@/hooks/use-toast';
@@ -28,15 +28,6 @@ import { Textarea } from '@/components/ui/textarea';
 import Link from 'next/link';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
-interface NewsArticle {
-    id: string;
-    title: string;
-    description: string;
-    link: string;
-    imageUrl: string;
-    date: string;
-    source: string;
-}
 
 const gradePoints: { [key: string]: number } = {
   'A+': 5.0,
@@ -199,22 +190,26 @@ const BoardHelplineCard = () => {
 };
 
 
-const NewsCard = ({ article }: { article: NewsArticle }) => (
+const NewsCard = ({ article }: { article: NewsPost }) => (
     <Card className="flex flex-col overflow-hidden hover:shadow-lg transition-shadow">
-        <CardHeader className="p-0">
-            <div className="aspect-video relative">
-                <Image
-                    src={article.imageUrl || '/logo.png'}
-                    alt={article.title}
-                    fill
-                    objectFit="cover"
-                    className="rounded-t-lg"
-                    onError={(e) => { e.currentTarget.src = '/logo.png'; }}
-                />
-            </div>
-        </CardHeader>
+        <Link href={`/education-news/${article.id}`}>
+            <CardHeader className="p-0">
+                <div className="aspect-video relative">
+                    <Image
+                        src={article.imageUrl || '/logo.png'}
+                        alt={article.title}
+                        fill
+                        objectFit="cover"
+                        className="rounded-t-lg"
+                        onError={(e) => { e.currentTarget.src = '/logo.png'; }}
+                    />
+                </div>
+            </CardHeader>
+        </Link>
         <CardContent className="p-4 flex-grow">
-            <h3 className="font-semibold leading-snug line-clamp-2">{article.title}</h3>
+            <Link href={`/education-news/${article.id}`}>
+                <h3 className="font-semibold leading-snug line-clamp-2 hover:text-primary">{article.title}</h3>
+            </Link>
             <p className="text-xs text-muted-foreground mt-2 line-clamp-3">{article.description}</p>
         </CardContent>
         <CardFooter className="p-4 pt-0 flex justify-between items-center">
@@ -222,9 +217,9 @@ const NewsCard = ({ article }: { article: NewsArticle }) => (
                 {article.date}
             </p>
             <Button asChild variant="secondary" size="sm">
-                <a href={article.link} target="_blank" rel="noopener noreferrer">
+                <Link href={`/education-news/${article.id}`}>
                     বিস্তারিত <ExternalLink className="ml-1 h-3 w-3" />
-                </a>
+                </Link>
             </Button>
         </CardFooter>
     </Card>
@@ -244,7 +239,7 @@ const NewsSkeleton = () => (
 
 
 const NewsSection = () => {
-    const [news, setNews] = useState<NewsArticle[]>([]);
+    const [news, setNews] = useState<NewsPost[]>([]);
     const [loadingNews, setLoadingNews] = useState(true);
     const { toast } = useToast();
     const db = getFirestore(app);
@@ -255,7 +250,7 @@ const NewsSection = () => {
             const newsRef = collection(db, 'news');
             const q = query(newsRef, orderBy('createdAt', 'desc'), limit(6));
             const querySnapshot = await getDocs(q);
-            const articles = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as NewsArticle[];
+            const articles = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as NewsPost[];
             setNews(articles);
         } catch (error) {
             console.error(`Failed to fetch news:`, error);
@@ -568,7 +563,7 @@ export default function Home() {
                            <CardDescription>শিক্ষা ক্ষেত্রে সর্বশেষ চাকরির খবর ও বিজ্ঞপ্তি।</CardDescription>
                       </CardHeader>
                       <CardFooter>
-                         <Button variant="link" asChild><Link href="/education-news">আরও দেখুন...</Link></Button>
+                         <Button variant="link" asChild><Link href="/career">আরও দেখুন...</Link></Button>
                       </CardFooter>
                   </Card>
                   <Card className="hover:shadow-lg transition-shadow">
@@ -579,7 +574,7 @@ export default function Home() {
                            <CardDescription>সরকারি-বেসরকারি স্কুল, কলেজ ও বিশ্ববিদ্যালয়ে শিক্ষক নিয়োগের আপডেট।</CardDescription>
                       </CardHeader>
                        <CardFooter>
-                         <Button variant="link" asChild><Link href="/education-news">আরও দেখুন...</Link></Button>
+                         <Button variant="link" asChild><Link href="/career">আরও দেখুন...</Link></Button>
                       </CardFooter>
                   </Card>
                    <Card className="hover:shadow-lg transition-shadow">
@@ -590,7 +585,7 @@ export default function Home() {
                             <CardDescription>দেশ-বিদেশের বিভিন্ন স্কলারশিপ ও ইন্টার্নশিপের সুযোগ।</CardDescription>
                       </CardHeader>
                        <CardFooter>
-                         <Button variant="link" asChild><Link href="/education-news">আরও দেখুন...</Link></Button>
+                         <Button variant="link" asChild><Link href="/career">আরও দেখুন...</Link></Button>
                       </CardFooter>
                   </Card>
                   <Card className="hover:shadow-lg transition-shadow">
@@ -601,7 +596,7 @@ export default function Home() {
                             <CardDescription>সফল ক্যারিয়ার গড়ার জন্য সিভি তৈরি, ভাইভা প্রস্তুতি ও অন্যান্য টিপস।</CardDescription>
                       </CardHeader>
                        <CardFooter>
-                         <Button variant="link" asChild><Link href="/education-news">আরও দেখুন...</Link></Button>
+                         <Button variant="link" asChild><Link href="/career">আরও দেখুন...</Link></Button>
                       </CardFooter>
                   </Card>
               </div>

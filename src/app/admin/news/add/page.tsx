@@ -19,10 +19,11 @@ import { format } from 'date-fns';
 
 const newsPostSchema = z.object({
   title: z.string().min(1, 'শিরোনাম আবশ্যক।'),
-  description: z.string().min(1, 'বিবরণ আবশ্যক।'),
+  description: z.string().min(1, 'সংক্ষিপ্ত বিবরণ আবশ্যক।'),
+  content: z.string().min(1, 'সম্পূর্ণ বিবরণ আবশ্যক।'),
   imageUrl: z.string().url('অনুগ্রহ করে একটি বৈধ ছবির লিঙ্ক দিন।'),
-  source: z.string().min(1, 'উৎস আবশ্যক।'),
-  link: z.string().url('অনুগ্রহ করে একটি বৈধ খবরের লিঙ্ক দিন।'),
+  source: z.string().optional(),
+  link: z.string().url('অনুগ্রহ করে একটি বৈধ খবরের লিঙ্ক দিন।').optional().or(z.literal('')),
   tags: z.string().optional(),
 });
 
@@ -37,6 +38,7 @@ export default function AddNewsPage() {
     defaultValues: {
       title: '',
       description: '',
+      content: '',
       imageUrl: '',
       source: '',
       link: '',
@@ -111,6 +113,23 @@ export default function AddNewsPage() {
                     </FormItem>
                     )}
                 />
+                 <FormField
+                    control={form.control}
+                    name="content"
+                    render={({ field }) => (
+                    <FormItem>
+                        <FormLabel>সম্পূর্ণ বিবরণ</FormLabel>
+                        <FormControl>
+                        <Textarea
+                            placeholder="সম্পূর্ণ আর্টিকেল এখানে লিখুন..."
+                            rows={10}
+                            {...field}
+                        />
+                        </FormControl>
+                        <FormMessage />
+                    </FormItem>
+                    )}
+                />
                 <FormField
                     control={form.control}
                     name="imageUrl"
@@ -129,9 +148,9 @@ export default function AddNewsPage() {
                     name="source"
                     render={({ field }) => (
                     <FormItem>
-                        <FormLabel>উৎস</FormLabel>
+                        <FormLabel>উৎস (ঐচ্ছিক)</FormLabel>
                         <FormControl>
-                        <Input placeholder="যেমন: The Daily Star" {...field} />
+                        <Input placeholder="যেমন: The Daily Star বা লেখকের নাম" {...field} />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -142,7 +161,7 @@ export default function AddNewsPage() {
                     name="link"
                     render={({ field }) => (
                     <FormItem>
-                        <FormLabel>খবরের লিঙ্ক</FormLabel>
+                        <FormLabel>বহিরাগত লিঙ্ক (ঐচ্ছিক)</FormLabel>
                         <FormControl>
                         <Input type="url" placeholder="https://example.com/full-news" {...field} />
                         </FormControl>

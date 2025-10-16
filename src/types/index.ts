@@ -86,3 +86,16 @@ export interface JobPost {
   contactInfo?: string;
   postedAt: { seconds: number };
 }
+
+export interface NewsPost {
+  id: string;
+  title: string;
+  description: string;
+  content: string;
+  imageUrl: string;
+  date: string;
+  source?: string;
+  link?: string;
+  tags?: string[];
+  createdAt: { seconds: number, nanoseconds: number };
+}

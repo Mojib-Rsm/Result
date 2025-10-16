@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Plus, Edit, Trash2, Loader2 } from 'lucide-react';
+import { Plus, Edit, Trash2, Loader2, ExternalLink } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
@@ -24,7 +24,7 @@ export default function NewsManagementPage() {
         const fetchNews = async () => {
             try {
                 const newsRef = collection(db, 'news');
-                const q = query(newsRef, orderBy('date', 'desc'));
+                const q = query(newsRef, orderBy('createdAt', 'desc'));
                 const querySnapshot = await getDocs(q);
                 setNewsItems(querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
             } catch (error) {
@@ -118,9 +118,12 @@ export default function NewsManagementPage() {
                                             />
                                         </TableCell>
                                         <TableCell className="font-medium max-w-xs truncate">
-                                            <a href={item.link} target="_blank" className="hover:underline">{item.title}</a>
+                                             <Link href={`/education-news/${item.id}`} className="hover:underline">
+                                                {item.title}
+                                                {item.link && <ExternalLink className="inline-block ml-1 h-3 w-3" />}
+                                             </Link>
                                         </TableCell>
-                                        <TableCell>{item.source}</TableCell>
+                                        <TableCell>{item.source || 'নিজস্ব'}</TableCell>
                                         <TableCell>{item.date}</TableCell>
                                         <TableCell className="text-right">
                                             <div className="flex justify-end gap-2">

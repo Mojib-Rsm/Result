@@ -10,9 +10,10 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ExternalLink, Bookmark } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import type { NewsPost } from '@/types';
 
 export default function EducationNewsPage() {
-    const [newsItems, setNewsItems] = useState<any[]>([]);
+    const [newsItems, setNewsItems] = useState<NewsPost[]>([]);
     const [loading, setLoading] = useState(true);
     const db = getFirestore(app);
 
@@ -20,9 +21,9 @@ export default function EducationNewsPage() {
         const fetchNews = async () => {
             try {
                 const newsRef = collection(db, 'news');
-                const q = query(newsRef, orderBy('date', 'desc'));
+                const q = query(newsRef, orderBy('createdAt', 'desc'));
                 const querySnapshot = await getDocs(q);
-                setNewsItems(querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+                setNewsItems(querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as NewsPost)));
             } catch (error) {
                 console.error("Error fetching news: ", error);
             } finally {
@@ -76,21 +77,23 @@ export default function EducationNewsPage() {
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     {newsItems.map((item) => (
                         <Card key={item.id} className="flex flex-col overflow-hidden hover:shadow-lg transition-shadow">
-                             <CardHeader>
-                                 <div className="aspect-video relative">
-                                    <Image
-                                        src={item.imageUrl}
-                                        alt={item.title}
-                                        layout="fill"
-                                        objectFit="cover"
-                                        className="rounded-t-lg"
-                                    />
-                                </div>
-                             </CardHeader>
+                            <Link href={`/education-news/${item.id}`} className="block">
+                                <CardHeader className="p-0">
+                                    <div className="aspect-video relative">
+                                        <Image
+                                            src={item.imageUrl}
+                                            alt={item.title}
+                                            layout="fill"
+                                            objectFit="cover"
+                                            className="rounded-t-lg"
+                                        />
+                                    </div>
+                                </CardHeader>
+                            </Link>
 
-                            <CardContent className="flex-grow">
+                            <CardContent className="flex-grow p-4">
                                  <CardTitle className="text-lg leading-snug hover:text-primary transition-colors">
-                                    <Link href={item.link} target="_blank">
+                                    <Link href={`/education-news/${item.id}`}>
                                         {item.title}
                                     </Link>
                                 </CardTitle>
@@ -99,9 +102,9 @@ export default function EducationNewsPage() {
                                 </CardDescription>
                             </CardContent>
 
-                            <CardFooter className="flex flex-col items-start gap-4">
+                            <CardFooter className="flex flex-col items-start gap-4 p-4">
                                  <div className="flex items-center justify-between w-full text-xs text-muted-foreground">
-                                    <span>{item.source}</span>
+                                    <span>{item.source || 'নিজস্ব'}</span>
                                     <span>{item.date}</span>
                                 </div>
                                 <div className="flex flex-wrap gap-2">
@@ -109,7 +112,7 @@ export default function EducationNewsPage() {
                                         <Badge key={tag} variant="secondary">{tag}</Badge>
                                     ))}
                                 </div>
-                                <Link href={item.link} target="_blank" className="text-sm font-semibold text-primary hover:underline flex items-center">
+                                <Link href={`/education-news/${item.id}`} className="text-sm font-semibold text-primary hover:underline flex items-center">
                                     বিস্তারিত পড়ুন <ExternalLink className="ml-1 h-3 w-3" />
                                 </Link>
                             </CardFooter>
@@ -128,5 +131,3 @@ export default function EducationNewsPage() {
         </div>
     );
 }
-
-    
