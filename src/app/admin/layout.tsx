@@ -91,9 +91,7 @@ export default function AdminLayout({
                         <SidebarTrigger />
                         <h1 className="text-lg font-semibold">অ্যাডমিন প্যানেল</h1>
                     </header>
-                    <div className="flex-1 bg-muted/30">
-                      {children}
-                    </div>
+                    {children}
                 </SidebarInset>
             </Sidebar>
         </SidebarProvider>
