@@ -241,6 +241,8 @@ export async function uploadImage(formData: FormData): Promise<{ url?: string; e
             headers: {
                 "Accept": "application/json",
                 "X-Requested-With": "XMLHttpRequest",
+                "Origin": "http://img.bdedu.me",
+                "Referer": "http://img.bdedu.me/en/user/gallery"
             }
         });
 
