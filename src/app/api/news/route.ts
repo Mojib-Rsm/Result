@@ -10,29 +10,41 @@ export async function GET(request: Request) {
         return NextResponse.json({ error: 'News API key is not configured.' }, { status: 500 });
     }
     
-    // More specific queries based on category
+    // More specific queries based on category for Bengali news
     let query;
     switch(category) {
         case 'ssc':
-            query = '"SSC" OR "Dakhil" AND "Bangladesh"';
+            query = 'এসএসসি OR দাখিল';
             break;
         case 'hsc':
-            query = '"HSC" OR "Alim" AND "Bangladesh"';
+            query = 'এইচএসসি OR আলিম';
             break;
         case 'admission':
-            query = '"University Admission" OR "College Admission" AND "Bangladesh"';
+            query = 'বিশ্ববিদ্যালয় ভর্তি OR কলেজ ভর্তি';
             break;
         case 'jobs':
-            query = '"Job circular" OR "Recruitment" AND "Bangladesh"';
+            query = 'চাকরির খবর OR নিয়োগ বিজ্ঞপ্তি';
             break;
         case 'all':
         default:
-            query = '"Education" AND "Bangladesh"';
+            query = 'শিক্ষা';
             break;
     }
 
+    const domains = [
+        'bdnews24.com',
+        'prothomalo.com',
+        'banglatribune.com',
+        'jugantor.com',
+        'kalerkantho.com',
+        'somoynews.tv',
+        'ittefaq.com.bd',
+        'tbsnews.net',
+        'dhakatribune.com',
+        'thedailystar.net'
+    ].join(',');
 
-    const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&sortBy=publishedAt&language=en&pageSize=6&apiKey=${apiKey}`;
+    const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent(query)}&domains=${domains}&sortBy=publishedAt&language=bn&pageSize=6&apiKey=${apiKey}`;
 
     try {
         const newsResponse = await fetch(url, {

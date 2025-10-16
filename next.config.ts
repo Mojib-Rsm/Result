@@ -89,12 +89,19 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'i.kinja-img.com' },
       { protocol: 'https', hostname: 'mypeoplesreview.com' },
       { protocol: 'https', hostname: 'journals.plos.org' },
+      { protocol: 'https', hostname: 'images.prothomalo.com' },
+      { protocol: 'https', hostname: 'banglatribune.com' },
+      { protocol: 'https', hostname: 'www.jugantor.com' },
+      { protocol: 'https', hostname: 'www.kalerkantho.com' },
+      { protocol: 'https', hostname: 'images.somoynews.tv' },
+      { protocol: 'https', hostname: 'www.ittefaq.com.bd' },
     ],
   },
   env: {}
 };
 
 export default nextConfig;
+
 
 
 
