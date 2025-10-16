@@ -2,12 +2,13 @@
 'use client';
 
 import { useState } from 'react';
-import { getFirestore, setDoc, doc, writeBatch } from 'firebase/firestore';
+import { getFirestore, setDoc, doc, writeBatch, serverTimestamp, collection } from 'firebase/firestore';
 import { app } from '@/lib/firebase';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, DatabaseZap } from 'lucide-react';
+import { format } from 'date-fns';
 
 // Data to be seeded
 const usersToSeed = [
@@ -64,7 +65,7 @@ const newsItems = [
         description: "MPO তালিকাভুক্ত শিক্ষক ও কর্মীরা তাদের তিনটি দাবি মেটানো না হলে সচিবালয়ের দিকে মিছিল করার ঘোষণা দিয়েছিলেন। সকালে মিছিল শুরু হলে দুপুর ৪টা পর্যন্ত তা স্থগিত রাখা হয়।",
         imageUrl: "https://www.tbsnews.net/sites/default/files/styles/media_gallery/public/media/images/2025/10/14/teachers_long_march.jpg",
         source: 'The Business Standard',
-        date: 'অক্টোবর ১৪, ২০২৪',
+        date: format(new Date('2024-10-14'), 'MMMM dd, yyyy'),
         link: "https://www.tbsnews.net/bangladesh/teachers-continue-sit-3rd-day-announce-long-march-towards-secretariat-1260011",
         tags: ['teachers', 'protest', 'MPO'],
     },
@@ -74,7 +75,7 @@ const newsItems = [
         description: "MPO-সংবলিত শিক্ষক ও কর্মীরা সরকারকে নির্ধারিত সময়ের মধ্যে তাদের দাবি মেটাতে বলেন, নাহলে তারা সচিবালয় পর্যন্ত মিছিল করবেন।",
         imageUrl: "https://picsum.photos/seed/news2/600/400",
         source: 'bdnews24.com',
-        date: 'অক্টোবর ১৩, ২০২৪',
+        date: format(new Date('2024-10-13'), 'MMMM dd, yyyy'),
         link: "https://bdnews24.com/bangladesh/8e99209c1a04",
         tags: ['teachers', 'protest', 'deadline'],
     },
@@ -84,7 +85,7 @@ const newsItems = [
         description: "যদিও প্রাথমিক বিদ্যালয়ে শিশুর সংখ্যা বেশ, শিক্ষার মান ও পাঠ্য বোঝাপড়ার অভাব বাংলাদেশের শিক্ষা ব্যবস্থাকে চ্যালেঞ্জ করেছে।",
         imageUrl: "https://www.tbsnews.net/sites/default/files/styles/media_gallery/public/media/images/2025/08/07/broken_ladder.jpg",
         source: 'The Business Standard',
-        date: 'আগস্ট ৭, ২০২৪',
+        date: format(new Date('2024-08-07'), 'MMMM dd, yyyy'),
         link: "https://www.tbsnews.net/features/big-picture/broken-ladder-analysing-present-and-future-bangladeshs-education-system-1207046",
         tags: ['education system', 'analysis'],
     },
@@ -94,7 +95,7 @@ const newsItems = [
         description: "শিক্ষা খাতে রাজনৈতিক হস্তক্ষেপ, শিক্ষক পদে অপসারণ, কাজ থেকে সরে যাওয়া ইত্যাদির কারণে অনেক শিক্ষা প্রতিষ্ঠান অনিশ্চিত অবস্থায় রয়েছে।",
         imageUrl: "https://www.thedailystar.net/sites/default/files/styles/media_main_image/public/media/images/2025/08/11/education_left_behind.jpg",
         source: 'The Daily Star',
-        date: 'আগস্ট ১১, ২০২৪',
+        date: format(new Date('2024-08-11'), 'MMMM dd, yyyy'),
         link: "https://www.thedailystar.net/news/bangladesh/news/education-left-behind-3959881",
         tags: ['education', 'politics'],
     },
@@ -104,7 +105,7 @@ const newsItems = [
         description: "বিশ্ববিদ্যালয় শেষ ছাত্রদের ক্ষেত্রে কর্মসংস্থান নিশ্চিত করতে ক্যারিয়ার ভিত্তিক শিক্ষা দ্রুত চালু করার প্রয়োজনীয়তা তুলে ধরা হয়েছে।",
         imageUrl: "https://www.dhakatribune.com/uploads/media/2025/10/14/career_education_bd.jpg",
         source: 'Dhaka Tribune',
-        date: 'অক্টোবর ১৪, ২০২৪',
+        date: format(new Date('2024-10-14'), 'MMMM dd, yyyy'),
         link: "https://www.dhakatribune.com/opinion/op-ed/393908/why-bangladesh-must-embrace-career-education-now",
         tags: ['career education', 'employment'],
     },
@@ -114,7 +115,7 @@ const newsItems = [
         description: "২০২৫-২৬ সালের বাজেটে শিক্ষার বরাদ্দ কম হওয়ায়, বাংলাদেশ আরও একটো ‘শিক্ষার দশক’ নষ্ট হওয়ার ভয়ে রয়েছে।",
         imageUrl: "https://www.thedailystar.net/sites/default/files/styles/media_main_image/public/media/images/2025/06/06/lost_decade.jpg",
         source: 'The Daily Star',
-        date: 'জুন ৬, ২০২৪',
+        date: format(new Date('2024-06-06'), 'MMMM dd, yyyy'),
         link: "https://www.thedailystar.net/news/bangladesh/education/news/cant-afford-another-lost-decade-education-3912291",
         tags: ['education budget', 'policy'],
     },
@@ -124,7 +125,7 @@ const newsItems = [
         description: "কক্সবাজার রোহিঙ্গা শিবিরে বাজেট সংকটের কারণে ৬,৪০০টি শিক্ষাপ্রতিষ্ঠান বন্ধ হয়েছে — প্রায় ৩ লাখ শিশু শিক্ষার সুযোগ হারাচ্ছে।",
         imageUrl: "https://www.savethechildren.org/sites/default/files/styles/media_gallery/public/media/images/2025/06/children_learning.jpg",
         source: 'Save the Children',
-        date: 'জুন ১২, ২০২৪',
+        date: format(new Date('2024-06-12'), 'MMMM dd, yyyy'),
         link: "https://www.savethechildren.org/us/about-us/media-and-news/2025-press-releases/about-300000-children-risk-losing-education-learning",
         tags: ['Rohingya', 'education crisis'],
     },
@@ -134,7 +135,7 @@ const newsItems = [
         description: "গুলশানে আয়োজিত Agami Fest ২০২৫-এ নিম্নবিত্ত সম্প্রদায় থেকে আগত শিক্ষার্থীদের জন্য শিক্ষামূলক কার্যক্রম ও উদ্ভাবনী উপস্থাপন করা হয়েছে।",
         imageUrl: "https://picsum.photos/seed/agami/600/400",
         source: 'Dhaka Tribune',
-        date: 'অক্টোবর ১৪, ২০২৪',
+        date: format(new Date('2024-10-14'), 'MMMM dd, yyyy'),
         link: "https://www.dhakatribune.com/bangladesh/education/393812/education-innovation-and-celebration-agami-fest",
         tags: ['Agami Fest', 'innovation'],
     },
@@ -144,7 +145,7 @@ const newsItems = [
         description: "বাংলাদেশের একাধিক বিশ্ববিদ্যালয় বিশ্ব র‌্যাংকিংয়ে জায়গা করে নিয়েছে এবং উচ্চ শিক্ষা খাতকে ‘গ্লোবাল ব্র্যান্ড’ হিসেবে তুলে ধরা হচ্ছে।",
         imageUrl: "https://www.thedailystar.net/sites/default/files/styles/media_main_image/public/media/images/2025/10/08/higher_education_global.jpg",
         source: 'The Daily Star',
-        date: 'অক্টোবর ৮, ২০২৪',
+        date: format(new Date('2024-10-08'), 'MMMM dd, yyyy'),
         link: "https://www.thedailystar.net/supplements/superbrands-special-2025/news/bangladeshs-global-brand-higher-education-4005251",
         tags: ['higher education', 'global ranking'],
     },
@@ -154,37 +155,51 @@ const newsItems = [
         description: "২০২৫ সালে সরকার ‘গ্রামীণ বিশ্ববিদ্যালয়’ নামে একটি নতুন বেসরকারি বিশ্ববিদ্যালয় প্রতিষ্ঠার অনুমোদন দিয়েছে, যা গ্রামীণ ট্রাস্ট দ্বারা পরিচালিত হবে।",
         imageUrl: "https://picsum.photos/seed/news10/600/400",
         source: 'Wikipedia',
-        date: 'অক্টোবর ১০, ২০২৪',
+        date: format(new Date('2024-10-10'), 'MMMM dd, yyyy'),
         link: "https://en.wikipedia.org/wiki/Grameen_University",
         tags: ['Grameen University', 'private university'],
     }
-];
+].map(news => ({ ...news, createdAt: serverTimestamp() }));
 
 const hsc2023Stats = {
     totalExaminees: 1359342,
     totalPassed: 1067852,
     passRate: 78.64,
     totalGpa5: 92595,
+    boardWiseGpa5: [
+        { board: 'ঢাকা', gpa5: 32801 }, { board: 'রাজশাহী', gpa5: 7853 },
+        { board: 'কুমিল্লা', gpa5: 6835 }, { board: 'যশোর', gpa5: 7800 },
+        { board: 'চট্টগ্রাম', gpa5: 6300 }, { board: 'বরিশাল', gpa5: 5800 },
+        { board: 'সিলেট', gpa5: 4200 }, { board: 'দিনাজপুর', gpa5: 6900 },
+        { board: 'ময়মনসিংহ', gpa5: 4500 }, { board: 'মাদ্রাসা', gpa5: 6125 },
+        { board: 'কারিগরি', gpa5: 6299 },
+    ],
+    boardWisePassRate: [
+        { board: 'ঢাকা', passRate: 79.44 }, { board: 'রাজশাহী', passRate: 78.46 },
+        { board: 'কুমিল্লা', passRate: 77.33 }, { board: 'যশোর', passRate: 83.95 },
+        { board: 'চট্টগ্রাম', passRate: 75.01 }, { board: 'বরিশাল', passRate: 85.01 },
+        { board: 'সিলেট', passRate: 71.02 }, { board: 'দিনাজপুর', passRate: 75.23 },
+        { board: 'ময়মনসিংহ', passRate: 74.00 }, { board: 'মাদ্রাসা', passRate: 91.80 },
+        { board: 'কারিগরি', passRate: 89.12 },
+    ]
 };
 
-const boardWiseGpa5 = [
-    { board: 'ঢাকা', gpa5: 32801 }, { board: 'রাজশাহী', gpa5: 7853 },
-];
-
-const boardWisePassRate = [
-    { board: 'ঢাকা', passRate: 79.44 }, { board: 'রাজশাহী', passRate: 78.46 },
-];
 
 export default function SeedingPage() {
     const [isSeeding, setIsSeeding] = useState(false);
     const { toast } = useToast();
     const db = getFirestore(app);
 
-    const seedCollection = async (collectionName: string, data: any[]) => {
+    const seedCollection = async (collectionName: string, data: any[], idKey = 'id') => {
         const batch = writeBatch(db);
         data.forEach((item) => {
-            const docRef = doc(db, collectionName, item.id || item.roll);
-            const { id, ...itemData } = item;
+            const docId = item[idKey];
+            if (!docId) {
+                console.warn(`Skipping item in ${collectionName} due to missing ID:`, item);
+                return;
+            }
+            const docRef = doc(db, collectionName, docId);
+            const { [idKey]: _, ...itemData } = item;
             batch.set(docRef, itemData);
         });
         await batch.commit();
@@ -195,7 +210,7 @@ export default function SeedingPage() {
         try {
             await Promise.all([
                 seedCollection('users', usersToSeed),
-                seedCollection('results', resultsToSeed),
+                seedCollection('results', resultsToSeed, 'roll'),
                 seedCollection('engineering-colleges', engineeringColleges),
                 seedCollection('medical-colleges', medicalColleges),
                 seedCollection('public-universities', publicUniversities),
@@ -207,11 +222,7 @@ export default function SeedingPage() {
 
             // For single doc statistics
             const statsRef = doc(db, 'statistics', 'hsc2023');
-            await setDoc(statsRef, {
-                ...hsc2023Stats,
-                boardWiseGpa5,
-                boardWisePassRate,
-            });
+            await setDoc(statsRef, hsc2023Stats);
 
             // For site settings
             const settingsRef = doc(db, 'settings', 'config');

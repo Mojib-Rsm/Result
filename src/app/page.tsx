@@ -15,7 +15,7 @@ import { Button } from '@/components/ui/button';
 import { formSchema } from '@/lib/schema';
 import ResultAlertForm from '@/components/result-alert-form';
 import { Separator } from '@/components/ui/separator';
-import { getFirestore, doc, getDoc, collection, query, orderBy, getDocs } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, collection, query, orderBy, getDocs, limit } from 'firebase/firestore';
 import { app } from '@/lib/firebase';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
@@ -253,7 +253,7 @@ const NewsSection = () => {
         setLoadingNews(true);
         try {
             const newsRef = collection(db, 'news');
-            const q = query(newsRef, orderBy('date', 'desc'));
+            const q = query(newsRef, orderBy('createdAt', 'desc'), limit(6));
             const querySnapshot = await getDocs(q);
             const articles = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as NewsArticle[];
             setNews(articles);
@@ -281,8 +281,8 @@ const NewsSection = () => {
                     <NewsSkeleton />
                ) : news && news.length > 0 ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                       {news.slice(0, 6).map((article, index) => (
-                           <NewsCard key={index} article={article} />
+                       {news.map((article) => (
+                           <NewsCard key={article.id} article={article} />
                        ))}
                     </div>
                ) : (
