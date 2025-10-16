@@ -84,7 +84,7 @@ const NewsSection = () => {
     const { toast } = useToast();
 
     const fetchNews = useCallback(async (category: string) => {
-        if (news[category]) return; 
+        if (news[category] && news[category].length > 0) return; 
 
         setLoadingNews(prev => ({ ...prev, [category]: true }));
         try {
@@ -109,19 +109,23 @@ const NewsSection = () => {
     useEffect(() => {
         fetchNews('all');
     }, [fetchNews]);
+    
+    const newsCategories = ['all', 'exam', 'ssc', 'hsc', 'admission', 'jobs'];
+
 
     return (
          <section>
               <h2 className="text-2xl font-bold text-center mb-6">সর্বশেষ শিক্ষা সংবাদ</h2>
               <Tabs defaultValue="all" className="w-full" onValueChange={fetchNews}>
-                  <TabsList className="grid w-full grid-cols-2 sm:grid-cols-5 mb-4">
+                  <TabsList className="grid w-full grid-cols-2 sm:grid-cols-6 mb-4">
                       <TabsTrigger value="all">সব খবর</TabsTrigger>
+                      <TabsTrigger value="exam">পরীক্ষা</TabsTrigger>
                       <TabsTrigger value="ssc">SSC</TabsTrigger>
                       <TabsTrigger value="hsc">HSC</TabsTrigger>
                       <TabsTrigger value="admission">ভর্তি</TabsTrigger>
                       <TabsTrigger value="jobs">চাকরি</TabsTrigger>
                   </TabsList>
-                    {['all', 'ssc', 'hsc', 'admission', 'jobs'].map(cat => (
+                    {newsCategories.map(cat => (
                         <TabsContent key={cat} value={cat}>
                            {loadingNews[cat] ? (
                                 <NewsSkeleton />

@@ -25,6 +25,9 @@ export async function GET(request: Request) {
         case 'jobs':
             query = 'চাকরির খবর OR নিয়োগ বিজ্ঞপ্তি';
             break;
+        case 'exam':
+            query = 'পরীক্ষা OR পরীক্ষার রুটিন';
+            break;
         case 'all':
         default:
             query = 'শিক্ষা';
@@ -64,3 +67,5 @@ export async function GET(request: Request) {
 }
 
 export const dynamic = 'force-dynamic';
+
+    
