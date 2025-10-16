@@ -1,19 +1,23 @@
 'use client'
 
 import { useState, useEffect } from 'react';
-import { getFirestore, collection, query, orderBy, getDocs } from 'firebase/firestore';
+import { getFirestore, collection, query, orderBy, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import { app } from '@/lib/firebase';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Plus, Edit, Trash2 } from 'lucide-react';
+import { Plus, Edit, Trash2, Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
+import { useToast } from '@/hooks/use-toast';
 
 export default function CareerManagementPage() {
     const [jobs, setJobs] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
     const db = getFirestore(app);
+    const { toast } = useToast();
 
     useEffect(() => {
         const fetchJobs = async () => {
@@ -31,6 +35,27 @@ export default function CareerManagementPage() {
         fetchJobs();
     }, [db]);
 
+    const handleDelete = async (jobId: string) => {
+        setDeletingId(jobId);
+        try {
+            await deleteDoc(doc(db, 'jobs', jobId));
+            setJobs(prevJobs => prevJobs.filter(job => job.id !== jobId));
+            toast({
+                title: 'সাফল্য',
+                description: 'চাকরির পোস্ট সফলভাবে মুছে ফেলা হয়েছে।',
+            });
+        } catch (error) {
+            toast({
+                title: 'ত্রুটি',
+                description: 'চাকরির পোস্ট মোছা যায়নি।',
+                variant: 'destructive',
+            });
+            console.error("Error deleting job: ", error);
+        } finally {
+            setDeletingId(null);
+        }
+    };
+
     const TableSkeleton = () => (
         [...Array(5)].map((_, i) => (
             <TableRow key={i}>
@@ -38,7 +63,7 @@ export default function CareerManagementPage() {
                 <TableCell><Skeleton className="h-4 w-1/2" /></TableCell>
                 <TableCell><Skeleton className="h-4 w-1/4" /></TableCell>
                 <TableCell><Skeleton className="h-4 w-1/4" /></TableCell>
-                <TableCell><Skeleton className="h-8 w-24" /></TableCell>
+                <TableCell><div className="flex justify-end gap-2"><Skeleton className="h-8 w-8" /><Skeleton className="h-8 w-8" /></div></TableCell>
             </TableRow>
         ))
     );
@@ -53,7 +78,7 @@ export default function CareerManagementPage() {
                     </p>
                 </div>
                 <Button asChild>
-                    <Link href="/career/post-job">
+                    <Link href="/admin/career/add">
                         <Plus className="mr-2 h-4 w-4" />
                         নতুন জব পোস্ট করুন
                     </Link>
@@ -90,12 +115,32 @@ export default function CareerManagementPage() {
                                         <TableCell>{item.postedAt ? new Date(item.postedAt.seconds * 1000).toLocaleDateString() : 'N/A'}</TableCell>
                                         <TableCell className="text-right">
                                             <div className="flex justify-end gap-2">
-                                                <Button variant="ghost" size="icon" disabled>
-                                                    <Edit className="h-4 w-4" />
+                                                <Button variant="ghost" size="icon" asChild>
+                                                    <Link href={`/admin/career/edit/${item.id}`}>
+                                                        <Edit className="h-4 w-4" />
+                                                    </Link>
                                                 </Button>
-                                                <Button variant="ghost" size="icon" className="text-destructive" disabled>
-                                                    <Trash2 className="h-4 w-4" />
-                                                </Button>
+                                                <AlertDialog>
+                                                    <AlertDialogTrigger asChild>
+                                                         <Button variant="ghost" size="icon" className="text-destructive" disabled={deletingId === item.id}>
+                                                            {deletingId === item.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                                                        </Button>
+                                                    </AlertDialogTrigger>
+                                                    <AlertDialogContent>
+                                                        <AlertDialogHeader>
+                                                            <AlertDialogTitle>আপনি কি নিশ্চিত?</AlertDialogTitle>
+                                                            <AlertDialogDescription>
+                                                                এই কাজটি ফিরিয়ে আনা যাবে না। এই পোস্টটি স্থায়ীভাবে মুছে যাবে।
+                                                            </AlertDialogDescription>
+                                                        </AlertDialogHeader>
+                                                        <AlertDialogFooter>
+                                                            <AlertDialogCancel>বাতিল</AlertDialogCancel>
+                                                            <AlertDialogAction onClick={() => handleDelete(item.id)}>
+                                                                মুছে ফেলুন
+                                                            </AlertDialogAction>
+                                                        </AlertDialogFooter>
+                                                    </AlertDialogContent>
+                                                </AlertDialog>
                                             </div>
                                         </TableCell>
                                     </TableRow>

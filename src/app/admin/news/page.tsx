@@ -1,21 +1,24 @@
 'use client'
 
 import { useState, useEffect } from 'react';
-import { getFirestore, collection, query, orderBy, getDocs } from 'firebase/firestore';
+import { getFirestore, collection, query, orderBy, getDocs, doc, deleteDoc } from 'firebase/firestore';
 import { app } from '@/lib/firebase';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Plus, Edit, Trash2 } from 'lucide-react';
+import { Plus, Edit, Trash2, Loader2 } from 'lucide-react';
 import Image from 'next/image';
-import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { useToast } from '@/hooks/use-toast';
 
 export default function NewsManagementPage() {
     const [newsItems, setNewsItems] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
     const db = getFirestore(app);
+    const { toast } = useToast();
 
     useEffect(() => {
         const fetchNews = async () => {
@@ -32,6 +35,27 @@ export default function NewsManagementPage() {
         };
         fetchNews();
     }, [db]);
+    
+    const handleDelete = async (newsId: string) => {
+        setDeletingId(newsId);
+        try {
+            await deleteDoc(doc(db, 'news', newsId));
+            setNewsItems(prevNews => prevNews.filter(item => item.id !== newsId));
+            toast({
+                title: 'সাফল্য',
+                description: 'সংবাদটি সফলভাবে মুছে ফেলা হয়েছে।',
+            });
+        } catch (error) {
+            toast({
+                title: 'ত্রুটি',
+                description: 'সংবাদটি মোছা যায়নি।',
+                variant: 'destructive',
+            });
+            console.error("Error deleting news item: ", error);
+        } finally {
+            setDeletingId(null);
+        }
+    };
 
     const TableSkeleton = () => (
         [...Array(5)].map((_, i) => (
@@ -40,7 +64,7 @@ export default function NewsManagementPage() {
                 <TableCell><Skeleton className="h-4 w-3/4" /></TableCell>
                 <TableCell><Skeleton className="h-4 w-1/2" /></TableCell>
                 <TableCell><Skeleton className="h-4 w-1/4" /></TableCell>
-                <TableCell><Skeleton className="h-8 w-24" /></TableCell>
+                <TableCell><div className="flex justify-end gap-2"><Skeleton className="h-8 w-8" /><Skeleton className="h-8 w-8" /></div></TableCell>
             </TableRow>
         ))
     );
@@ -54,9 +78,11 @@ export default function NewsManagementPage() {
                         ওয়েবসাইটের সকল সংবাদ ও নোটিশ পরিচালনা করুন।
                     </p>
                 </div>
-                <Button>
-                    <Plus className="mr-2 h-4 w-4" />
-                    নতুন খবর যোগ করুন
+                <Button asChild>
+                    <Link href="/admin/news/add">
+                        <Plus className="mr-2 h-4 w-4" />
+                        নতুন খবর যোগ করুন
+                    </Link>
                 </Button>
             </div>
 
@@ -84,7 +110,7 @@ export default function NewsManagementPage() {
                                     <TableRow key={item.id}>
                                         <TableCell>
                                             <Image
-                                                src={item.imageUrl}
+                                                src={item.imageUrl || '/logo.png'}
                                                 alt={item.title}
                                                 width={64}
                                                 height={40}
@@ -92,18 +118,38 @@ export default function NewsManagementPage() {
                                             />
                                         </TableCell>
                                         <TableCell className="font-medium max-w-xs truncate">
-                                            <Link href={item.link} target="_blank" className="hover:underline">{item.title}</Link>
+                                            <a href={item.link} target="_blank" className="hover:underline">{item.title}</a>
                                         </TableCell>
                                         <TableCell>{item.source}</TableCell>
                                         <TableCell>{item.date}</TableCell>
                                         <TableCell className="text-right">
                                             <div className="flex justify-end gap-2">
-                                                <Button variant="ghost" size="icon" disabled>
-                                                    <Edit className="h-4 w-4" />
+                                                <Button variant="ghost" size="icon" asChild>
+                                                    <Link href={`/admin/news/edit/${item.id}`}>
+                                                        <Edit className="h-4 w-4" />
+                                                    </Link>
                                                 </Button>
-                                                <Button variant="ghost" size="icon" className="text-destructive" disabled>
-                                                    <Trash2 className="h-4 w-4" />
-                                                </Button>
+                                                <AlertDialog>
+                                                    <AlertDialogTrigger asChild>
+                                                        <Button variant="ghost" size="icon" className="text-destructive" disabled={deletingId === item.id}>
+                                                             {deletingId === item.id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                                                        </Button>
+                                                    </AlertDialogTrigger>
+                                                    <AlertDialogContent>
+                                                        <AlertDialogHeader>
+                                                            <AlertDialogTitle>আপনি কি নিশ্চিত?</AlertDialogTitle>
+                                                            <AlertDialogDescription>
+                                                                এই কাজটি ফিরিয়ে আনা যাবে না। এই সংবাদটি স্থায়ীভাবে মুছে যাবে।
+                                                            </AlertDialogDescription>
+                                                        </AlertDialogHeader>
+                                                        <AlertDialogFooter>
+                                                            <AlertDialogCancel>বাতিল</AlertDialogCancel>
+                                                            <AlertDialogAction onClick={() => handleDelete(item.id)}>
+                                                                মুছে ফেলুন
+                                                            </AlertDialogAction>
+                                                        </AlertDialogFooter>
+                                                    </AlertDialogContent>
+                                                </AlertDialog>
                                             </div>
                                         </TableCell>
                                     </TableRow>
