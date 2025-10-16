@@ -187,11 +187,11 @@ export default function Home() {
     refreshCaptcha();
   };
 
-  const FeatureCard = ({ icon, title, description, href }: { icon: React.ElementType, title: string, description: string, href: string }) => (
+  const FeatureCard = ({ icon: Icon, title, description, href }: { icon: React.ElementType, title: string, description: string, href: string }) => (
     <Card className="hover:shadow-lg transition-shadow">
         <CardHeader className="flex-row items-center gap-4 space-y-0 pb-2">
             <div className="p-3 bg-primary/10 rounded-lg">
-                <icon className="h-6 w-6 text-primary" />
+                <Icon className="h-6 w-6 text-primary" />
             </div>
             <div>
                 <CardTitle className="text-lg">{title}</CardTitle>
