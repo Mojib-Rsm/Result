@@ -88,7 +88,7 @@ export default function AppProvider({
 }) {
   return (
     <AuthProvider>
-      <div className={cn('font-sans antialiased bg-background text-foreground')}>
+      <div className={cn('font-poppins antialiased bg-background text-foreground')}>
         <div className="relative flex min-h-screen flex-col">
           <Header className="no-print" />
           <main className="flex-1">{children}</main>

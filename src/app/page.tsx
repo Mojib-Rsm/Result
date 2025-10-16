@@ -136,7 +136,7 @@ const GpaCalculatorCard = () => {
 
 
 const NewsCard = ({ article }: { article: NewsArticle }) => (
-    <Card className="flex flex-col overflow-hidden">
+    <Card className="flex flex-col overflow-hidden hover:shadow-lg transition-shadow">
         <CardHeader className="p-0">
             <div className="aspect-video relative">
                 <Image
@@ -212,11 +212,11 @@ const NewsSection = () => {
 
     return (
          <section>
-              <h2 className="text-2xl font-bold text-center mb-6">সর্বশেষ শিক্ষা সংবাদ</h2>
+              <h2 className="text-3xl font-bold text-center mb-8">সর্বশেষ শিক্ষা সংবাদ</h2>
                {loadingNews ? (
                     <NewsSkeleton />
                ) : news && news.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                        {news.slice(0, 6).map((article, index) => (
                            <NewsCard key={index} article={article} />
                        ))}
@@ -349,26 +349,8 @@ export default function Home() {
     refreshCaptcha();
   };
 
-  const FeatureCard = ({ icon: Icon, title, description, href }: { icon: React.ElementType, title: string, description: string, href: string }) => (
-    <Card className="hover:shadow-lg transition-shadow">
-        <CardHeader className="flex-row items-center gap-4 space-y-0 pb-2">
-            <div className="p-3 bg-primary/10 rounded-lg">
-                <Icon className="h-6 w-6 text-primary" />
-            </div>
-            <div>
-                <CardTitle className="text-lg">{title}</CardTitle>
-                <CardDescription>{description}</CardDescription>
-            </div>
-        </CardHeader>
-        <CardContent>
-            <Button variant="link" asChild><Link href={href}>আরও দেখুন...</Link></Button>
-        </CardContent>
-    </Card>
-);
-
-
   return (
-    <div className="container mx-auto max-w-4xl px-4 py-8 md:py-12" id="main-content">
+    <div className="container mx-auto max-w-5xl px-4 py-8 md:py-12" id="main-content">
        <div className="flex flex-col items-center text-center mb-12 no-print">
         <h1 className="text-4xl md:text-5xl font-bold tracking-tight bg-gradient-to-br from-primary to-accent bg-clip-text text-transparent animate-fade-in-up">
           BD Edu: Your Education &amp; Career Hub
@@ -379,7 +361,7 @@ export default function Home() {
       </div>
 
       {!result ? (
-        <div className="space-y-12">
+        <div className="space-y-16">
           <div className="rounded-xl border bg-card text-card-foreground shadow p-4 md:p-8">
               <ExamForm 
                 form={form} 
@@ -393,46 +375,8 @@ export default function Home() {
 
           <Separator />
           
-          <NewsSection />
-          
-          <Separator />
-
           <section>
-              <h2 className="text-2xl font-bold text-center mb-6">ভর্তি ও পরীক্ষার আপডেট</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Card className="hover:shadow-lg transition-shadow">
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-3">
-                            <BookOpen className="h-6 w-6 text-primary" /> ভর্তি তথ্য
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <CardDescription>বিশ্ববিদ্যালয় ও কলেজ ভর্তি সংক্রান্ত সকল তথ্য।</CardDescription>
-                    </CardContent>
-                    <CardFooter>
-                         <Button variant="link" asChild><Link href="/suggestions">আরও দেখুন...</Link></Button>
-                    </CardFooter>
-                </Card>
-                <Card className="hover:shadow-lg transition-shadow">
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-3">
-                            <Calendar className="h-6 w-6 text-primary" /> পরীক্ষার সময়সূচী
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                       <CardDescription>সকল পাবলিক পরীক্ষার সময়সূচী ও রুটিন।</CardDescription>
-                    </CardContent>
-                     <CardFooter>
-                         <Button variant="link" asChild><Link href="#">আরও দেখুন...</Link></Button>
-                    </CardFooter>
-                </Card>
-                </div>
-            </section>
-
-          <Separator />
-
-            <section>
-              <h2 className="text-2xl font-bold text-center mb-6">নোটিশ বোর্ড</h2>
+              <h2 className="text-3xl font-bold text-center mb-8">নোটিশ বোর্ড</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Card className="hover:shadow-lg transition-shadow">
                     <CardHeader>
@@ -463,9 +407,11 @@ export default function Home() {
                 </div>
             </section>
           
+          <Separator />
+
            {/* Educational Resources Section */}
           <section>
-              <h2 className="text-2xl font-bold text-center mb-6">শিক্ষামূলক রিসোর্স</h2>
+              <h2 className="text-3xl font-bold text-center mb-8">শিক্ষামূলক রিসোর্স</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <Card className="hover:shadow-lg transition-shadow">
                       <CardHeader>
@@ -509,9 +455,11 @@ export default function Home() {
               </div>
           </section>
 
-          {/* Job & Career Corner Section */}
+          <Separator />
+
+          {/* Career Hub Section */}
           <section>
-              <h2 className="text-2xl font-bold text-center mb-6">ক্যারিয়ার হাব</h2>
+              <h2 className="text-3xl font-bold text-center mb-8">ক্যারিয়ার হাব</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <Card className="hover:shadow-lg transition-shadow">
                       <CardHeader>
@@ -559,10 +507,16 @@ export default function Home() {
                   </Card>
               </div>
           </section>
+          
+          <Separator />
 
+          <NewsSection />
+
+          <Separator />
+          
            {/* Tools & Features Section */}
           <section>
-              <h2 className="text-2xl font-bold text-center mb-6">টুলস ও ফিচার</h2>
+              <h2 className="text-3xl font-bold text-center mb-8">টুলস ও ফিচার</h2>
               <div className="space-y-4">
                   <GpaCalculatorCard />
                   <Card>
@@ -601,12 +555,12 @@ export default function Home() {
           <Separator />
 
           <section>
-              <h2 className="text-2xl font-bold text-center mb-6">স্টুডেন্ট কমিউনিটি ফোরাম</h2>
+              <h2 className="text-3xl font-bold text-center mb-8">স্টুডেন্ট কমিউনিটি ফোরাম</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <Card>
                       <CardHeader>
                           <CardTitle className="flex items-center gap-3">
-                              <MessageCircleQuestion className="h-6 w-6" /> প্রশ্নোত্তর পর্ব (Q&amp;A)
+                              <MessageCircleQuestion className="h-6 w-6" /> প্রশ্নোত্তর পর্ব (Q&A)
                           </CardTitle>
                           <CardDescription>
                               আপনার প্রশ্নটি এখানে জমা দিন এবং কমিউনিটির কাছ থেকে উত্তর পান।
