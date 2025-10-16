@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { GraduationCap, History, Calculator, MoreVertical, Sparkles, LogOut, User, Bookmark, BarChart, Building, Code } from 'lucide-react';
+import { GraduationCap, History, Calculator, MoreVertical, Sparkles, LogOut, User, Bookmark, BarChart, Building, Code, MailCheck } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -32,6 +32,14 @@ export default function Header({ className }: { className?: string }) {
     { href: '/gpa-calculator', label: 'GPA ক্যালকুলেটর', icon: Calculator },
     { href: '/developer', label: 'ডেভেলপার', icon: Code },
   ];
+  
+  const adminNavLinks = [
+      { href: '/admin', label: 'ড্যাশবোর্ড', icon: GraduationCap },
+      { href: '/admin/subscriptions', label: 'সাবস্ক্রিপশন', icon: MailCheck },
+      { href: '/admin/search-history', label: 'অনুসন্ধানের ইতিহাস', icon: History },
+      { href: '/admin/news', label: 'শিক্ষা সংবাদ', icon: Bookmark },
+      { href: '/admin/api-logs', label: 'API লগ', icon: BarChart },
+  ]
 
   const handleLogout = () => {
     logout();
@@ -77,10 +85,31 @@ export default function Header({ className }: { className?: string }) {
 
         <div className="flex items-center justify-end">
             {isAdminPage && user ? (
-                 <Button variant="ghost" onClick={handleLogout}>
-                    <LogOut className="mr-2 h-4 w-4" />
-                    লগআউট
-                </Button>
+                 <div className="md:hidden">
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                                <MoreVertical className="h-5 w-5" />
+                                <span className="sr-only">Open admin menu</span>
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                            {adminNavLinks.map(link => (
+                                 <DropdownMenuItem key={link.href} asChild>
+                                     <Link href={link.href} className="flex items-center gap-2">
+                                        <link.icon className="h-4 w-4" />
+                                        <span>{link.label}</span>
+                                    </Link>
+                                 </DropdownMenuItem>
+                            ))}
+                            <DropdownMenuSeparator />
+                             <DropdownMenuItem onClick={handleLogout} className="text-destructive">
+                                <LogOut className="mr-2 h-4 w-4" />
+                                <span>লগআউট</span>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
             ) : (
               <div className="md:hidden">
                 <DropdownMenu>
@@ -103,8 +132,31 @@ export default function Header({ className }: { className?: string }) {
                 </DropdownMenu>
               </div>
             )}
-
-            {!isAdminPage && (
+            
+            {isAdminPage && user ? (
+                 <nav className="hidden md:flex items-center gap-2 text-sm">
+                    {adminNavLinks.map((link) => (
+                      <Button
+                        key={link.href}
+                        variant="ghost"
+                        asChild
+                        className={cn(
+                          'transition-colors hover:text-foreground/80',
+                          pathname === link.href ? 'text-foreground' : 'text-foreground/60'
+                        )}
+                      >
+                        <Link href={link.href} className="flex items-center gap-2">
+                          <link.icon className="h-4 w-4" />
+                          {link.label}
+                        </Link>
+                      </Button>
+                    ))}
+                    <Button variant="ghost" onClick={handleLogout}>
+                        <LogOut className="mr-2 h-4 w-4" />
+                        লগআউট
+                    </Button>
+                </nav>
+            ) : !isAdminPage && (
                <Button variant="ghost" size="icon" asChild>
                   <Link href="/admin">
                     <User className="h-5 w-5" />

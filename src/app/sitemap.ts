@@ -15,6 +15,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/login',
     '/admin',
     '/admin/api-logs',
+    '/admin/subscriptions',
+    '/admin/search-history',
     '/developer',
     '/suggestions/public-universities',
     '/suggestions/private-universities',
@@ -37,5 +39,3 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return sitemapEntries;
 }
-
-    
