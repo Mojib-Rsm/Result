@@ -87,11 +87,13 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'img-cdn.tnwcdn.com' },
       { protocol: 'https', hostname: 'images.wsj.net' },
       { protocol: 'https', hostname: 'i.kinja-img.com' },
+      { protocol: 'https', hostname: 'mypeoplesreview.com' },
     ],
   },
   env: {}
 };
 
 export default nextConfig;
+
 
 
