@@ -577,7 +577,7 @@ export default function Home() {
                                <CardDescription>শিক্ষা ক্ষেত্রে সর্বশেষ চাকরির খবর ও বিজ্ঞপ্তি।</CardDescription>
                           </CardHeader>
                           <CardFooter>
-                             <Button variant="link" asChild><Link href="/education-news">আরও দেখুন...</Link></Button>
+                             <Button variant="link" asChild><Link href="/career">আরও দেখুন...</Link></Button>
                           </CardFooter>
                       </Card>
                       <Card className="hover:shadow-lg transition-shadow">
@@ -588,7 +588,7 @@ export default function Home() {
                                <CardDescription>সরকারি-বেসরকারি স্কুল, কলেজ ও বিশ্ববিদ্যালয়ে শিক্ষক নিয়োগের আপডেট।</CardDescription>
                           </CardHeader>
                            <CardFooter>
-                             <Button variant="link" asChild><Link href="/education-news">আরও দেখুন...</Link></Button>
+                             <Button variant="link" asChild><Link href="/career">আরও দেখুন...</Link></Button>
                           </CardFooter>
                       </Card>
                        <Card className="hover:shadow-lg transition-shadow">
@@ -599,7 +599,7 @@ export default function Home() {
                                 <CardDescription>দেশ-বিদেশের বিভিন্ন স্কলারশিপ ও ইন্টার্নশিপের সুযোগ।</CardDescription>
                           </CardHeader>
                            <CardFooter>
-                             <Button variant="link" asChild><Link href="/education-news">আরও দেখুন...</Link></Button>
+                             <Button variant="link" asChild><Link href="/career">আরও দেখুন...</Link></Button>
                           </CardFooter>
                       </Card>
                       <Card className="hover:shadow-lg transition-shadow">
@@ -610,7 +610,7 @@ export default function Home() {
                                 <CardDescription>সফল ক্যারিয়ার গড়ার জন্য সিভি তৈরি, ভাইভা প্রস্তুতি ও অন্যান্য টিপস।</CardDescription>
                           </CardHeader>
                            <CardFooter>
-                             <Button variant="link" asChild><Link href="/education-news">আরও দেখুন...</Link></Button>
+                             <Button variant="link" asChild><Link href="/career">আরও দেখুন...</Link></Button>
                           </CardFooter>
                       </Card>
                   </div>

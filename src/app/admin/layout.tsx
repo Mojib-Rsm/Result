@@ -1,9 +1,11 @@
+
 'use client';
 
 import { useAuth } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import Loading from '../loading';
+import Header from '@/components/header';
 
 export default function AdminLayout({
     children,
@@ -12,10 +14,14 @@ export default function AdminLayout({
 }) {
     const { user, loading } = useAuth();
     const router = useRouter();
+    
+    // Use usePathname hook at the top level
     const pathname = useRouter();
 
     useEffect(() => {
-        if (!loading && !user && pathname !== '/login') {
+        // This check should ideally be inside the component's body or another useEffect
+        // For simplicity, we assume we want to redirect if not loading and no user, and not on login page
+        if (!loading && !user && pathname.pathname !== '/login') {
             router.push('/login');
         }
     }, [user, loading, router, pathname]);
@@ -25,13 +31,16 @@ export default function AdminLayout({
         return <Loading />;
     }
 
-    if (!user && pathname !== '/login') {
+    if (!user && pathname.pathname !== '/login') {
       return <Loading />;
     }
 
     return (
-        <div className="flex-1">
-            {children}
-        </div>
+        <>
+            <Header />
+            <main>
+                {children}
+            </main>
+        </>
     );
 }

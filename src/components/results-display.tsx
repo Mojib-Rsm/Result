@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Loader2, Search, Download, BarChart, ArrowUp, ArrowDown, Star, Sparkles, Share2, Building, Copy } from 'lucide-react';
+import { Loader2, Search, Download, BarChart, ArrowUp, ArrowDown, Star, Sparkles, Share2, Building, Copy, Twitter, MessageCircle } from 'lucide-react';
 import type { ExamResult, GradeInfo } from '@/types';
 import { Separator } from './ui/separator';
 import { cn } from '@/lib/utils';
@@ -14,6 +14,7 @@ import Link from 'next/link';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { useToast } from '@/hooks/use-toast';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown-menu';
 
 
 interface ResultsDisplayProps {
@@ -167,7 +168,6 @@ const GradesTable = ({ grades, showMarks }: { grades: GradeInfo[], showMarks: bo
 
 export default function ResultsDisplay({ result, onReset, isDialog = false }: ResultsDisplayProps) {
   const [isDownloading, setIsDownloading] = useState(false);
-  const [isSharing, setIsSharing] = useState(false);
   const { toast } = useToast();
 
   
@@ -216,30 +216,21 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
     }
   }
 
-  const handleShare = async () => {
-      setIsSharing(true);
-      const element = document.getElementById('share-card');
-      if (!element) {
-          setIsSharing(false);
-          return;
+  const handleShare = (platform: 'facebook' | 'twitter' | 'whatsapp') => {
+      const shareUrl = result.pdfId ? `${window.location.origin}/results/${result.pdfId}` : 'https://www.bdedu.me';
+      const text = encodeURIComponent(`আমি আমার পরীক্ষার ফলাফল BD Edu Hub-এ পেয়েছি! আপনার ফলাফল দেখতে ভিজিট করুন: ${shareUrl}`);
+
+      let url = '';
+      if (platform === 'facebook') {
+          url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${text}`;
+      } else if (platform === 'twitter') {
+          url = `https://twitter.com/intent/tweet?url=${encodeURIComponent(shareUrl)}&text=${text}`;
+      } else if (platform === 'whatsapp') {
+          url = `https://api.whatsapp.com/send?text=${text}`;
       }
 
-      try {
-          const canvas = await html2canvas(element, { 
-              scale: 2, 
-              useCORS: true,
-              backgroundColor: null,
-          });
-
-          const link = document.createElement('a');
-          link.download = `BD_Edu_Result_${result.roll}.png`;
-          link.href = canvas.toDataURL("image/png");
-          link.click();
-
-      } catch (error) {
-          console.error("Could not generate share image", error);
-      } finally {
-          setIsSharing(false);
+      if (url) {
+          window.open(url, '_blank', 'noopener,noreferrer');
       }
   };
 
@@ -281,46 +272,42 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
 
   return (
     <div className={containerClasses}>
-       {/* Hidden card for sharing */}
-        <div id="share-card" className="fixed top-0 left-[200vw] w-[600px] h-[315px] bg-gradient-to-br from-primary via-green-500 to-accent p-8 text-white font-sans flex flex-col justify-between">
-             <div>
-                 <div className="flex items-center gap-3">
-                     <Image src="/logo.png" alt="Logo" width={48} height={48} className="h-12 w-12 rounded-full border-2 border-white/50" />
-                    <p className="text-2xl font-bold tracking-wider">BD Edu Result</p>
-                </div>
-                 <p className="mt-4 text-lg opacity-90">Congratulations, {result.studentInfo.name}!</p>
-            </div>
-
-            <div className="text-center">
-                <p className="text-3xl font-bold leading-tight">
-                    Passed the <span className="uppercase">{result.exam}</span> - {result.year} exam
-                </p>
-                {isPass && gpa && <p className="text-5xl font-extrabold mt-2 text-white/90 drop-shadow-lg">GPA: {gpa} 🎉</p>}
-            </div>
-
-             <p className="text-sm text-right opacity-80 font-medium">Check your result at bdedu.me</p>
-        </div>
-
        <div className={cn("flex flex-wrap justify-end gap-2", !isDialog && "no-print")}>
           {!isDialog && onReset && (
-              <Button variant="outline" onClick={onReset} disabled={isDownloading || isSharing}>
+              <Button variant="outline" onClick={onReset} disabled={isDownloading}>
                   <Search className="mr-2 h-4 w-4" />
                   অন্য ফলাফল খুঁজুন
               </Button>
           )}
 
-           <Button onClick={handleShare} disabled={isSharing || isDownloading}>
-                {isSharing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Share2 className="mr-2 h-4 w-4" />}
-                শেয়ার কার্ড
-           </Button>
-
-            {result.pdfId && (
-                <Button variant="outline" size="icon" onClick={handleCopyLink} aria-label="Copy shareable link">
-                    <Copy className="h-4 w-4" />
+           <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button>
+                  <Share2 className="mr-2 h-4 w-4" />
+                  শেয়ার করুন
                 </Button>
-            )}
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={handleCopyLink}>
+                  <Copy className="mr-2 h-4 w-4" />
+                  লিঙ্ক কপি করুন
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleShare('facebook')}>
+                  <svg className="mr-2 h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3l-.5 3h-2.5v6.95C18.05 21.45 22 17.18 22 12z"/></svg>
+                  Facebook
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleShare('twitter')}>
+                  <Twitter className="mr-2 h-4 w-4" />
+                  Twitter / X
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleShare('whatsapp')}>
+                   <MessageCircle className="mr-2 h-4 w-4" />
+                   WhatsApp
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
 
-          <Button onClick={handleDownload} disabled={isDownloading || isSharing}>
+          <Button onClick={handleDownload} disabled={isDownloading}>
               {isDownloading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
               ডাউনলোড করুন
           </Button>
@@ -410,21 +397,38 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
       {!isDialog && (
          <CardFooter className="flex flex-wrap justify-end gap-2 no-print">
             {onReset && (
-                <Button variant="outline" onClick={onReset} disabled={isDownloading || isSharing}>
+                <Button variant="outline" onClick={onReset} disabled={isDownloading}>
                     <Search className="mr-2 h-4 w-4" />
                     অন্য ফলাফল খুঁজুন
                 </Button>
             )}
-             <Button onClick={handleShare} disabled={isSharing || isDownloading}>
-                {isSharing ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Share2 className="mr-2 h-4 w-4" />}
-                শেয়ার কার্ড
-            </Button>
-             {result.pdfId && (
-                <Button variant="outline" size="icon" onClick={handleCopyLink} aria-label="Copy shareable link">
-                    <Copy className="h-4 w-4" />
+             <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button>
+                  <Share2 className="mr-2 h-4 w-4" />
+                  শেয়ার করুন
                 </Button>
-            )}
-            <Button onClick={handleDownload} disabled={isDownloading || isSharing}>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem onClick={handleCopyLink}>
+                  <Copy className="mr-2 h-4 w-4" />
+                  লিঙ্ক কপি করুন
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleShare('facebook')}>
+                   <svg className="mr-2 h-4 w-4" fill="currentColor" viewBox="0 0 24 24"><path d="M22 12c0-5.52-4.48-10-10-10S2 6.48 2 12c0 4.84 3.44 8.87 8 9.8V15H8v-3h2V9.5C10 7.57 11.57 6 13.5 6H16v3h-2c-.55 0-1 .45-1 1v2h3l-.5 3h-2.5v6.95C18.05 21.45 22 17.18 22 12z"/></svg>
+                  Facebook
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleShare('twitter')}>
+                  <Twitter className="mr-2 h-4 w-4" />
+                  Twitter / X
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleShare('whatsapp')}>
+                   <MessageCircle className="mr-2 h-4 w-4" />
+                   WhatsApp
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <Button onClick={handleDownload} disabled={isDownloading}>
                {isDownloading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
                 ডাউনলোড করুন
             </Button>
