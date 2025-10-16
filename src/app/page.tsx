@@ -89,13 +89,14 @@ const GpaCalculatorCard = () => {
   };
 
   return (
-    <AccordionItem value="gpa-calculator">
-      <AccordionTrigger className="text-lg font-semibold">
-        <div className="flex items-center gap-3">
-          <Calculator className="h-6 w-6" /> GPA ক্যালকুলেটর
-        </div>
-      </AccordionTrigger>
-      <AccordionContent>
+    <Card>
+        <CardHeader>
+            <CardTitle className="flex items-center gap-3">
+                <Calculator className="h-6 w-6" /> GPA ক্যালকুলেটর
+            </CardTitle>
+            <CardDescription>আপনার বিষয়ভিত্তিক গ্রেড ব্যবহার করে GPA গণনা করুন।</CardDescription>
+        </CardHeader>
+      <CardContent>
         <div className="space-y-4 pt-2">
           {subjects.map((subject, index) => (
             <div key={subject.id} className="flex items-center gap-2">
@@ -127,8 +128,8 @@ const GpaCalculatorCard = () => {
             </div>
           )}
         </div>
-      </AccordionContent>
-    </AccordionItem>
+      </CardContent>
+    </Card>
   );
 };
 
@@ -430,55 +431,39 @@ export default function Home() {
            {/* Tools & Features Section */}
           <section>
               <h2 className="text-2xl font-bold text-center mb-6">টুলস ও ফিচার</h2>
-              <Accordion type="single" collapsible className="w-full space-y-4">
-                <Card>
-                  <CardContent className="p-2">
-                    <GpaCalculatorCard />
-                  </CardContent>
-                </Card>
-                 <Card>
-                  <CardContent className="p-2">
-                    <AccordionItem value="sms-format">
-                        <AccordionTrigger className="text-lg font-semibold">
-                           <div className="flex items-center gap-3">
-                               <MessageSquare className="h-6 w-6" /> রেজাল্ট SMS ফরম্যাট
-                           </div>
-                        </AccordionTrigger>
-                        <AccordionContent className="pt-4">
-                           <p className="text-muted-foreground">Coming soon...</p>
-                        </AccordionContent>
-                    </AccordionItem>
-                  </CardContent>
-                </Card>
-                 <Card>
-                  <CardContent className="p-2">
-                     <AccordionItem value="board-codes">
-                        <AccordionTrigger className="text-lg font-semibold">
-                           <div className="flex items-center gap-3">
-                               <ListChecks className="h-6 w-6" /> বোর্ড শর্ট কোড
-                           </div>
-                        </AccordionTrigger>
-                        <AccordionContent className="pt-4">
-                            <p className="text-muted-foreground">Coming soon...</p>
-                        </AccordionContent>
-                    </AccordionItem>
-                  </CardContent>
-                </Card>
-                 <Card>
-                  <CardContent className="p-2">
-                    <AccordionItem value="board-helpline">
-                        <AccordionTrigger className="text-lg font-semibold">
-                           <div className="flex items-center gap-3">
+              <div className="space-y-4">
+                  <GpaCalculatorCard />
+                  <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-3">
+                            <MessageSquare className="h-6 w-6" /> রেজাল্ট SMS ফরম্যাট
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                          <p className="text-muted-foreground">Coming soon...</p>
+                      </CardContent>
+                  </Card>
+                   <Card>
+                      <CardHeader>
+                          <CardTitle className="flex items-center gap-3">
+                             <ListChecks className="h-6 w-6" /> বোর্ড শর্ট কোড
+                          </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                         <p className="text-muted-foreground">Coming soon...</p>
+                      </CardContent>
+                  </Card>
+                   <Card>
+                      <CardHeader>
+                           <CardTitle className="flex items-center gap-3">
                                <Phone className="h-6 w-6" /> শিক্ষা বোর্ড হেল্পলাইন
-                           </div>
-                        </AccordionTrigger>
-                        <AccordionContent className="pt-4">
-                            <p className="text-muted-foreground">Coming soon...</p>
-                        </AccordionContent>
-                    </AccordionItem>
-                  </CardContent>
-                </Card>
-              </Accordion>
+                           </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                         <p className="text-muted-foreground">Coming soon...</p>
+                      </CardContent>
+                  </Card>
+              </div>
           </section>
 
            <Separator />
