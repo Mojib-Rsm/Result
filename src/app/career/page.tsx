@@ -8,10 +8,10 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { ExternalLink, Briefcase, MapPin, Clock, Building, DollarSign, BrainCircuit, Sparkles, UserCheck, Phone } from 'lucide-react';
+import { ExternalLink, Briefcase, MapPin, Clock, Building, DollarSign } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { JobPost } from '@/types';
 
@@ -85,7 +85,7 @@ export default function CareerPage() {
                  <div className="flex flex-wrap gap-x-6 gap-y-3 my-4 text-sm">
                     <div className="flex items-center gap-2"><Briefcase className="h-4 w-4 text-primary" /> {job.type}</div>
                     {job.salary && <div className="flex items-center gap-2"><DollarSign className="h-4 w-4 text-primary" />{job.salary}</div>}
-                    <div className="flex items-center gap-2"><Clock className="h-4 w-4 text-primary" /> শেষ তারিখ: {job.deadline}</div>
+                    <div className="flex items-center gap-2"><Clock className="h-4 w-4 text-primary" /> শেষ তারিখ: {new Date(job.deadline).toLocaleDateString('bn-BD')}</div>
                 </div>
 
                 <Tabs defaultValue="description" className="w-full">
