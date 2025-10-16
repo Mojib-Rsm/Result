@@ -430,6 +430,52 @@ export default function Home() {
                 </div>
             </section>
           
+           {/* Educational Resources Section */}
+          <section>
+              <h2 className="text-2xl font-bold text-center mb-6">শিক্ষামূলক রিসোর্স</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <Card className="hover:shadow-lg transition-shadow">
+                      <CardHeader>
+                          <CardTitle className="flex items-center gap-3">
+                              <FileText className="h-6 w-6" /> মডেল টেস্ট / সাজেশন
+                          </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                          <CardDescription>পরীক্ষার প্রস্তুতির জন্য মডেল টেস্ট ও সাজেশন।</CardDescription>
+                      </CardContent>
+                      <CardFooter>
+                         <Button variant="link" asChild><Link href="#">আরও দেখুন...</Link></Button>
+                      </CardFooter>
+                  </Card>
+                  <Card className="hover:shadow-lg transition-shadow">
+                      <CardHeader>
+                          <CardTitle className="flex items-center gap-3">
+                              <BookOpen className="h-6 w-6" /> স্টাডি গাইড
+                          </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                         <CardDescription>SSC, HSC ও বিশ্ববিদ্যালয় ভর্তি গাইড।</CardDescription>
+                      </CardContent>
+                       <CardFooter>
+                         <Button variant="link" asChild><Link href="#">আরও দেখুন...</Link></Button>
+                      </CardFooter>
+                  </Card>
+                   <Card className="hover:shadow-lg transition-shadow">
+                      <CardHeader>
+                           <CardTitle className="flex items-center gap-3">
+                               <Briefcase className="h-6 w-6" /> eBook / PDF নোটস
+                           </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                         <CardDescription>প্রয়োজনীয় বই ও নোটস ডাউনলোড করুন।</CardDescription>
+                      </CardContent>
+                       <CardFooter>
+                         <Button variant="link" asChild><Link href="#">আরও দেখুন...</Link></Button>
+                      </CardFooter>
+                  </Card>
+              </div>
+          </section>
+
            {/* Tools & Features Section */}
           <section>
               <h2 className="text-2xl font-bold text-center mb-6">টুলস ও ফিচার</h2>
