@@ -78,7 +78,7 @@ export default function StatisticsPage() {
     return (
         <div className="container mx-auto max-w-7xl px-4 py-8 md:py-12">
             <div className="mb-10">
-                <h1 className="text-4xl font-bold tracking-tight">ফলাফল পরিসংখ্যান (HSC-2023)</h1>
+                <h1 className="text-4xl font-bold tracking-tight">ফলাফল পরিসংখ্যান (HSC-2025)</h1>
                 <p className="mt-3 text-lg text-muted-foreground">
                     বিগত পরীক্ষার ফলাফলের পরিসংখ্যান দেখুন এবং বোর্ডগুলোর পারফরম্যান্স তুলনা করুন।
                 </p>
