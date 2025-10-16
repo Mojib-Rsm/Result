@@ -63,16 +63,10 @@ const adminFeatures = [
         href: '/admin/api-logs'
     },
     {
-        title: 'সেটিংস ও SEO',
-        description: 'সাইটের SEO, অ্যানালিটিক্স এবং অন্যান্য সেটিংস পরিচালনা করুন।',
+        title: 'সেটিংস',
+        description: 'সাইটের ফিচার, বিজ্ঞাপন এবং অন্যান্য সেটিংস পরিচালনা করুন।',
         icon: Settings,
         href: '/admin/settings'
-    },
-    {
-        title: 'বিজ্ঞাপন ম্যানেজমেন্ট',
-        description: 'Google AdSense বা অন্যান্য বিজ্ঞাপন নেটওয়ার্ক পরিচালনা করুন।',
-        icon: BadgeDollarSign,
-        href: '#'
     },
     {
         title: 'পেইজ ম্যানেজমেন্ট',
@@ -333,5 +327,3 @@ export default function AdminPage() {
         </div>
     );
 }
-
-    

@@ -5,13 +5,15 @@ import { useState, useEffect } from 'react';
 import { getFirestore, doc, getDoc, setDoc } from 'firebase/firestore';
 import { app } from '@/lib/firebase';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Settings } from 'lucide-react';
+import { Settings, BadgeDollarSign, Loader2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useToast } from '@/hooks/use-toast';
 import { Separator } from '@/components/ui/separator';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/button';
 
 export default function SettingsPage() {
     const [siteSettings, setSiteSettings] = useState({
@@ -25,7 +27,9 @@ export default function SettingsPage() {
         showCommunityForum: true,
         activeSmsApi: 'anbu',
     });
+    const [adsTxtContent, setAdsTxtContent] = useState('');
     const [loadingSettings, setLoadingSettings] = useState(true);
+    const [isSavingAds, setIsSavingAds] = useState(false);
 
     const db = getFirestore(app);
     const { toast } = useToast();
@@ -40,6 +44,14 @@ export default function SettingsPage() {
                     const settingsData = settingsSnap.data();
                     setSiteSettings(prev => ({ ...prev, ...settingsData }));
                 }
+
+                // Fetch ads.txt content from our new API
+                const adsRes = await fetch('/api/settings?file=ads.txt');
+                if (adsRes.ok) {
+                    const data = await adsRes.json();
+                    setAdsTxtContent(data.content);
+                }
+
             } catch (error) {
                 console.error("Error fetching site settings: ", error);
                 toast({
@@ -73,10 +85,40 @@ export default function SettingsPage() {
              setSiteSettings(prev => ({ ...prev, [key]: !value }));
         }
     };
+    
+    const handleSaveAdsTxt = async () => {
+        setIsSavingAds(true);
+        try {
+            const response = await fetch('/api/settings', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ file: 'ads.txt', content: adsTxtContent }),
+            });
+            
+            const result = await response.json();
+
+            if (response.ok) {
+                toast({
+                    title: 'সফল',
+                    description: 'ads.txt ফাইল সফলভাবে সংরক্ষিত হয়েছে।',
+                });
+            } else {
+                throw new Error(result.error || 'ফাইল সংরক্ষণ করা যায়নি।');
+            }
+        } catch (error: any) {
+             toast({
+                title: 'ত্রুটি',
+                description: error.message,
+                variant: 'destructive',
+            });
+        } finally {
+            setIsSavingAds(false);
+        }
+    }
 
     return (
-        <div className="container mx-auto max-w-4xl px-4 py-8 md:py-12">
-            <div className="flex items-center justify-between mb-8">
+        <div className="container mx-auto max-w-4xl px-4 py-8 md:py-12 space-y-8">
+            <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight">সাইট সেটিংস</h1>
                     <p className="mt-2 text-md text-muted-foreground">
@@ -159,6 +201,43 @@ export default function SettingsPage() {
                             </div>
                         </>
                     )}
+                </CardContent>
+            </Card>
+
+            <Card id="ads-management">
+                 <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                        <BadgeDollarSign className="h-6 w-6" />
+                        বিজ্ঞাপন ম্যানেজমেন্ট
+                    </CardTitle>
+                    <CardDescription>
+                        Google AdSense বা অন্যান্য বিজ্ঞাপন নেটওয়ার্কের জন্য ads.txt ফাইল পরিচালনা করুন।
+                    </CardDescription>
+                </CardHeader>
+                 <CardContent className="space-y-4">
+                     {loadingSettings ? (
+                        <Skeleton className="h-48 w-full" />
+                     ) : (
+                        <>
+                            <Label htmlFor="ads-txt">ads.txt ফাইলের কনটেন্ট</Label>
+                            <Textarea 
+                                id="ads-txt"
+                                placeholder="google.com, pub-0000000000000000, DIRECT, f08c47fec0942fa0"
+                                value={adsTxtContent}
+                                onChange={(e) => setAdsTxtContent(e.target.value)}
+                                rows={8}
+                            />
+                            <p className="text-xs text-muted-foreground">
+                                ads.txt ফাইলটি বিজ্ঞাপনের স্বচ্ছতা এবং জালিয়াতি রোধ করতে ব্যবহৃত হয়। প্রতিটি লাইন একটি অনুমোদিত বিজ্ঞাপন বিক্রেতাকে প্রতিনিধিত্ব করে।
+                            </p>
+                        </>
+                     )}
+                 </CardContent>
+                 <CardContent>
+                     <Button onClick={handleSaveAdsTxt} disabled={isSavingAds || loadingSettings}>
+                        {isSavingAds ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : null}
+                        সংরক্ষণ করুন
+                     </Button>
                 </CardContent>
             </Card>
         </div>
