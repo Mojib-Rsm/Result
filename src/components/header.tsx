@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { GraduationCap, History, Calculator, MoreVertical, Sparkles, LogOut, User, Bookmark, BarChart, Building, Code, MailCheck, Briefcase, FileText, Phone, Wrench, ChevronDown } from 'lucide-react';
+import { GraduationCap, History, Calculator, MoreVertical, Sparkles, LogOut, User, Bookmark, BarChart, Building, Code, MailCheck, Briefcase, FileText, Phone, Wrench, ChevronDown, Rss } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -24,7 +24,7 @@ export default function Header({ className }: { className?: string }) {
 
   const mainNavLinks = [
     { href: '/', label: 'হোম', icon: GraduationCap },
-    { href: '/education-news', label: 'শিক্ষা সংবাদ', icon: Bookmark },
+    { href: '/education-news', label: 'শিক্ষা সংবাদ', icon: Rss },
     { href: '/career', label: 'ক্যারিয়ার হাব', icon: Briefcase },
     { href: '/suggestions', label: 'ভর্তি পরামর্শ', icon: Sparkles },
     { href: '/gpa-calculator', label: 'টুলস', icon: Wrench },

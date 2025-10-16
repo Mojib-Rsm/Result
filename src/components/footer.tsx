@@ -10,6 +10,8 @@ const footerLinks = [
     { href: '/privacy-policy', label: 'গোপনীয়তা নীতি' },
     { href: '/disclaimer', label: 'দাবিত্যাগ' },
     { href: '/terms-and-conditions', label: 'শর্তাবলী' },
+    { href: '/suggestions', label: 'ভর্তি পরামর্শ' },
+    { href: '/education-news', label: 'শিক্ষা সংবাদ' },
 ];
 
 export default function Footer() {

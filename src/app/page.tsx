@@ -20,92 +20,57 @@ import { app } from '@/lib/firebase';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Bell, BookOpen, Briefcase, Calendar, FileText, Rss, ExternalLink, Calculator, Phone, Trash2, Plus, MessageCircleQuestion, MessagesSquare, UserPlus, Award, Sparkles, TableIcon } from 'lucide-react';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Image from 'next/image';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
 import Link from 'next/link';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
 
-const gradePoints: { [key: string]: number } = {
-  'A+': 5.0,
-  'A': 4.0,
-  'A-': 3.5,
-  'B': 3.0,
-  'C': 2.0,
-  'D': 1.0,
-  'F': 0.0,
-};
-
-const gradeOptions = Object.keys(gradePoints);
-
-interface Subject {
-  id: number;
-  name: string;
-  grade: string;
-}
-
-
 const GpaCalculatorCard = () => {
+  const gradePoints: { [key: string]: number } = {
+    'A+': 5.0, 'A': 4.0, 'A-': 3.5, 'B': 3.0, 'C': 2.0, 'D': 1.0, 'F': 0.0,
+  };
+  const gradeOptions = Object.keys(gradePoints);
+
+  interface Subject {
+    id: number;
+    name: string;
+    grade: string;
+  }
+
   const [subjects, setSubjects] = useState<Subject[]>([{ id: 1, name: '', grade: '' }]);
   const [gpa, setGpa] = useState<number | null>(null);
 
-  const handleAddSubject = () => {
-    setSubjects([...subjects, { id: Date.now(), name: '', grade: '' }]);
-  };
-
-  const handleRemoveSubject = (id: number) => {
-    setSubjects(subjects.filter(s => s.id !== id));
-  };
-
+  const handleAddSubject = () => setSubjects([...subjects, { id: Date.now(), name: '', grade: '' }]);
+  const handleRemoveSubject = (id: number) => setSubjects(subjects.filter(s => s.id !== id));
   const handleSubjectChange = (id: number, field: 'name' | 'grade', value: string) => {
     setSubjects(subjects.map(s => (s.id === id ? { ...s, [field]: value } : s)));
-    setGpa(null); // Reset GPA when subjects change
+    setGpa(null);
   };
 
   const calculateGpa = () => {
     const validSubjects = subjects.filter(s => s.grade && gradePoints[s.grade] !== undefined);
-    if (validSubjects.length === 0) {
-      setGpa(0);
-      return;
-    }
-
-    const totalPoints = validSubjects.reduce((acc, subject) => {
-      return acc + gradePoints[subject.grade];
-    }, 0);
-
-    const averageGpa = totalPoints / validSubjects.length;
-    setGpa(averageGpa);
+    if (validSubjects.length === 0) { setGpa(0); return; }
+    const totalPoints = validSubjects.reduce((acc, subject) => acc + gradePoints[subject.grade], 0);
+    setGpa(totalPoints / validSubjects.length);
   };
 
   return (
     <Card>
-        <CardHeader>
-            <CardTitle className="flex items-center gap-3">
-                <Calculator className="h-6 w-6" /> GPA ক্যালকুলেটর
-            </CardTitle>
-        </CardHeader>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-3"><Calculator className="h-6 w-6" /> GPA ক্যালকুলেটর</CardTitle>
+      </CardHeader>
       <CardContent>
         <div className="space-y-4 pt-2">
           {subjects.map((subject, index) => (
             <div key={subject.id} className="flex items-center gap-2">
-              <Input
-                placeholder={`বিষয় ${index + 1}`}
-                value={subject.name}
-                onChange={e => handleSubjectChange(subject.id, 'name', e.target.value)}
-                className="w-full"
-              />
+              <Input placeholder={`বিষয় ${index + 1}`} value={subject.name} onChange={e => handleSubjectChange(subject.id, 'name', e.target.value)} />
               <Select value={subject.grade} onValueChange={value => handleSubjectChange(subject.id, 'grade', value)}>
                 <SelectTrigger className="w-[180px]"><SelectValue placeholder="গ্রেড" /></SelectTrigger>
-                <SelectContent>
-                  {gradeOptions.map(grade => <SelectItem key={grade} value={grade}>{grade}</SelectItem>)}
-                </SelectContent>
+                <SelectContent>{gradeOptions.map(grade => <SelectItem key={grade} value={grade}>{grade}</SelectItem>)}</SelectContent>
               </Select>
-              <Button variant="ghost" size="icon" onClick={() => handleRemoveSubject(subject.id)} disabled={subjects.length === 1}>
-                <Trash2 className="h-4 w-4 text-destructive" />
-              </Button>
+              <Button variant="ghost" size="icon" onClick={() => handleRemoveSubject(subject.id)} disabled={subjects.length === 1}><Trash2 className="h-4 w-4 text-destructive" /></Button>
             </div>
           ))}
           <div className="flex justify-between items-center">
@@ -124,119 +89,80 @@ const GpaCalculatorCard = () => {
   );
 };
 
-const BoardShortCodesCard = () => {
-    const boardCodes = [
-        { name: 'ঢাকা', code: 'DHA' }, { name: 'কুমিল্লা', code: 'COM' },
-        { name: 'রাজশাহী', code: 'RAJ' }, { name: 'যশোর', code: 'JES' },
-        { name: 'চট্টগ্রাম', code: 'CHI' }, { name: 'বরিশাল', code: 'BAR' },
-        { name: 'সিলেট', code: 'SYL' }, { name: 'দিনাজপুর', code: 'DIN' },
-        { name: 'ময়মনসিংহ', code: 'MYM' }, { name: 'মাদ্রাসা', code: 'MAD' },
-        { name: 'কারিগরি', code: 'TEC' },
-    ];
+const BoardShortCodesCard = () => (
+  <Card>
+    <CardHeader>
+      <CardTitle className="flex items-center gap-3"><TableIcon className="h-6 w-6" /> বোর্ড শর্ট কোড</CardTitle>
+    </CardHeader>
+    <CardContent>
+      <Table>
+        <TableHeader><TableRow><TableHead>বোর্ডের নাম</TableHead><TableHead className="text-right">শর্ট কোড</TableHead></TableRow></TableHeader>
+        <TableBody>
+          {[
+            { name: 'ঢাকা', code: 'DHA' }, { name: 'কুমিল্লা', code: 'COM' }, { name: 'রাজশাহী', code: 'RAJ' }, { name: 'যশোর', code: 'JES' },
+            { name: 'চট্টগ্রাম', code: 'CHI' }, { name: 'বরিশাল', code: 'BAR' }, { name: 'সিলেট', code: 'SYL' }, { name: 'দিনাজপুর', code: 'DIN' },
+            { name: 'ময়মনসিংহ', code: 'MYM' }, { name: 'মাদ্রাসা', code: 'MAD' }, { name: 'কারিগরি', code: 'TEC' },
+          ].map(board => <TableRow key={board.code}><TableCell>{board.name}</TableCell><TableCell className="text-right font-mono">{board.code}</TableCell></TableRow>)}
+        </TableBody>
+      </Table>
+    </CardContent>
+  </Card>
+);
 
-    return (
-        <Card>
-            <CardHeader>
-                <CardTitle className="flex items-center gap-3">
-                    <TableIcon className="h-6 w-6" /> বোর্ড শর্ট কোড
-                </CardTitle>
-            </CardHeader>
-            <CardContent>
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>বোর্ডের নাম</TableHead>
-                            <TableHead className="text-right">শর্ট কোড</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {boardCodes.map(board => (
-                            <TableRow key={board.code}>
-                                <TableCell>{board.name}</TableCell>
-                                <TableCell className="text-right font-mono">{board.code}</TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </CardContent>
-        </Card>
-    );
-};
-
-const BoardHelplineCard = () => {
-    const helplines = [
-        { board: 'সকল বোর্ডের জন্য', number: '16222' },
-        { board: 'বাংলাদেশ পুলিশ হেল্পডেস্ক', number: '999' },
-    ];
-    return (
-        <Card>
-            <CardHeader>
-                <CardTitle className="flex items-center gap-3">
-                    <Phone className="h-6 w-6" /> শিক্ষা বোর্ড হেল্পলাইন
-                </CardTitle>
-            </CardHeader>
-            <CardContent>
-                <ul className="space-y-2">
-                    {helplines.map(line => (
-                        <li key={line.number} className="flex justify-between items-center p-2 bg-muted/50 rounded-md">
-                            <span>{line.board}</span>
-                            <a href={`tel:${line.number}`} className="font-bold text-primary">{line.number}</a>
-                        </li>
-                    ))}
-                </ul>
-            </CardContent>
-        </Card>
-    );
-};
-
+const BoardHelplineCard = () => (
+  <Card>
+    <CardHeader>
+      <CardTitle className="flex items-center gap-3"><Phone className="h-6 w-6" /> শিক্ষা বোর্ড হেল্পলাইন</CardTitle>
+    </CardHeader>
+    <CardContent>
+      <ul className="space-y-2">
+        {[
+          { board: 'সকল বোর্ডের জন্য', number: '16222' },
+          { board: 'বাংলাদেশ পুলিশ হেল্পডেস্ক', number: '999' },
+        ].map(line => (
+          <li key={line.number} className="flex justify-between items-center p-2 bg-muted/50 rounded-md">
+            <span>{line.board}</span>
+            <a href={`tel:${line.number}`} className="font-bold text-primary">{line.number}</a>
+          </li>
+        ))}
+      </ul>
+    </CardContent>
+  </Card>
+);
 
 const NewsCard = ({ article }: { article: NewsPost }) => (
-    <Card className="flex flex-col overflow-hidden hover:shadow-lg transition-shadow">
-        <Link href={`/education-news/${article.id}`}>
-            <CardHeader className="p-0">
-                <div className="aspect-video relative">
-                    <Image
-                        src={article.imageUrl || '/logo.png'}
-                        alt={article.title}
-                        fill
-                        objectFit="cover"
-                        className="rounded-t-lg"
-                        onError={(e) => { e.currentTarget.src = '/logo.png'; }}
-                    />
-                </div>
-            </CardHeader>
-        </Link>
-        <CardContent className="p-4 flex-grow">
-            <Link href={`/education-news/${article.id}`}>
-                <h3 className="font-semibold leading-snug line-clamp-2 hover:text-primary">{article.title}</h3>
-            </Link>
-            <p className="text-xs text-muted-foreground mt-2 line-clamp-3">{article.description}</p>
-        </CardContent>
-        <CardFooter className="p-4 pt-0 flex justify-between items-center">
-            <p className="text-xs text-muted-foreground">
-                {article.date}
-            </p>
-            <Button asChild variant="secondary" size="sm">
-                <Link href={`/education-news/${article.id}`}>
-                    বিস্তারিত <ExternalLink className="ml-1 h-3 w-3" />
-                </Link>
-            </Button>
-        </CardFooter>
-    </Card>
+  <Card className="flex flex-col overflow-hidden hover:shadow-lg transition-shadow">
+    <Link href={`/education-news/${article.id}`}>
+      <CardHeader className="p-0">
+        <div className="aspect-video relative">
+          <Image src={article.imageUrl || '/logo.png'} alt={article.title} fill objectFit="cover" className="rounded-t-lg" onError={(e) => { e.currentTarget.src = '/logo.png'; }} />
+        </div>
+      </CardHeader>
+    </Link>
+    <CardContent className="p-4 flex-grow">
+      <Link href={`/education-news/${article.id}`}>
+        <h3 className="font-semibold leading-snug line-clamp-2 hover:text-primary">{article.title}</h3>
+      </Link>
+      <p className="text-xs text-muted-foreground mt-2 line-clamp-3">{article.description}</p>
+    </CardContent>
+    <CardFooter className="p-4 pt-0 flex justify-between items-center">
+      <p className="text-xs text-muted-foreground">{article.date}</p>
+      <Button asChild variant="secondary" size="sm"><Link href={`/education-news/${article.id}`}>বিস্তারিত <ExternalLink className="ml-1 h-3 w-3" /></Link></Button>
+    </CardFooter>
+  </Card>
 );
 
 const NewsSkeleton = () => (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {[...Array(6)].map((_, i) => (
-            <Card key={i}>
-                <CardHeader className="p-0"><Skeleton className="aspect-video w-full rounded-t-lg" /></CardHeader>
-                <CardContent className="p-4"><Skeleton className="h-4 w-3/4 mb-2" /><Skeleton className="h-3 w-full" /></CardContent>
-                <CardFooter className="p-4 pt-0"><Skeleton className="h-8 w-24" /></CardFooter>
-            </Card>
-        ))}
-    </div>
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    {[...Array(6)].map((_, i) => (
+      <Card key={i}>
+        <CardHeader className="p-0"><Skeleton className="aspect-video w-full rounded-t-lg" /></CardHeader>
+        <CardContent className="p-4"><Skeleton className="h-4 w-3/4 mb-2" /><Skeleton className="h-3 w-full" /></CardContent>
+        <CardFooter className="p-4 pt-0"><Skeleton className="h-8 w-24" /></CardFooter>
+      </Card>
+    ))}
+  </div>
 );
-
 
 const NewsSection = () => {
     const [news, setNews] = useState<NewsPost[]>([]);
@@ -250,43 +176,30 @@ const NewsSection = () => {
             const newsRef = collection(db, 'news');
             const q = query(newsRef, orderBy('createdAt', 'desc'), limit(6));
             const querySnapshot = await getDocs(q);
-            const articles = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as NewsPost[];
-            setNews(articles);
+            setNews(querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as NewsPost[]);
         } catch (error) {
             console.error(`Failed to fetch news:`, error);
-            toast({
-                title: "সংবাদ আনতে ব্যর্থ",
-                description: "সংবাদ লোড করা যায়নি। অনুগ্রহ করে কিছুক্ষণ পর আবার চেষ্টা করুন।",
-                variant: "destructive"
-            });
+            toast({ title: "সংবাদ আনতে ব্যর্থ", description: "সংবাদ লোড করা যায়নি।", variant: "destructive" });
         } finally {
             setLoadingNews(false);
         }
     }, [db, toast]);
 
-    useEffect(() => {
-        fetchNews();
-    }, [fetchNews]);
-    
+    useEffect(() => { fetchNews(); }, [fetchNews]);
 
     return (
-         <section>
-              <h2 className="text-3xl font-bold text-center mb-8">সর্বশেষ শিক্ষা সংবাদ</h2>
-               {loadingNews ? (
-                    <NewsSkeleton />
-               ) : news && news.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                       {news.map((article) => (
-                           <NewsCard key={article.id} article={article} />
-                       ))}
-                    </div>
-               ) : (
-                   <p className="text-center text-muted-foreground py-8">এই বিভাগের জন্য কোনো সংবাদ পাওয়া যায়নি।</p>
-               )}
-          </section>
+        <section>
+            <h2 className="text-3xl font-bold text-center mb-8">সর্বশেষ শিক্ষা সংবাদ</h2>
+            {loadingNews ? <NewsSkeleton /> : news.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {news.map((article) => <NewsCard key={article.id} article={article} />)}
+                </div>
+            ) : (
+                <p className="text-center text-muted-foreground py-8">এই বিভাগের জন্য কোনো সংবাদ পাওয়া যায়নি।</p>
+            )}
+        </section>
     );
-}
-
+};
 
 export default function Home() {
   const [result, setResult] = useState<ExamResult | null>(null);
@@ -297,42 +210,22 @@ export default function Home() {
   const [captchaCookie, setCaptchaCookie] = useState('');
   
   const [siteSettings, setSiteSettings] = useState({
-      showSubscriptionForm: true,
-      showNoticeBoard: true,
-      showAdmissionUpdate: true,
-      showEducationalResources: true,
-      showCareerHub: true,
-      showNewsSection: true,
-      showTools: true,
-      showCommunityForum: true,
+      showSubscriptionForm: true, showNoticeBoard: true, showAdmissionUpdate: true,
+      showEducationalResources: true, showCareerHub: true, showNewsSection: true,
+      showTools: true, showCommunityForum: true,
   });
   const [loadingSettings, setLoadingSettings] = useState(true);
-
   const db = getFirestore(app);
-
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      exam: 'hsc',
-      year: String(new Date().getFullYear()),
-      board: '',
-      roll: '',
-      reg: '',
-      captcha: '',
-    },
+    defaultValues: { exam: 'hsc', year: String(new Date().getFullYear()), board: '', roll: '', reg: '', captcha: '' },
   });
   
   const selectedExam = form.watch('exam');
-
   useEffect(() => {
-    if (selectedExam === 'hsc_bm') {
-      form.setValue('board', 'tec');
-    } else {
-      if (form.getValues('board') === 'tec') {
-        form.setValue('board', '');
-      }
-    }
+    if (selectedExam === 'hsc_bm') form.setValue('board', 'tec');
+    else if (form.getValues('board') === 'tec') form.setValue('board', '');
   }, [selectedExam, form]);
 
   const refreshCaptcha = useCallback(async () => {
@@ -344,76 +237,59 @@ export default function Home() {
         setCaptchaCookie(data.cookie);
     } catch(e) {
         console.error("Failed to refresh captcha", e);
-        toast({
-            title: "ত্রুটি",
-            description: "ক্যাপচা লোড করা যায়নি। অনুগ্রহ করে পৃষ্ঠাটি রিফ্রেশ করুন।",
-            variant: "destructive"
-        });
+        toast({ title: "ত্রুটি", description: "ক্যাপচা লোড করা যায়নি।", variant: "destructive" });
     }
   }, [form, toast]);
 
-
   useEffect(() => {
     refreshCaptcha();
-    
     const fetchSettings = async () => {
-        setLoadingSettings(true);
-        try {
-            const settingsRef = doc(db, 'settings', 'config');
-            const settingsSnap = await getDoc(settingsRef);
-            if (settingsSnap.exists()) {
-                setSiteSettings(prev => ({...prev, ...settingsSnap.data()}));
-            }
-        } catch (error) {
-            console.error("Error fetching site settings: ", error);
-        } finally {
-            setLoadingSettings(false);
-        }
+      setLoadingSettings(true);
+      try {
+        const settingsSnap = await getDoc(doc(db, 'settings', 'config'));
+        if (settingsSnap.exists()) setSiteSettings(prev => ({...prev, ...settingsSnap.data()}));
+      } catch (error) { console.error("Error fetching site settings: ", error); }
+      finally { setLoadingSettings(false); }
     };
-
     fetchSettings();
   }, [refreshCaptcha, db]);
 
-
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    setIsSubmitting(true);
-    setResult(null);
-
-    const valuesWithCookie = { ...values, cookie: captchaCookie };
-
+    setIsSubmitting(true); setResult(null);
     try {
-      const searchResult = await searchResultLegacy(valuesWithCookie);
-      
-      if ('error' in searchResult) {
-          throw new Error(searchResult.error);
-      }
-
+      const searchResult = await searchResultLegacy({ ...values, cookie: captchaCookie });
+      if ('error' in searchResult) throw new Error(searchResult.error);
       setResult(searchResult);
-      addHistoryItem({
-          roll: values.roll,
-          reg: values.reg,
-          board: values.board,
-          year: values.year,
-          exam: values.exam,
-          result: searchResult,
-      });
+      addHistoryItem({ roll: values.roll, reg: values.reg, board: values.board, year: values.year, exam: values.exam, result: searchResult });
     } catch (e: any) {
-       toast({
-        title: "ত্রুটি",
-        description: e.message,
-        variant: "destructive"
-       });
+       toast({ title: "ত্রুটি", description: e.message, variant: "destructive" });
        refreshCaptcha();
-    } finally {
-        setIsSubmitting(false);
-    }
+    } finally { setIsSubmitting(false); }
   };
 
-  const resetSearch = () => {
-    setResult(null);
-    form.reset();
-    refreshCaptcha();
-  };
+  const resetSearch = () => { setResult(null); form.reset(); refreshCaptcha(); };
+
+  const contentSections = [
+    { name: 'showNoticeBoard', title: 'নোটিশ বোর্ড', icon: Rss, link: '/education-news', items: [
+        { title: 'বোর্ড ও মন্ত্রণালয়ের নোটিশ', description: 'শিক্ষা বোর্ড ও মন্ত্রণালয়ের সকল নোটিশ।' },
+        { title: 'পরীক্ষা ও ফলাফল', description: 'পরীক্ষার তারিখ ও ফলাফল প্রকাশের ঘোষণা।' },
+    ]},
+    { name: 'showAdmissionUpdate', title: 'ভর্তি নির্দেশনা', icon: BookOpen, link: '/suggestions', items: [
+        { title: 'ভর্তি তথ্য', description: 'বিশ্ববিদ্যালয় ও কলেজ ভর্তি সংক্রান্ত সকল তথ্য।' },
+        { title: 'পরীক্ষার সময়সূচী', description: 'সকল পাবলিক পরীক্ষার সময়সূচী ও রুটিন।' },
+    ]},
+    { name: 'showEducationalResources', title: 'রেজাল্ট গাইড', icon: FileText, link: '/suggestions', items: [
+        { title: 'মডেল টেস্ট / সাজেশন', description: 'পরীক্ষার প্রস্তুতির জন্য মডেল টেস্ট ও সাজেশন।' },
+        { title: 'স্টাডি গাইড', description: 'SSC, HSC ও বিশ্ববিদ্যালয় ভর্তি গাইড।' },
+        { title: 'eBook / PDF নোটস', description: 'প্রয়োজনীয় বই ও নোটস ডাউনলোড করুন।' },
+    ]},
+    { name: 'showCareerHub', title: 'জব/স্কলারশিপ নিউজ', icon: Briefcase, link: '/career', items: [
+        { title: 'শিক্ষা সংক্রান্ত চাকরি', description: 'শিক্ষা ক্ষেত্রে সর্বশেষ চাকরির খবর ও বিজ্ঞপ্তি।' },
+        { title: 'শিক্ষক নিয়োগ', description: 'সরকারি-বেসরকারি স্কুল, কলেজ ও বিশ্ববিদ্যালয়ে শিক্ষক নিয়োগের আপডেট।'},
+        { title: 'স্কলারশিপ ও ইন্টার্নশিপ', description: 'দেশ-বিদেশের বিভিন্ন স্কলারশিপ ও ইন্টার্নশিপের সুযোগ।'},
+        { title: 'ক্যারিয়ার গাইডলাইন', description: 'সফল ক্যারিয়ার গড়ার জন্য সিভি তৈরি, ভাইভা প্রস্তুতি ও অন্যান্য টিপস।'},
+    ]},
+];
 
   return (
     <div className="container mx-auto max-w-5xl px-4 py-8 md:py-12" id="main-content">
@@ -429,302 +305,72 @@ export default function Home() {
       {!result ? (
         <div className="space-y-16">
           <div className="rounded-xl border bg-card text-card-foreground shadow p-4 md:p-8">
-              <ExamForm 
-                form={form} 
-                onSubmit={onSubmit} 
-                isSubmitting={isSubmitting}
-                captchaUrl={captchaUrl}
-                onCaptchaRefresh={refreshCaptcha}
-                selectedExam={selectedExam}
-              />
+              <ExamForm form={form} onSubmit={onSubmit} isSubmitting={isSubmitting} captchaUrl={captchaUrl} onCaptchaRefresh={refreshCaptcha} selectedExam={selectedExam} />
           </div>
 
-          {siteSettings.showNoticeBoard && (
-            <>
-              <Separator />
-              <section>
-                  <h2 className="text-3xl font-bold text-center mb-8">নোটিশ বোর্ড</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <Card className="hover:shadow-lg transition-shadow">
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-3">
-                                <Rss className="h-6 w-6 text-primary" /> বোর্ড ও মন্ত্রণালয়ের নোটিশ
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <CardDescription>শিক্ষা বোর্ড ও মন্ত্রণালয়ের সকল নোটিশ।</CardDescription>
-                        </CardContent>
-                        <CardFooter>
-                             <Button variant="link" asChild><Link href="/education-news">আরও দেখুন...</Link></Button>
-                        </CardFooter>
-                    </Card>
-                    <Card className="hover:shadow-lg transition-shadow">
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-3">
-                                <Rss className="h-6 w-6 text-primary" /> পরীক্ষা ও ফলাফল
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                           <CardDescription>পরীক্ষার তারিখ ও ফলাফল প্রকাশের ঘোষণা।</CardDescription>
-                        </CardContent>
-                         <CardFooter>
-                             <Button variant="link" asChild><Link href="/education-news">আরও দেখুন...</Link></Button>
-                          </CardFooter>
-                    </Card>
-                    </div>
-                </section>
-            </>
-          )}
-
-          {siteSettings.showAdmissionUpdate && (
-            <>
-              <Separator />
-              <section>
-                  <h2 className="text-3xl font-bold text-center mb-8">ভর্তি ও পরীক্ষার আপডেট</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <Card className="hover:shadow-lg transition-shadow">
-                          <CardHeader>
-                              <CardTitle className="flex items-center gap-3">
-                                  <BookOpen className="h-6 w-6" /> ভর্তি তথ্য
-                              </CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                              <CardDescription>বিশ্ববিদ্যালয় ও কলেজ ভর্তি সংক্রান্ত সকল তথ্য।</CardDescription>
-                          </CardContent>
-                          <CardFooter>
-                             <Button variant="link" asChild><Link href="/suggestions">আরও দেখুন...</Link></Button>
-                          </CardFooter>
-                      </Card>
-                      <Card className="hover:shadow-lg transition-shadow">
-                          <CardHeader>
-                              <CardTitle className="flex items-center gap-3">
-                                  <Calendar className="h-6 w-6" /> পরীক্ষার সময়সূচী
-                              </CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                             <CardDescription>সকল পাবলিক পরীক্ষার সময়সূচী ও রুটিন।</CardDescription>
-                          </CardContent>
-                           <CardFooter>
-                             <Button variant="link" asChild><Link href="/education-news">আরও দেখুন...</Link></Button>
-                          </CardFooter>
-                      </Card>
+          {contentSections.map(section => (
+              siteSettings[section.name as keyof typeof siteSettings] && (
+                  <div key={section.name}>
+                    <Separator />
+                    <section>
+                      <h2 className="text-3xl font-bold text-center mb-8">{section.title}</h2>
+                      <div className={`grid grid-cols-1 md:grid-cols-2 ${section.items.length > 2 ? 'lg:grid-cols-' + Math.min(section.items.length, 4) : ''} gap-6`}>
+                          {section.items.map(item => (
+                              <Card key={item.title} className="hover:shadow-lg transition-shadow">
+                                  <CardHeader><CardTitle className="flex items-center gap-3"><section.icon className="h-6 w-6 text-primary" /> {item.title}</CardTitle></CardHeader>
+                                  <CardContent><CardDescription>{item.description}</CardDescription></CardContent>
+                                  <CardFooter><Button variant="link" asChild><Link href={section.link}>আরও দেখুন...</Link></Button></CardFooter>
+                              </Card>
+                          ))}
+                      </div>
+                    </section>
                   </div>
-              </section>
-            </>
-          )}
+              )
+          ))}
 
-          {siteSettings.showEducationalResources && (
-            <>
-              <Separator />
-              <section>
-                  <h2 className="text-3xl font-bold text-center mb-8">শিক্ষামূলক রিসোর্স</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                      <Card className="hover:shadow-lg transition-shadow">
-                          <CardHeader>
-                              <CardTitle className="flex items-center gap-3">
-                                  <FileText className="h-6 w-6" /> মডেল টেস্ট / সাজেশন
-                              </CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                              <CardDescription>পরীক্ষার প্রস্তুতির জন্য মডেল টেস্ট ও সাজেশন।</CardDescription>
-                          </CardContent>
-                          <CardFooter>
-                             <Button variant="link" asChild><Link href="/suggestions">আরও দেখুন...</Link></Button>
-                          </CardFooter>
-                      </Card>
-                      <Card className="hover:shadow-lg transition-shadow">
-                          <CardHeader>
-                              <CardTitle className="flex items-center gap-3">
-                                  <BookOpen className="h-6 w-6" /> স্টাডি গাইড
-                              </CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                             <CardDescription>SSC, HSC ও বিশ্ববিদ্যালয় ভর্তি গাইড।</CardDescription>
-                          </CardContent>
-                           <CardFooter>
-                             <Button variant="link" asChild><Link href="/suggestions">আরও দেখুন...</Link></Button>
-                          </CardFooter>
-                      </Card>
-                       <Card className="hover:shadow-lg transition-shadow">
-                          <CardHeader>
-                               <CardTitle className="flex items-center gap-3">
-                                   <Briefcase className="h-6 w-6" /> eBook / PDF নোটস
-                               </CardTitle>
-                          </CardHeader>
-                          <CardContent>
-                             <CardDescription>প্রয়োজনীয় বই ও নোটস ডাউনলোড করুন।</CardDescription>
-                          </CardContent>
-                           <CardFooter>
-                             <Button variant="link" asChild><Link href="/suggestions">আরও দেখুন...</Link></Button>
-                          </CardFooter>
-                      </Card>
-                  </div>
-              </section>
-            </>
-          )}
-
-          {siteSettings.showCareerHub && (
-            <>
-              <Separator />
-              <section>
-                  <h2 className="text-3xl font-bold text-center mb-8">ক্যারিয়ার হাব</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                      <Card className="hover:shadow-lg transition-shadow">
-                          <CardHeader>
-                              <CardTitle className="flex items-center gap-3">
-                                  <Briefcase className="h-6 w-6" /> শিক্ষা সংক্রান্ত চাকরি
-                              </CardTitle>
-                               <CardDescription>শিক্ষা ক্ষেত্রে সর্বশেষ চাকরির খবর ও বিজ্ঞপ্তি।</CardDescription>
-                          </CardHeader>
-                          <CardFooter>
-                             <Button variant="link" asChild><Link href="/career">আরও দেখুন...</Link></Button>
-                          </CardFooter>
-                      </Card>
-                      <Card className="hover:shadow-lg transition-shadow">
-                          <CardHeader>
-                              <CardTitle className="flex items-center gap-3">
-                                  <UserPlus className="h-6 w-6" /> শিক্ষক নিয়োগ
-                              </CardTitle>
-                               <CardDescription>সরকারি-বেসরকারি স্কুল, কলেজ ও বিশ্ববিদ্যালয়ে শিক্ষক নিয়োগের আপডেট।</CardDescription>
-                          </CardHeader>
-                           <CardFooter>
-                             <Button variant="link" asChild><Link href="/career">আরও দেখুন...</Link></Button>
-                          </CardFooter>
-                      </Card>
-                       <Card className="hover:shadow-lg transition-shadow">
-                          <CardHeader>
-                               <CardTitle className="flex items-center gap-3">
-                                   <Award className="h-6 w-6" /> স্কলারশিপ ও ইন্টার্নশিপ
-                               </CardTitle>
-                                <CardDescription>দেশ-বিদেশের বিভিন্ন স্কলারশিপ ও ইন্টার্নশিপের সুযোগ।</CardDescription>
-                          </CardHeader>
-                           <CardFooter>
-                             <Button variant="link" asChild><Link href="/career">আরও দেখুন...</Link></Button>
-                          </CardFooter>
-                      </Card>
-                      <Card className="hover:shadow-lg transition-shadow">
-                          <CardHeader>
-                               <CardTitle className="flex items-center gap-3">
-                                   <Sparkles className="h-6 w-6" /> ক্যারিয়ার গাইডলাইন
-                               </CardTitle>
-                                <CardDescription>সফল ক্যারিয়ার গড়ার জন্য সিভি তৈরি, ভাইভা প্রস্তুতি ও অন্যান্য টিপস।</CardDescription>
-                          </CardHeader>
-                           <CardFooter>
-                             <Button variant="link" asChild><Link href="/career">আরও দেখুন...</Link></Button>
-                          </CardFooter>
-                      </Card>
-                  </div>
-              </section>
-            </>
-          )}
-
-          {siteSettings.showNewsSection && (
-            <>
-              <Separator />
-              <NewsSection />
-            </>
-          )}
-
+          {siteSettings.showNewsSection && <><Separator /><NewsSection /></>}
+          
           {siteSettings.showTools && (
-            <>
-              <Separator />
-              <section>
-                <h2 className="text-3xl font-bold text-center mb-8">টুলস ও ফিচার</h2>
-                <div className="space-y-4">
-                    <GpaCalculatorCard />
-                    <Card>
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-3">
-                                <Rss className="h-6 w-6" /> রেজাল্ট SMS ফরম্যাট
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                            <p className="mb-4 text-muted-foreground">যেকোনো মোবাইল থেকে SMS-এর মাধ্যমে ফলাফল পেতে নিচের ফরম্যাট অনুসরণ করুন এবং 16222 নম্বরে পাঠান।</p>
-                            <div className="space-y-2">
-                                <p><strong>HSC:</strong> <code className="bg-muted px-2 py-1 rounded">HSC &lt;Space&gt; বোর্ডের নামের প্রথম ৩ অক্ষর &lt;Space&gt; রোল নম্বর &lt;Space&gt; বছর</code></p>
-                                <p><strong>SSC:</strong> <code className="bg-muted px-2 py-1 rounded">SSC &lt;Space&gt; বোর্ডের নামের প্রথম ৩ অক্ষর &lt;Space&gt; রোল নম্বর &lt;Space&gt; বছর</code></p>
-                                <p><strong>JSC:</strong> <code className="bg-muted px-2 py-1 rounded">JSC &lt;Space&gt; বোর্ডের নামের প্রথম ৩ অক্ষর &lt;Space&gt; রোল নম্বর &lt;Space&gt; বছর</code></p>
-                                 <p><strong>Dakhil:</strong> <code className="bg-muted px-2 py-1 rounded">DAKHIL &lt;Space&gt; MAD &lt;Space&gt; রোল নম্বর &lt;Space&gt; বছর</code></p>
-                            </div>
-                        </CardContent>
-                    </Card>
-                    <BoardShortCodesCard />
-                    <BoardHelplineCard />
-                </div>
-            </section>
-            </>
+            <><Separator />
+            <section>
+              <h2 className="text-3xl font-bold text-center mb-8">টুলস ও ফিচার</h2>
+              <div className="space-y-4">
+                <GpaCalculatorCard />
+                <Card>
+                  <CardHeader><CardTitle className="flex items-center gap-3"><Rss className="h-6 w-6" /> রেজাল্ট SMS ফরম্যাট</CardTitle></CardHeader>
+                  <CardContent>
+                    <p className="mb-4 text-muted-foreground">যেকোনো মোবাইল থেকে SMS-এর মাধ্যমে ফলাফল পেতে নিচের ফরম্যাট অনুসরণ করুন এবং 16222 নম্বরে পাঠান।</p>
+                    <div className="space-y-2">
+                      <p><strong>HSC:</strong> <code className="bg-muted px-2 py-1 rounded">HSC &lt;Space&gt; বোর্ডের নামের প্রথম ৩ অক্ষর &lt;Space&gt; রোল নম্বর &lt;Space&gt; বছর</code></p>
+                      <p><strong>SSC:</strong> <code className="bg-muted px-2 py-1 rounded">SSC &lt;Space&gt; বোর্ডের নামের প্রথম ৩ অক্ষর &lt;Space&gt; রোল নম্বর &lt;Space&gt; বছর</code></p>
+                      <p><strong>JSC:</strong> <code className="bg-muted px-2 py-1 rounded">JSC &lt;Space&gt; বোর্ডের নামের প্রথম ৩ অক্ষর &lt;Space&gt; রোল নম্বর &lt;Space&gt; বছর</code></p>
+                      <p><strong>Dakhil:</strong> <code className="bg-muted px-2 py-1 rounded">DAKHIL &lt;Space&gt; MAD &lt;Space&gt; রোল নম্বর &lt;Space&gt; বছর</code></p>
+                    </div>
+                  </CardContent>
+                </Card>
+                <BoardShortCodesCard />
+                <BoardHelplineCard />
+              </div>
+            </section></>
           )}
 
           {siteSettings.showCommunityForum && (
-            <>
-              <Separator />
-              <section>
-                  <h2 className="text-3xl font-bold text-center mb-8">স্টুডেন্ট কমিউনিটি ফোরাম</h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                      <Card>
-                          <CardHeader>
-                              <CardTitle className="flex items-center gap-3">
-                                  <MessageCircleQuestion className="h-6 w-6" /> প্রশ্নোত্তর পর্ব (Q&A)
-                              </CardTitle>
-                              <CardDescription>
-                                  আপনার প্রশ্নটি এখানে জমা দিন এবং কমিউনিটির কাছ থেকে উত্তর পান।
-                              </CardDescription>
-                          </CardHeader>
-                          <CardContent>
-                              <form className="space-y-4">
-                                  <Textarea placeholder="আপনার প্রশ্নটি এখানে লিখুন..." />
-                                  <Button className="w-full">প্রশ্ন জমা দিন</Button>
-                              </form>
-                          </CardContent>
-                          <CardFooter>
-                              <p className="text-xs text-muted-foreground">শীঘ্রই আসছে আরও ফিচার...</p>
-                          </CardFooter>
-                      </Card>
-                      <Card>
-                          <CardHeader>
-                              <CardTitle className="flex items-center gap-3">
-                                  <MessagesSquare className="h-6 w-6" /> আলোচনা ও মন্তব্য
-                              </CardTitle>
-                              <CardDescription>
-                                  শিক্ষার্থীরা এখানে বিভিন্ন বিষয় নিয়ে আলোচনা করতে পারেন।
-                              </CardDescription>
-                          </CardHeader>
-                          <CardContent>
-                              <div className="border-2 border-dashed rounded-lg p-8 text-center">
-                                  <p className="text-muted-foreground">আলোচনা বোর্ড শীঘ্রই আসছে...</p>
-                              </div>
-                          </CardContent>
-                      </Card>
-                  </div>
-              </section>
-            </>
+            <><Separator />
+             <section>
+                <h2 className="text-3xl font-bold text-center mb-8">স্টুডেন্ট কমিউনিটি ফোরাম</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <Card><CardHeader><CardTitle className="flex items-center gap-3"><MessageCircleQuestion className="h-6 w-6" /> প্রশ্নোত্তর পর্ব (Q&A)</CardTitle><CardDescription>আপনার প্রশ্নটি এখানে জমা দিন এবং কমিউনিটির কাছ থেকে উত্তর পান।</CardDescription></CardHeader><CardContent><p className="text-center text-muted-foreground py-8">এই ফিচারটি শীঘ্রই আসছে...</p></CardContent></Card>
+                    <Card><CardHeader><CardTitle className="flex items-center gap-3"><MessagesSquare className="h-6 w-6" /> আলোচনা ও মন্তব্য</CardTitle><CardDescription>শিক্ষার্থীরা এখানে বিভিন্ন বিষয় নিয়ে আলোচনা করতে পারেন।</CardDescription></CardHeader><CardContent><p className="text-center text-muted-foreground py-8">আলোচনা বোর্ড শীঘ্রই আসছে...</p></CardContent></Card>
+                </div>
+            </section></>
            )}
 
            <Separator />
-
-           {loadingSettings ? (
-              <Card className="border-dashed">
-                  <CardHeader className="text-center">
-                       <Skeleton className="h-12 w-12 rounded-full mx-auto" />
-                       <Skeleton className="h-7 w-64 mx-auto mt-4" />
-                       <Skeleton className="h-5 w-80 mx-auto mt-2" />
-                  </CardHeader>
-                  <CardContent>
-                      <Skeleton className="h-40 w-full" />
-                  </CardContent>
-              </Card>
-            ) : siteSettings.showSubscriptionForm && <ResultAlertForm />}
+           {loadingSettings ? <Skeleton className="h-96 w-full" /> : siteSettings.showSubscriptionForm && <ResultAlertForm />}
         </div>
       ) : (
-        <>
-          <ResultsDisplay 
-            result={result} 
-            onReset={resetSearch}
-          />
-        </>
+        <ResultsDisplay result={result} onReset={resetSearch} />
       )}
     </div>
   );
 }
-
-    
