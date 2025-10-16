@@ -88,12 +88,14 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'images.wsj.net' },
       { protocol: 'https', hostname: 'i.kinja-img.com' },
       { protocol: 'https', hostname: 'mypeoplesreview.com' },
+      { protocol: 'https', hostname: 'journals.plos.org' },
     ],
   },
   env: {}
 };
 
 export default nextConfig;
+
 
 
 
