@@ -8,8 +8,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Download } from 'lucide-react';
+import { Download, Search } from 'lucide-react';
 import { format } from 'date-fns';
+import { Input } from '@/components/ui/input';
 
 type SearchHistoryItem = {
     id: string;
@@ -30,6 +31,7 @@ type SearchHistoryItem = {
 export default function SearchHistoryPage() {
     const [history, setHistory] = useState<SearchHistoryItem[]>([]);
     const [loading, setLoading] = useState(true);
+    const [searchQuery, setSearchQuery] = useState('');
     const db = getFirestore(app);
 
     useEffect(() => {
@@ -48,6 +50,10 @@ export default function SearchHistoryPage() {
         fetchHistory();
     }, [db]);
 
+    const filteredHistory = history.filter(item =>
+        item.roll.includes(searchQuery) || (item.reg && item.reg.includes(searchQuery))
+    );
+
     const TableSkeleton = ({ columns }: { columns: number }) => (
         [...Array(10)].map((_, i) => (
             <TableRow key={i}>
@@ -59,12 +65,12 @@ export default function SearchHistoryPage() {
     );
     
     const handleExport = () => {
-        if (history.length === 0) return;
+        if (filteredHistory.length === 0) return;
 
         const headers = ['Timestamp', 'Name', 'Roll', 'Registration', 'Board', 'Exam', 'Year', 'GPA'];
         const csvRows = [
             headers.join(','),
-            ...history.map(item => {
+            ...filteredHistory.map(item => {
                 const row = [
                     item.timestamp && typeof item.timestamp.seconds === 'number' ? format(new Date(item.timestamp.seconds * 1000), 'yyyy-MM-dd HH:mm:ss') : 'N/A',
                     `"${item.result?.studentInfo?.name || 'N/A'}"`,
@@ -99,7 +105,7 @@ export default function SearchHistoryPage() {
                         ব্যবহারকারীদের দ্বারা করা সমস্ত ফলাফল অনুসন্ধানের লগ।
                     </p>
                 </div>
-                <Button onClick={handleExport} disabled={history.length === 0}>
+                <Button onClick={handleExport} disabled={filteredHistory.length === 0}>
                     <Download className="mr-2 h-4 w-4" />
                     CSV এক্সপোর্ট
                 </Button>
@@ -111,6 +117,18 @@ export default function SearchHistoryPage() {
                     <CardDescription>এখানে সর্বশেষ থেকে শুরু করে সকল অনুসন্ধানের তালিকা রয়েছে।</CardDescription>
                 </CardHeader>
                 <CardContent>
+                    <div className="mb-4">
+                        <div className="relative">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+                            <Input
+                                type="text"
+                                placeholder="রোল বা রেজি. নম্বর দিয়ে ফিল্টার করুন..."
+                                className="pl-10 w-full"
+                                value={searchQuery}
+                                onChange={e => setSearchQuery(e.target.value)}
+                            />
+                        </div>
+                    </div>
                     <Table>
                         <TableHeader>
                             <TableRow>
@@ -127,8 +145,8 @@ export default function SearchHistoryPage() {
                         <TableBody>
                             {loading ? (
                                 <TableSkeleton columns={8} />
-                            ) : history.length > 0 ? (
-                                history.map(item => (
+                            ) : filteredHistory.length > 0 ? (
+                                filteredHistory.map(item => (
                                     <TableRow key={item.id}>
                                         <TableCell className="text-xs">
                                           {item.timestamp && typeof item.timestamp.seconds === 'number'
@@ -147,7 +165,7 @@ export default function SearchHistoryPage() {
                             ) : (
                                 <TableRow>
                                     <TableCell colSpan={8} className="text-center h-24">
-                                        কোনো অনুসন্ধানের ইতিহাস পাওয়া যায়নি।
+                                        {history.length > 0 ? 'এই অনুসন্ধানের জন্য কোনো ফলাফল পাওয়া যায়নি।' : 'কোনো অনুসন্ধানের ইতিহাস পাওয়া যায়নি।'}
                                     </TableCell>
                                 </TableRow>
                             )}
