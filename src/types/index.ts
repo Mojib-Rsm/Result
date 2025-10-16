@@ -69,10 +69,20 @@ export interface JobPost {
   id: string;
   title: string;
   companyName: string;
+  companyLogoUrl?: string;
   location: string;
   type: 'Full-time' | 'Part-time' | 'Internship' | 'Contractual' | 'Remote';
+  salary?: string;
   description: string;
+  requirements: string;
+  preferredSkills?: string;
+  benefits?: string;
+  category: 'IT' | 'Marketing' | 'Finance' | 'Teaching' | 'Engineering' | 'Healthcare' | 'Other';
+  experienceLevel: 'Entry' | 'Mid' | 'Senior';
   applyLink: string;
+  howToApply?: string;
   deadline: string;
+  companyOverview?: string;
+  contactInfo?: string;
   postedAt: { seconds: number };
 }
