@@ -1,4 +1,3 @@
-
 'use client'
 
 import { useState, useEffect } from 'react';
@@ -74,7 +73,7 @@ export default function NewsManagementPage() {
                                 <TableHead>শিরোনাম</TableHead>
                                 <TableHead>উৎস</TableHead>
                                 <TableHead>তারিখ</TableHead>
-                                <TableHead className="text-right">פעולות</TableHead>
+                                <TableHead className="text-right">কার্যকলাপ</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -123,5 +122,3 @@ export default function NewsManagementPage() {
         </div>
     );
 }
-
-    
