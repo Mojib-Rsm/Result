@@ -13,7 +13,7 @@ import { format } from 'date-fns';
 
 type SearchHistoryItem = {
     id: string;
-    timestamp: { seconds: number };
+    timestamp?: { seconds: number };
     roll: string;
     reg: string;
     board: string;
@@ -66,7 +66,7 @@ export default function SearchHistoryPage() {
             headers.join(','),
             ...history.map(item => {
                 const row = [
-                    format(new Date(item.timestamp.seconds * 1000), 'yyyy-MM-dd HH:mm:ss'),
+                    item.timestamp ? format(new Date(item.timestamp.seconds * 1000), 'yyyy-MM-dd HH:mm:ss') : 'N/A',
                     `"${item.result?.studentInfo?.name || 'N/A'}"`,
                     item.roll,
                     item.reg,
@@ -130,7 +130,11 @@ export default function SearchHistoryPage() {
                             ) : history.length > 0 ? (
                                 history.map(item => (
                                     <TableRow key={item.id}>
-                                        <TableCell className="text-xs">{format(new Date(item.timestamp.seconds * 1000), 'dd/MM/yy hh:mm a')}</TableCell>
+                                        <TableCell className="text-xs">
+                                          {item.timestamp && typeof item.timestamp.seconds === 'number'
+                                              ? format(new Date(item.timestamp.seconds * 1000), 'dd/MM/yy hh:mm a')
+                                              : 'N/A'}
+                                        </TableCell>
                                         <TableCell>{item.result?.studentInfo?.name || 'N/A'}</TableCell>
                                         <TableCell>{item.roll}</TableCell>
                                         <TableCell>{item.reg}</TableCell>
