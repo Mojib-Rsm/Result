@@ -15,7 +15,7 @@ import { Button } from '@/components/ui/button';
 import { formSchema } from '@/lib/schema';
 import ResultAlertForm from '@/components/result-alert-form';
 import { Separator } from '@/components/ui/separator';
-import { getFirestore, doc, getDoc } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, collection, query, orderBy, getDocs } from 'firebase/firestore';
 import { app } from '@/lib/firebase';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
@@ -30,12 +30,13 @@ import { Textarea } from '@/components/ui/textarea';
 import Link from 'next/link';
 
 interface NewsArticle {
+    id: string;
     title: string;
     description: string;
-    url: string;
-    urlToImage: string;
-    publishedAt: string;
-    source: { name: string };
+    link: string;
+    imageUrl: string;
+    date: string;
+    source: string;
 }
 
 const gradePoints: { [key: string]: number } = {
@@ -139,7 +140,7 @@ const NewsCard = ({ article }: { article: NewsArticle }) => (
         <CardHeader className="p-0">
             <div className="aspect-video relative">
                 <Image
-                    src={article.urlToImage || '/logo.png'}
+                    src={article.imageUrl || '/logo.png'}
                     alt={article.title}
                     fill
                     objectFit="cover"
@@ -154,10 +155,10 @@ const NewsCard = ({ article }: { article: NewsArticle }) => (
         </CardContent>
         <CardFooter className="p-4 pt-0 flex justify-between items-center">
             <p className="text-xs text-muted-foreground">
-                {formatDistanceToNow(new Date(article.publishedAt), { addSuffix: true, locale: bn })}
+                {article.date}
             </p>
             <Button asChild variant="secondary" size="sm">
-                <a href={article.url} target="_blank" rel="noopener noreferrer">
+                <a href={article.link} target="_blank" rel="noopener noreferrer">
                     বিস্তারিত <ExternalLink className="ml-1 h-3 w-3" />
                 </a>
             </Button>
@@ -179,68 +180,50 @@ const NewsSkeleton = () => (
 
 
 const NewsSection = () => {
-    const [news, setNews] = useState<Record<string, NewsArticle[]>>({});
-    const [loadingNews, setLoadingNews] = useState<Record<string, boolean>>({ all: true });
+    const [news, setNews] = useState<NewsArticle[]>([]);
+    const [loadingNews, setLoadingNews] = useState(true);
     const { toast } = useToast();
+    const db = getFirestore(app);
 
-    const fetchNews = useCallback(async (category: string) => {
-        if (news[category] && news[category].length > 0) return; 
-
-        setLoadingNews(prev => ({ ...prev, [category]: true }));
+    const fetchNews = useCallback(async () => {
+        setLoadingNews(true);
         try {
-            const response = await fetch(`/api/news?category=${category}`);
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            const articles: NewsArticle[] = await response.json();
-            setNews(prev => ({ ...prev, [category]: articles }));
+            const newsRef = collection(db, 'news');
+            const q = query(newsRef, orderBy('date', 'desc'));
+            const querySnapshot = await getDocs(q);
+            const articles = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as NewsArticle[];
+            setNews(articles);
         } catch (error) {
-            console.error(`Failed to fetch ${category} news:`, error);
+            console.error(`Failed to fetch news:`, error);
             toast({
                 title: "সংবাদ আনতে ব্যর্থ",
                 description: "সংবাদ লোড করা যায়নি। অনুগ্রহ করে কিছুক্ষণ পর আবার চেষ্টা করুন।",
                 variant: "destructive"
             });
         } finally {
-            setLoadingNews(prev => ({ ...prev, [category]: false }));
+            setLoadingNews(false);
         }
-    }, [news, toast]);
+    }, [db, toast]);
 
     useEffect(() => {
-        fetchNews('all');
+        fetchNews();
     }, [fetchNews]);
     
-    const newsCategories = ['all', 'exam', 'ssc', 'hsc', 'admission', 'jobs'];
-
 
     return (
          <section>
               <h2 className="text-2xl font-bold text-center mb-6">সর্বশেষ শিক্ষা সংবাদ</h2>
-              <Tabs defaultValue="all" className="w-full" onValueChange={fetchNews}>
-                  <TabsList className="grid w-full grid-cols-3 sm:grid-cols-6 mb-4">
-                      <TabsTrigger value="all">সব খবর</TabsTrigger>
-                      <TabsTrigger value="exam">পরীক্ষা</TabsTrigger>
-                      <TabsTrigger value="ssc">SSC</TabsTrigger>
-                      <TabsTrigger value="hsc">HSC</TabsTrigger>
-                      <TabsTrigger value="admission">ভর্তি</TabsTrigger>
-                      <TabsTrigger value="jobs">চাকরি</TabsTrigger>
-                  </TabsList>
-                    {newsCategories.map(cat => (
-                        <TabsContent key={cat} value={cat}>
-                           {loadingNews[cat] ? (
-                                <NewsSkeleton />
-                           ) : news[cat] && news[cat].length > 0 ? (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                                   {news[cat].slice(0, 6).map((article, index) => (
-                                       <NewsCard key={index} article={article} />
-                                   ))}
-                                </div>
-                           ) : (
-                               <p className="text-center text-muted-foreground py-8">এই বিভাগের জন্য কোনো সংবাদ পাওয়া যায়নি।</p>
-                           )}
-                        </TabsContent>
-                    ))}
-              </Tabs>
+               {loadingNews ? (
+                    <NewsSkeleton />
+               ) : news && news.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                       {news.slice(0, 6).map((article, index) => (
+                           <NewsCard key={index} article={article} />
+                       ))}
+                    </div>
+               ) : (
+                   <p className="text-center text-muted-foreground py-8">এই বিভাগের জন্য কোনো সংবাদ পাওয়া যায়নি।</p>
+               )}
           </section>
     );
 }
@@ -418,8 +401,32 @@ export default function Home() {
             <section>
               <h2 className="text-2xl font-bold text-center mb-6">নোটিশ বোর্ড</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <FeatureCard icon={Rss} title="বোর্ড ও মন্ত্রণালয়ের নোটিশ" description="শিক্ষা বোর্ড ও মন্ত্রণালয়ের সকল নোটিশ।" href="/education-news" />
-                <FeatureCard icon={Rss} title="পরীক্ষা ও ফলাফল" description="পরীক্ষার তারিখ ও ফলাফল প্রকাশের ঘোষণা।" href="/education-news" />
+                <Card className="hover:shadow-lg transition-shadow">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-3">
+                            <Rss className="h-6 w-6 text-primary" /> বোর্ড ও মন্ত্রণালয়ের নোটিশ
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <CardDescription>শিক্ষা বোর্ড ও মন্ত্রণালয়ের সকল নোটিশ।</CardDescription>
+                    </CardContent>
+                    <CardFooter>
+                         <Button variant="link" asChild><Link href="/education-news">আরও দেখুন...</Link></Button>
+                    </CardFooter>
+                </Card>
+                <Card className="hover:shadow-lg transition-shadow">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-3">
+                            <Rss className="h-6 w-6 text-primary" /> পরীক্ষা ও ফলাফল
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                       <CardDescription>পরীক্ষার তারিখ ও ফলাফল প্রকাশের ঘোষণা।</CardDescription>
+                    </CardContent>
+                     <CardFooter>
+                         <Button variant="link" asChild><Link href="/education-news">আরও দেখুন...</Link></Button>
+                    </CardFooter>
+                </Card>
                 </div>
             </section>
           
