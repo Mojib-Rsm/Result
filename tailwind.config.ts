@@ -111,7 +111,20 @@ export default {
         'accordion-up': 'accordion-up 0.2s ease-out',
         'fade-in-up': 'fade-in-up 0.5s ease-out forwards',
       },
+      animationDelay: {
+        '200': '200ms',
+      },
     },
   },
-  plugins: [require('tailwindcss-animate')],
+  plugins: [
+      require('tailwindcss-animate'),
+      function({ addUtilities }: { addUtilities: Function }) {
+        const newUtilities = {
+          '.animation-delay-200': {
+            'animation-delay': '200ms',
+          },
+        }
+        addUtilities(newUtilities, ['responsive', 'hover'])
+      }
+    ],
 } satisfies Config;

@@ -50,8 +50,8 @@ export default function LoginPage() {
       const userDoc = querySnapshot.docs[0];
       const userData = userDoc.data();
 
-      // IMPORTANT: In a real-world app, passwords should be hashed.
-      // This is a plain-text comparison for demo purposes only.
+      // IMPORTANT: In a real-world app, passwords should be hashed and compared securely.
+      // This is a plain-text comparison for demo/prototype purposes only and is NOT secure.
       if (userData.password !== values.password) {
         throw new Error('আপনার ইমেইল বা পাসওয়ার্ড ভুল।');
       }

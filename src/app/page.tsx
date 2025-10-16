@@ -147,10 +147,10 @@ export default function Home() {
     <div className="container mx-auto max-w-4xl px-4 py-8 md:py-12" id="main-content">
        <div className="flex flex-col items-center text-center mb-12 no-print">
         <h1 className="text-4xl md:text-5xl font-bold tracking-tight bg-gradient-to-br from-primary to-accent bg-clip-text text-transparent animate-fade-in-up">
-          BD Edu: Your Education & Career Hub
+          বাংলাদেশের শিক্ষা বিষয়ক সব তথ্য এক জায়গায়
         </h1>
         <p className="mt-4 max-w-2xl text-lg text-muted-foreground animate-fade-in-up animation-delay-200">
-           ফলাফল, ভর্তি তথ্য, এবং শিক্ষা ও ক্যারিয়ার সংক্রান্ত সকল তথ্যের নির্ভরযোগ্য সমাধান।
+           রেজাল্ট, ভর্তি, শিক্ষা সংবাদ ও গাইড — সব BD Edu তে।
         </p>
       </div>
 
