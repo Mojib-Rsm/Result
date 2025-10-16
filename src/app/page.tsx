@@ -271,23 +271,23 @@ export default function Home() {
 
   const contentSections = [
     { name: 'showNoticeBoard', title: 'নোটিশ বোর্ড', icon: Rss, link: '/education-news', items: [
-        { title: 'বোর্ড ও মন্ত্রণালয়ের নোটিশ', description: 'শিক্ষা বোর্ড ও মন্ত্রণালয়ের সকল নোটিশ।' },
-        { title: 'পরীক্ষা ও ফলাফল', description: 'পরীক্ষার তারিখ ও ফলাফল প্রকাশের ঘোষণা।' },
+        { title: 'বোর্ড ও মন্ত্রণালয়ের নোটিশ', description: 'শিক্ষা বোর্ড ও মন্ত্রণালয়ের সকল নোটিশ।', link: '/education-news' },
+        { title: 'পরীক্ষা ও ফলাফল', description: 'পরীক্ষার তারিখ ও ফলাফল প্রকাশের ঘোষণা।', link: '/education-news' },
     ]},
     { name: 'showAdmissionUpdate', title: 'ভর্তি নির্দেশনা', icon: BookOpen, link: '/suggestions', items: [
-        { title: 'ভর্তি তথ্য', description: 'বিশ্ববিদ্যালয় ও কলেজ ভর্তি সংক্রান্ত সকল তথ্য।' },
-        { title: 'পরীক্ষার সময়সূচী', description: 'সকল পাবলিক পরীক্ষার সময়সূচী ও রুটিন।' },
+        { title: 'ভর্তি তথ্য', description: 'বিশ্ববিদ্যালয় ও কলেজ ভর্তি সংক্রান্ত সকল তথ্য।', link: '/suggestions' },
+        { title: 'পরীক্ষার সময়সূচী', description: 'সকল পাবলিক পরীক্ষার সময়সূচী ও রুটিন।', link: '/education-news' },
     ]},
     { name: 'showEducationalResources', title: 'রেজাল্ট গাইড', icon: FileText, link: '/suggestions', items: [
-        { title: 'মডেল টেস্ট / সাজেশন', description: 'পরীক্ষার প্রস্তুতির জন্য মডেল টেস্ট ও সাজেশন।' },
-        { title: 'স্টাডি গাইড', description: 'SSC, HSC ও বিশ্ববিদ্যালয় ভর্তি গাইড।' },
-        { title: 'eBook / PDF নোটস', description: 'প্রয়োজনীয় বই ও নোটস ডাউনলোড করুন।' },
+        { title: 'মডেল টেস্ট / সাজেশন', description: 'পরীক্ষার প্রস্তুতির জন্য মডেল টেস্ট ও সাজেশন।', link: '/suggestions' },
+        { title: 'স্টাডি গাইড', description: 'SSC, HSC ও বিশ্ববিদ্যালয় ভর্তি গাইড।', link: '/suggestions' },
+        { title: 'eBook / PDF নোটস', description: 'প্রয়োজনীয় বই ও নোটস ডাউনলোড করুন।', link: '/suggestions' },
     ]},
-    { name: 'showCareerHub', title: 'জব/স্কলারশিপ নিউজ', icon: Briefcase, link: '/career', items: [
-        { title: 'শিক্ষা সংক্রান্ত চাকরি', description: 'শিক্ষা ক্ষেত্রে সর্বশেষ চাকরির খবর ও বিজ্ঞপ্তি।' },
-        { title: 'শিক্ষক নিয়োগ', description: 'সরকারি-বেসরকারি স্কুল, কলেজ ও বিশ্ববিদ্যালয়ে শিক্ষক নিয়োগের আপডেট।'},
-        { title: 'স্কলারশিপ ও ইন্টার্নশিপ', description: 'দেশ-বিদেশের বিভিন্ন স্কলারশিপ ও ইন্টার্নশিপের সুযোগ।'},
-        { title: 'ক্যারিয়ার গাইডলাইন', description: 'সফল ক্যারিয়ার গড়ার জন্য সিভি তৈরি, ভাইভা প্রস্তুতি ও অন্যান্য টিপস।'},
+    { name: 'showCareerHub', title: 'ক্যারিয়ার হাব', icon: Briefcase, link: '/career', items: [
+        { title: 'শিক্ষা সংক্রান্ত চাকরি', icon: Briefcase, description: 'শিক্ষা ক্ষেত্রে সর্বশেষ চাকরির খবর ও বিজ্ঞপ্তি।', link: '/career/education-jobs'},
+        { title: 'শিক্ষক নিয়োগ', icon: UserPlus, description: 'সরকারি-বেসরকারি স্কুল, কলেজ ও বিশ্ববিদ্যালয়ে শিক্ষক নিয়োগের আপডেট।', link: '/career/teacher-recruitment'},
+        { title: 'স্কলারশিপ ও ইন্টার্নশিপ', icon: Award, description: 'দেশ-বিদেশের বিভিন্ন স্কলারশিপ ও ইন্টার্নশিপের সুযোগ।', link: '/career/scholarships'},
+        { title: 'ক্যারিয়ার গাইডলাইন', icon: Sparkles, description: 'সফল ক্যারিয়ার গড়ার জন্য সিভি তৈরি, ভাইভা প্রস্তুতি ও অন্যান্য টিপস।', link: '/career/guidelines'},
     ]},
 ];
 
@@ -312,14 +312,14 @@ export default function Home() {
               siteSettings[section.name as keyof typeof siteSettings] && (
                   <div key={section.name}>
                     <Separator />
-                    <section>
+                    <section className="pt-12">
                       <h2 className="text-3xl font-bold text-center mb-8">{section.title}</h2>
-                      <div className={`grid grid-cols-1 md:grid-cols-2 ${section.items.length > 2 ? 'lg:grid-cols-' + Math.min(section.items.length, 4) : ''} gap-6`}>
+                      <div className={`grid grid-cols-1 sm:grid-cols-2 ${section.items.length > 2 ? 'lg:grid-cols-' + Math.min(section.items.length, 4) : ''} gap-6`}>
                           {section.items.map(item => (
                               <Card key={item.title} className="hover:shadow-lg transition-shadow">
-                                  <CardHeader><CardTitle className="flex items-center gap-3"><section.icon className="h-6 w-6 text-primary" /> {item.title}</CardTitle></CardHeader>
+                                  <CardHeader><CardTitle className="flex items-center gap-3"><item.icon className="h-6 w-6 text-primary" /> {item.title}</CardTitle></CardHeader>
                                   <CardContent><CardDescription>{item.description}</CardDescription></CardContent>
-                                  <CardFooter><Button variant="link" asChild><Link href={section.link}>আরও দেখুন...</Link></Button></CardFooter>
+                                  <CardFooter><Button variant="link" asChild><Link href={item.link}>আরও দেখুন...</Link></Button></CardFooter>
                               </Card>
                           ))}
                       </div>
@@ -328,11 +328,11 @@ export default function Home() {
               )
           ))}
 
-          {siteSettings.showNewsSection && <><Separator /><NewsSection /></>}
+          {siteSettings.showNewsSection && <><Separator /><div className="pt-12"><NewsSection /></div></>}
           
           {siteSettings.showTools && (
             <><Separator />
-            <section>
+            <section className="pt-12">
               <h2 className="text-3xl font-bold text-center mb-8">টুলস ও ফিচার</h2>
               <div className="space-y-4">
                 <GpaCalculatorCard />
@@ -356,7 +356,7 @@ export default function Home() {
 
           {siteSettings.showCommunityForum && (
             <><Separator />
-             <section>
+             <section className="pt-12">
                 <h2 className="text-3xl font-bold text-center mb-8">স্টুডেন্ট কমিউনিটি ফোরাম</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <Card><CardHeader><CardTitle className="flex items-center gap-3"><MessageCircleQuestion className="h-6 w-6" /> প্রশ্নোত্তর পর্ব (Q&A)</CardTitle><CardDescription>আপনার প্রশ্নটি এখানে জমা দিন এবং কমিউনিটির কাছ থেকে উত্তর পান।</CardDescription></CardHeader><CardContent><p className="text-center text-muted-foreground py-8">এই ফিচারটি শীঘ্রই আসছে...</p></CardContent></Card>
@@ -366,7 +366,7 @@ export default function Home() {
            )}
 
            <Separator />
-           {loadingSettings ? <Skeleton className="h-96 w-full" /> : siteSettings.showSubscriptionForm && <ResultAlertForm />}
+           {loadingSettings ? <Skeleton className="h-96 w-full" /> : siteSettings.showSubscriptionForm && <div className="pt-12"><ResultAlertForm /></div>}
         </div>
       ) : (
         <ResultsDisplay result={result} onReset={resetSearch} />
