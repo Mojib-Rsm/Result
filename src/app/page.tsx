@@ -28,7 +28,6 @@ export default function Home() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const { addHistoryItem } = useHistory();
-  const [showNotice, setShowNotice] = useState(false);
   const [captchaUrl, setCaptchaUrl] = useState('');
   const [captchaCookie, setCaptchaCookie] = useState('');
   const [showSubscriptionForm, setShowSubscriptionForm] = useState(false);
@@ -81,11 +80,6 @@ export default function Home() {
 
 
   useEffect(() => {
-    const noticeSeen = sessionStorage.getItem('noticeSeen');
-    if (!noticeSeen) {
-      setShowNotice(true);
-      sessionStorage.setItem('noticeSeen', 'true');
-    }
     refreshCaptcha();
     
     const fetchSettings = async () => {
@@ -151,42 +145,12 @@ export default function Home() {
 
   return (
     <div className="container mx-auto max-w-4xl px-4 py-8 md:py-12" id="main-content">
-      <Dialog open={showNotice} onOpenChange={setShowNotice}>
-          <DialogContent>
-              <DialogHeader>
-                  <div className="mx-auto bg-primary/10 p-3 rounded-full w-fit mb-4">
-                      <Megaphone className="h-8 w-8 text-primary" />
-                  </div>
-                  <DialogTitle className="text-center">এইচএসসি ফলাফল ২০২৫ সংক্রান্ত বিজ্ঞপ্তি</DialogTitle>
-                  <DialogDescription className="text-center">
-                      ফলাফল প্রকাশের গুরুত্বপূর্ণ তথ্য।
-                  </DialogDescription>
-              </DialogHeader>
-              <div className="prose prose-sm dark:prose-invert max-w-full">
-                  <p>
-                      এইচএসসি ও সমমান পরীক্ষা ২০২৫-এর ফলাফল আগামী <strong className="text-primary">১৬ অক্টোবর ২০২৫</strong> সকাল ১০:০০ টায় একযোগে প্রকাশ করা হবে।
-                  </p>
-                  <ul className="list-decimal pl-5 space-y-1">
-                      <li>
-                          ফলাফল দেখতে <a href="#main-content" onClick={() => setShowNotice(false)} className="font-semibold text-primary">এই ওয়েবসাইটে (bdedu.me)</a> আপনার রোল ও রেজিস্ট্রেশন নম্বর ব্যবহার করুন।
-                      </li>
-                      <li>
-                          SMS-এর মাধ্যমে ফল পেতে <strong className="text-primary">HSC &lt;Board&gt; &lt;Roll&gt; &lt;Year&gt;</strong> লিখে <strong className="text-primary">16222</strong> নম্বরে পাঠান।
-                      </li>
-                  </ul>
-              </div>
-              <DialogFooter>
-                  <Button onClick={() => setShowNotice(false)}>বুঝেছি</Button>
-              </DialogFooter>
-          </DialogContent>
-      </Dialog>
-
        <div className="flex flex-col items-center text-center mb-12 no-print">
         <h1 className="text-4xl md:text-5xl font-bold tracking-tight bg-gradient-to-br from-primary to-accent bg-clip-text text-transparent animate-fade-in-up">
-          আপনার ফলাফল দেখুন
+          আপনার শিক্ষা জীবনের পথচলার সঙ্গী
         </h1>
         <p className="mt-4 max-w-2xl text-lg text-muted-foreground animate-fade-in-up animation-delay-200">
-           যেকোনো শিক্ষাবোর্ডের ফলাফল দেখুন খুব সহজে।
+           ফলাফল, ভর্তি তথ্য, এবং শিক্ষা সংক্রান্ত সকল তথ্যের নির্ভরযোগ্য সমাধান।
         </p>
       </div>
 

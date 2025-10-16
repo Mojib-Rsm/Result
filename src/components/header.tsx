@@ -52,12 +52,12 @@ export default function Header({ className }: { className?: string }) {
         <Link href="/" className="mr-6 flex items-center space-x-2">
            <Image
             src="/logo.png"
-            alt="BD Edu Result Logo"
+            alt="BD Edu Center Logo"
             width={32}
             height={32}
             className="h-8 w-8"
           />
-          <span className="font-bold sm:inline-block">BD Edu Result</span>
+          <span className="font-bold sm:inline-block">BD Edu Center</span>
         </Link>
         
         {!isAdminPage && (

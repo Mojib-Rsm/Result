@@ -19,14 +19,14 @@ function Footer() {
             <Link href="https://www.bdedu.me" target="_blank" rel="noopener noreferrer">
                  <Image 
                     src="/logo.png"
-                    alt="BD Edu Result Logo"
+                    alt="BD Edu Center Logo"
                     width={40}
                     height={40}
                     className="h-10 w-10"
                 />
             </Link>
              <Link href="https://www.bdedu.me" target="_blank" rel="noopener noreferrer" className="text-sm font-semibold text-primary hover:underline">
-                BD Edu Result
+                BD Edu Center
             </Link>
         </div>
         <div className="text-center">
@@ -99,4 +99,3 @@ export default function AppProvider({
     </AuthProvider>
   );
 }
-

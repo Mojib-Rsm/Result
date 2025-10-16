@@ -10,14 +10,14 @@ const siteUrl = 'https://www.bdedu.me';
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: 'BD Edu Result 2025 - Check All Board Result with Marksheet',
-  description: 'Check your SSC, HSC, Dakhil, JSC, JDC, Alim and all board results for 2025 instantly with marksheet. The best eboardresults.com alternative. Register early to get your result by SMS/Email at BD Edu Result.',
+  title: 'BD Edu Center - Your Companion for Educational Journey in Bangladesh',
+  description: 'BD Edu Center is your one-stop platform for all educational needs in Bangladesh, from exam results (SSC, HSC, etc.) and marksheets to admission information, GPA calculation, and the latest education news.',
   keywords: [
     // Primary Keywords
-    'SSC Result 2025', 'HSC Result 2025', 'Bangladesh Education Board Result', 'All Board Result 2025', 'eboardresults.com alternative', 'BD Result Check', 'Education Board Result BD', 'Result Check by Roll and Reg No', 'SSC Marksheet Download', 'HSC Marksheet Download', 'BD Exam Result Online',
+    'Bangladesh Education', 'BD Edu Center', 'Educational Platform BD', 'Admission Information', 'University Admission BD', 'College Suggestions', 'GPA Calculator', 'SSC Result', 'HSC Result', 'BD Exam Result', 'Education Board Result BD',
     'BD Edu Result', 'Mojib Rsm', 'BD Result', 'Education Board Result', 'SSC Result', 'HSC Result', 'JSC Result', 'Dakhil Result', 'Alim Result', 'JDC Result', 'Bangladesh Education Board', 'Public Exam Result', 'Marksheet', 'Online Result',
     // Bangla Keywords
-    'এসএসসি রেজাল্ট ২০২৫', 'এইচএসসি রেজাল্ট ২০২৫', 'রেজাল্ট চেক করার ওয়েবসাইট', 'অনলাইনে রেজাল্ট দেখার নিয়ম', 'মার্কশিটসহ রেজাল্ট দেখুন', 'সব বোর্ডের রেজাল্ট', 'বোর্ড রেজাল্ট চেক', 'শিক্ষা বোর্ডের রেজাল্ট', 'কিভাবে রেজাল্ট দেখবো', 'দ্রুত রেজাল্ট দেখার ওয়েবসাইট',
+    'শিক্ষা কেন্দ্র', 'বিডি এডু সেন্টার', 'ভর্তি তথ্য', 'বিশ্ববিদ্যালয় ভর্তি', 'কলেজ সাজেশন', 'এসএসসি রেজাল্ট', 'এইচএসসি রেজাল্ট', 'রেজাল্ট চেক', 'শিক্ষা সংবাদ', 'ক্যারিয়ার গাইডলাইন',
     'ফলাফল', 'রেজাল্ট', 'এসএসসি রেজাল্ট', 'এইচএসসি রেজাল্ট', 'জেএসসি রেজাল্ট', 'দাখিল রেজাল্ট', 'আলিম রেজাল্ট', 'জেডিসি রেজাল্ট', 'মার্কশিট', 'অনলাইন রেজাল্ট',
     // Feature/Service Keywords
     'GPA Calculator BD', 'SSC GPA Calculator', 'HSC GPA Calculator', 'Result Notification System', 'SMS Result Alert BD', 'Online Marksheet Generator', 'Result Card Generator', 'Institute Wise Result BD', 'Education News Update BD', 'Board Notice Bangladesh',
@@ -31,16 +31,16 @@ export const metadata: Metadata = {
     canonical: '/',
   },
   openGraph: {
-    title: 'BD Edu Result 2025 - All Education Board Results',
-    description: 'The fastest and most reliable way to check all public examination results in Bangladesh with detailed marksheets.',
+    title: 'BD Edu Center - Your Guide to Education in Bangladesh',
+    description: 'The most comprehensive platform for exam results, admission guidance, educational news, and tools for students in Bangladesh.',
     url: siteUrl,
-    siteName: 'BD Edu Result',
+    siteName: 'BD Edu Center',
     images: [
       {
         url: '/logo.png',
         width: 1200,
         height: 630,
-        alt: 'BD Edu Result',
+        alt: 'BD Edu Center',
       },
     ],
     locale: 'en_US',
@@ -48,8 +48,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'BD Edu Result - Check Your Exam Results Instantly',
-    description: 'Easily check all Bangladesh Education Board results including SSC, HSC, JSC, and more. Maintained by Mojib Rsm.',
+    title: 'BD Edu Center - Results, News, and Admission Info',
+    description: 'Your complete guide for educational resources in Bangladesh, including results, news, GPA tools, and admission help. Maintained by Mojib Rsm.',
     creator: '@MrTools_BD',
     images: ['/logo.png'],
   },
