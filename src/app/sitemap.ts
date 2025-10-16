@@ -24,6 +24,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/suggestions/engineering-colleges',
     '/suggestions/national-university',
     '/suggestions/polytechnic-institutes',
+    '/career',
+    '/career/post-job'
   ];
 
   const sitemapEntries: MetadataRoute.Sitemap = staticPages.map((path) => ({

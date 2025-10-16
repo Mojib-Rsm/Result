@@ -6,7 +6,7 @@ import { getFirestore, collection, query, orderBy, getDocs, where, getCountFromS
 import { startOfDay, subDays } from 'date-fns';
 import { app } from '@/lib/firebase';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText, Users, MailCheck, DatabaseZap, Search, BellRing, MessageSquare, Bookmark, Trash2, RefreshCw, Settings, BadgeDollarSign, FileCog, History } from 'lucide-react';
+import { FileText, Users, MailCheck, DatabaseZap, Search, BellRing, MessageSquare, Bookmark, Trash2, RefreshCw, Settings, BadgeDollarSign, FileCog, History, Briefcase } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -49,6 +49,12 @@ const adminFeatures = [
         description: 'সাইটের সংবাদ এবং নোটিশ পরিচালনা করুন।',
         icon: Bookmark,
         href: '/admin/news'
+    },
+    {
+        title: 'ক্যারিয়ার ম্যানেজমেন্ট',
+        description: 'সাইটের সকল চাকরির পোস্ট পরিচালনা করুন।',
+        icon: Briefcase,
+        href: '/admin/career'
     },
     {
         title: 'API লগ',

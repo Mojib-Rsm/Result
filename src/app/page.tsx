@@ -400,7 +400,7 @@ export default function Home() {
                     </CardContent>
                      <CardFooter>
                          <Button variant="link" asChild><Link href="/education-news">আরও দেখুন...</Link></Button>
-                    </CardFooter>
+                      </CardFooter>
                 </Card>
                 </div>
             </section>
@@ -502,7 +502,7 @@ export default function Home() {
                            <CardDescription>শিক্ষা ক্ষেত্রে সর্বশেষ চাকরির খবর ও বিজ্ঞপ্তি।</CardDescription>
                       </CardHeader>
                       <CardFooter>
-                         <Button variant="link" asChild><Link href="/education-news">আরও দেখুন...</Link></Button>
+                         <Button variant="link" asChild><Link href="/career">আরও দেখুন...</Link></Button>
                       </CardFooter>
                   </Card>
                   <Card className="hover:shadow-lg transition-shadow">
@@ -513,7 +513,7 @@ export default function Home() {
                            <CardDescription>সরকারি-বেসরকারি স্কুল, কলেজ ও বিশ্ববিদ্যালয়ে শিক্ষক নিয়োগের আপডেট।</CardDescription>
                       </CardHeader>
                        <CardFooter>
-                         <Button variant="link" asChild><Link href="/education-news">আরও দেখুন...</Link></Button>
+                         <Button variant="link" asChild><Link href="/career">আরও দেখুন...</Link></Button>
                       </CardFooter>
                   </Card>
                    <Card className="hover:shadow-lg transition-shadow">
@@ -524,7 +524,7 @@ export default function Home() {
                             <CardDescription>দেশ-বিদেশের বিভিন্ন স্কলারশিপ ও ইন্টার্নশিপের সুযোগ।</CardDescription>
                       </CardHeader>
                        <CardFooter>
-                         <Button variant="link" asChild><Link href="/education-news">আরও দেখুন...</Link></Button>
+                         <Button variant="link" asChild><Link href="/career">আরও দেখুন...</Link></Button>
                       </CardFooter>
                   </Card>
                   <Card className="hover:shadow-lg transition-shadow">
@@ -535,7 +535,7 @@ export default function Home() {
                             <CardDescription>সফল ক্যারিয়ার গড়ার জন্য সিভি তৈরি, ভাইভা প্রস্তুতি ও অন্যান্য টিপস।</CardDescription>
                       </CardHeader>
                        <CardFooter>
-                         <Button variant="link" asChild><Link href="/education-news">আরও দেখুন...</Link></Button>
+                         <Button variant="link" asChild><Link href="/career">আরও দেখুন...</Link></Button>
                       </CardFooter>
                   </Card>
               </div>
@@ -593,7 +593,7 @@ export default function Home() {
                   <Card>
                       <CardHeader>
                           <CardTitle className="flex items-center gap-3">
-                              <MessageCircleQuestion className="h-6 w-6" /> প্রশ্নোত্তর পর্ব (Q&amp;A)
+                              <MessageCircleQuestion className="h-6 w-6" /> প্রশ্নোত্তর পর্ব (Q&A)
                           </CardTitle>
                           <CardDescription>
                               আপনার প্রশ্নটি এখানে জমা দিন এবং কমিউনিটির কাছ থেকে উত্তর পান।

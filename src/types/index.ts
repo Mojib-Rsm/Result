@@ -64,3 +64,15 @@ export interface InstituteResult {
     board: string;
     results: StudentResult[];
 }
+
+export interface JobPost {
+  id: string;
+  title: string;
+  companyName: string;
+  location: string;
+  type: 'Full-time' | 'Part-time' | 'Internship' | 'Contractual' | 'Remote';
+  description: string;
+  applyLink: string;
+  deadline: string;
+  postedAt: { seconds: number };
+}
