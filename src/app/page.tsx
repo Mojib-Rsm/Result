@@ -19,7 +19,7 @@ import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { app } from '@/lib/firebase';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
-import { Bell, BookOpen, Briefcase, Calendar, FileText, Rss, ExternalLink } from 'lucide-react';
+import { Bell, BookOpen, Briefcase, Calendar, FileText, Rss, ExternalLink, Calculator, MessageSquare, ListChecks, Phone } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Image from 'next/image';
 import { formatDistanceToNow } from 'date-fns';
@@ -117,7 +117,7 @@ const NewsSection = () => {
          <section>
               <h2 className="text-2xl font-bold text-center mb-6">সর্বশেষ শিক্ষা সংবাদ</h2>
               <Tabs defaultValue="all" className="w-full" onValueChange={fetchNews}>
-                  <TabsList className="grid w-full grid-cols-2 sm:grid-cols-6 mb-4">
+                  <TabsList className="grid w-full grid-cols-3 sm:grid-cols-6 mb-4">
                       <TabsTrigger value="all">সব খবর</TabsTrigger>
                       <TabsTrigger value="exam">পরীক্ষা</TabsTrigger>
                       <TabsTrigger value="ssc">SSC</TabsTrigger>
@@ -284,7 +284,6 @@ export default function Home() {
 );
 
 
-
   return (
     <div className="container mx-auto max-w-4xl px-4 py-8 md:py-12" id="main-content">
        <div className="flex flex-col items-center text-center mb-12 no-print">
@@ -327,6 +326,19 @@ export default function Home() {
                 </div>
           </section>
 
+          <Separator />
+          
+           {/* Tools & Features Section */}
+          <section>
+              <h2 className="text-2xl font-bold text-center mb-6">টুলস ও ফিচার</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <FeatureCard icon={Calculator} title="GPA ক্যালকুলেটর" description="আপনার বিষয়ভিত্তিক গ্রেড দিয়ে GPA গণনা করুন।" href="/gpa-calculator" />
+                  <FeatureCard icon={MessageSquare} title="রেজাল্ট SMS ফরম্যাট" description="যেকোনো অপারেটর থেকে SMS-এর মাধ্যমে ফলাফল জানুন।" href="#" />
+                  <FeatureCard icon={ListChecks} title="বোর্ড শর্ট কোড" description="সকল শিক্ষা বোর্ডের শর্ট কোড তালিকা দেখুন।" href="#" />
+                  <FeatureCard icon={Phone} title="শিক্ষা বোর্ড হেল্পলাইন" description="জরুরী প্রয়োজনে বোর্ড হেল্পলাইনের নম্বর খুঁজুন।" href="#" />
+              </div>
+          </section>
+
            <Separator />
 
            {loadingSettings ? (
@@ -353,5 +365,3 @@ export default function Home() {
     </div>
   );
 }
-
-    
