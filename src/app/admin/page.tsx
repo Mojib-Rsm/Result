@@ -110,31 +110,32 @@ export default function AdminPage() {
         setLoading(true);
         setLoadingSettings(true);
         try {
-            const today = new Date();
-            const startOfToday = startOfDay(today);
-            const startOf7DaysAgo = startOfDay(subDays(today, 7));
-            const startOf30DaysAgo = startOfDay(subDays(today, 30));
+            // const today = new Date();
+            // const startOfToday = startOfDay(today);
+            // const startOf7DaysAgo = startOfDay(subDays(today, 7));
+            // const startOf30DaysAgo = startOfDay(subDays(today, 30));
 
             const searchesRef = collection(db, 'search-history');
             const usersRef = collection(db, 'users');
             const subscriptionsRef = collection(db, 'subscriptions');
             const settingsRef = doc(db, 'settings', 'config');
             
+            // Temporarily simplified query to avoid composite index requirement
             const [
                 totalUsersSnap,
                 totalSearchesSnap,
-                todaysSearchesSnap,
-                last7DaysSearchesSnap,
-                last30DaysSearchesSnap,
+                // todaysSearchesSnap,
+                // last7DaysSearchesSnap,
+                // last30DaysSearchesSnap,
                 totalSubscriptionsSnap,
                 allUsersSnap,
                 settingsSnap
             ] = await Promise.all([
                 getCountFromServer(query(usersRef)),
                 getCountFromServer(query(searchesRef)),
-                getCountFromServer(query(searchesRef, where('timestamp', '>=', startOfToday))),
-                getCountFromServer(query(searchesRef, where('timestamp', '>=', startOf7DaysAgo))),
-                getCountFromServer(query(searchesRef, where('timestamp', '>=', startOf30DaysAgo))),
+                // getCountFromServer(query(searchesRef, where('timestamp', '>=', startOfToday))),
+                // getCountFromServer(query(searchesRef, where('timestamp', '>=', startOf7DaysAgo))),
+                // getCountFromServer(query(searchesRef, where('timestamp', '>=', startOf30DaysAgo))),
                 getCountFromServer(query(subscriptionsRef)),
                 getDocs(query(usersRef, orderBy('name'))),
                 getDoc(settingsRef)
@@ -146,9 +147,9 @@ export default function AdminPage() {
             setStats({
                 totalUsers: totalUsersSnap.data().count,
                 totalSearches: totalSearchesSnap.data().count,
-                todaysSearches: todaysSearchesSnap.data().count,
-                searchesLast7Days: last7DaysSearchesSnap.data().count,
-                searchesLast30Days: last30DaysSearchesSnap.data().count,
+                todaysSearches: 0, //todaysSearchesSnap.data().count,
+                searchesLast7Days: 0, //last7DaysSearchesSnap.data().count,
+                searchesLast30Days: 0, //last30DaysSearchesSnap.data().count,
                 totalSubscriptions: subsCount,
             });
 
@@ -436,5 +437,3 @@ export default function AdminPage() {
         </div>
     );
 }
-
-    
