@@ -1,4 +1,3 @@
-
 'use server';
 
 import type { ExamResult, GradeInfo, InstituteResult, StudentResult } from '@/types';
@@ -257,7 +256,6 @@ export async function uploadImage(formData: FormData): Promise<{ url?: string; e
 
         const responseText = await response.text();
         
-        // Try to parse as JSON first
         try {
             const result = JSON.parse(responseText);
              if (result.status === "success" && result.url) {
@@ -266,7 +264,6 @@ export async function uploadImage(formData: FormData): Promise<{ url?: string; e
                 throw new Error(result.error?.message || "ছবি আপলোড করার পর সার্ভার থেকে কোনো URL পাওয়া যায়নি।");
             }
         } catch(e) {
-            // If JSON parsing fails, it's likely HTML. Let's parse it.
             try {
                 const dom = new JSDOM(responseText);
                 const urlInput = dom.window.document.querySelector('input[data-action="copy-to-clipboard"]');
@@ -289,5 +286,6 @@ export async function uploadImage(formData: FormData): Promise<{ url?: string; e
 
 
 export { searchResultLegacy, searchInstituteResult };
+
 
 

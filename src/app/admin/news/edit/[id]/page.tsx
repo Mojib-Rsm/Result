@@ -187,14 +187,14 @@ export default function EditNewsPage({ params }: { params: { id: string } }) {
                     name="imageUrl"
                     render={({ field }) => (
                     <FormItem>
-                        <FormLabel>ছবির লিঙ্ক</FormLabel>
+                        <FormLabel>ছবি</FormLabel>
                         <div className="flex items-center gap-2">
                             <FormControl>
                                 <Input type="url" placeholder="https://example.com/image.jpg" {...field} />
                             </FormControl>
                             <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()} disabled={isUploading}>
                                 {isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-                                <span className="ml-2">আপলোড</span>
+                                <span className="ml-2">ছবি আপলোড করুন</span>
                             </Button>
                         </div>
                         <input type="file" ref={fileInputRef} onChange={handleImageUpload} accept="image/*" className="hidden" />
