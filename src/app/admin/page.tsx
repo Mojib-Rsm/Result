@@ -1,3 +1,4 @@
+
 'use client'
 
 import { useState, useEffect, useCallback } from 'react';
@@ -5,7 +6,7 @@ import { getFirestore, collection, query, orderBy, getDocs, where, getCountFromS
 import { startOfDay, subDays } from 'date-fns';
 import { app } from '@/lib/firebase';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText, Users, MailCheck, DatabaseZap, Search, BellRing, MessageSquare, Bookmark, Trash2, RefreshCw, Settings, BadgeDollarSign, FileCog, History, Briefcase } from 'lucide-react';
+import { FileText, Users, MailCheck, DatabaseZap, Search, BellRing, MessageSquare, Bookmark, Trash2, RefreshCw, Settings, BadgeDollarSign, FileCog, History, Briefcase, Eye } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -97,8 +98,17 @@ export default function AdminPage() {
     const [smsMessage, setSmsMessage] = useState('');
     
     // Site settings state
-    const [showSubscriptionForm, setShowSubscriptionForm] = useState(true);
-    const [activeSmsApi, setActiveSmsApi] = useState('anbu');
+    const [siteSettings, setSiteSettings] = useState({
+        showSubscriptionForm: true,
+        showNoticeBoard: true,
+        showAdmissionUpdate: true,
+        showEducationalResources: true,
+        showCareerHub: true,
+        showNewsSection: true,
+        showTools: true,
+        showCommunityForum: true,
+        activeSmsApi: 'anbu',
+    });
     const [loadingSettings, setLoadingSettings] = useState(true);
 
 
@@ -109,11 +119,6 @@ export default function AdminPage() {
         setLoading(true);
         setLoadingSettings(true);
         try {
-            // const today = new Date();
-            // const startOfToday = startOfDay(today);
-            // const startOf7DaysAgo = startOfDay(subDays(today, 7));
-            // const startOf30DaysAgo = startOfDay(subDays(today, 30));
-
             const searchesRef = collection(db, 'search-history');
             const usersRef = collection(db, 'users');
             const subscriptionsRef = collection(db, 'subscriptions');
@@ -123,18 +128,12 @@ export default function AdminPage() {
             const [
                 totalUsersSnap,
                 totalSearchesSnap,
-                // todaysSearchesSnap,
-                // last7DaysSearchesSnap,
-                // last30DaysSearchesSnap,
                 totalSubscriptionsSnap,
                 allUsersSnap,
                 settingsSnap
             ] = await Promise.all([
                 getCountFromServer(query(usersRef)),
                 getCountFromServer(query(searchesRef)),
-                // getCountFromServer(query(searchesRef, where('timestamp', '>=', startOfToday))),
-                // getCountFromServer(query(searchesRef, where('timestamp', '>=', startOf7DaysAgo))),
-                // getCountFromServer(query(searchesRef, where('timestamp', '>=', startOf30DaysAgo))),
                 getCountFromServer(query(subscriptionsRef)),
                 getDocs(query(usersRef, orderBy('name'))),
                 getDoc(settingsRef)
@@ -146,9 +145,9 @@ export default function AdminPage() {
             setStats({
                 totalUsers: totalUsersSnap.data().count,
                 totalSearches: totalSearchesSnap.data().count,
-                todaysSearches: 0, //todaysSearchesSnap.data().count,
-                searchesLast7Days: 0, //last7DaysSearchesSnap.data().count,
-                searchesLast30Days: 0, //last30DaysSearchesSnap.data().count,
+                todaysSearches: 0,
+                searchesLast7Days: 0,
+                searchesLast30Days: 0,
                 totalSubscriptions: subsCount,
             });
 
@@ -156,29 +155,27 @@ export default function AdminPage() {
             
             if (settingsSnap.exists()) {
                 const settingsData = settingsSnap.data();
-                setShowSubscriptionForm(settingsData.showSubscriptionForm);
-                setActiveSmsApi(settingsData.activeSmsApi || 'anbu');
+                setSiteSettings(prev => ({ ...prev, ...settingsData }));
             }
-
-
         } catch (error) {
             console.error("Error fetching admin data: ", error);
-            toast({
-                title: "ত্রুটি",
-                description: "অ্যাডমিন ডেটা আনতে সমস্যা হয়েছে।",
-                variant: "destructive",
-            });
+            // toast({
+            //     title: "ত্রুটি",
+            //     description: "অ্যাডমিন ডেটা আনতে সমস্যা হয়েছে।",
+            //     variant: "destructive",
+            // });
         } finally {
             setLoading(false);
             setLoadingSettings(false);
         }
-    }, [db, toast]);
+    }, [db]);
 
     useEffect(() => {
         fetchAllData();
     }, [fetchAllData]);
     
     const handleSettingsChange = async (key: string, value: any) => {
+        setSiteSettings(prev => ({ ...prev, [key]: value }));
         try {
             const settingsRef = doc(db, 'settings', 'config');
             await setDoc(settingsRef, { [key]: value }, { merge: true });
@@ -191,18 +188,11 @@ export default function AdminPage() {
                 description: 'সেটিং সংরক্ষণ করা যায়নি।',
                 variant: 'destructive',
             });
+             // Revert UI change on error
+             setSiteSettings(prev => ({ ...prev, [key]: !value }));
         }
     };
     
-    const handleSubscriptionFormToggle = (checked: boolean) => {
-        setShowSubscriptionForm(checked);
-        handleSettingsChange('showSubscriptionForm', checked);
-    };
-
-    const handleSmsApiChange = (value: string) => {
-        setActiveSmsApi(value);
-        handleSettingsChange('activeSmsApi', value);
-    };
 
     const handleBulkSendSms = async () => {
         if (!smsMessage.trim()) {
@@ -216,7 +206,6 @@ export default function AdminPage() {
 
         setIsSendingSms(true);
         try {
-            // Fetch phone numbers from subscriptions collection
             const subscriptionsRef = collection(db, 'subscriptions');
             const subsSnapshot = await getDocs(query(subscriptionsRef));
             const phoneNumbers = subsSnapshot.docs.map(doc => doc.data().phone);
@@ -353,25 +342,53 @@ export default function AdminPage() {
                     <CardContent className="space-y-6">
                         {loadingSettings ? (
                            <div className="space-y-4">
-                               <Skeleton className="h-8 w-48" />
-                               <Skeleton className="h-10 w-full" />
+                               {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-8 w-full" />)}
                            </div>
                         ) : (
                             <>
-                                <div className="flex items-center space-x-2">
-                                    <Switch
-                                        id="subscription-form-toggle"
-                                        checked={showSubscriptionForm}
-                                        onCheckedChange={handleSubscriptionFormToggle}
-                                    />
-                                    <Label htmlFor="subscription-form-toggle">ফলাফল অ্যালার্ট ফর্ম দেখান</Label>
+                                <div className="space-y-4">
+                                    <h4 className="font-medium">হোমপেজ সেকশন ম্যানেজমেন্ট</h4>
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                        <div className="flex items-center space-x-2">
+                                            <Switch id="notice-board-toggle" checked={siteSettings.showNoticeBoard} onCheckedChange={(c) => handleSettingsChange('showNoticeBoard', c)} />
+                                            <Label htmlFor="notice-board-toggle">নোটিশ বোর্ড</Label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <Switch id="admission-update-toggle" checked={siteSettings.showAdmissionUpdate} onCheckedChange={(c) => handleSettingsChange('showAdmissionUpdate', c)} />
+                                            <Label htmlFor="admission-update-toggle">ভর্তি আপডেট</Label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <Switch id="educational-resources-toggle" checked={siteSettings.showEducationalResources} onCheckedChange={(c) => handleSettingsChange('showEducationalResources', c)} />
+                                            <Label htmlFor="educational-resources-toggle">শিক্ষামূলক রিসোর্স</Label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <Switch id="career-hub-toggle" checked={siteSettings.showCareerHub} onCheckedChange={(c) => handleSettingsChange('showCareerHub', c)} />
+                                            <Label htmlFor="career-hub-toggle">ক্যারিয়ার হাব</Label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <Switch id="news-section-toggle" checked={siteSettings.showNewsSection} onCheckedChange={(c) => handleSettingsChange('showNewsSection', c)} />
+                                            <Label htmlFor="news-section-toggle">শিক্ষা সংবাদ</Label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <Switch id="tools-toggle" checked={siteSettings.showTools} onCheckedChange={(c) => handleSettingsChange('showTools', c)} />
+                                            <Label htmlFor="tools-toggle">টুলস ও ফিচার</Label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <Switch id="community-forum-toggle" checked={siteSettings.showCommunityForum} onCheckedChange={(c) => handleSettingsChange('showCommunityForum', c)} />
+                                            <Label htmlFor="community-forum-toggle">কমিউনিটি ফোরাম</Label>
+                                        </div>
+                                        <div className="flex items-center space-x-2">
+                                            <Switch id="subscription-form-toggle" checked={siteSettings.showSubscriptionForm} onCheckedChange={(c) => handleSettingsChange('showSubscriptionForm', c)} />
+                                            <Label htmlFor="subscription-form-toggle">ফলাফল অ্যালার্ট ফর্ম</Label>
+                                        </div>
+                                    </div>
                                 </div>
                                 <Separator />
                                 <div>
-                                    <Label className="mb-2 block">সক্রিয় SMS গেটওয়ে</Label>
+                                    <Label className="mb-2 block font-medium">সক্রিয় SMS গেটওয়ে</Label>
                                     <RadioGroup
-                                        value={activeSmsApi}
-                                        onValueChange={handleSmsApiChange}
+                                        value={siteSettings.activeSmsApi}
+                                        onValueChange={(v) => handleSettingsChange('activeSmsApi', v)}
                                         className="flex flex-col space-y-1"
                                     >
                                         <div className="flex items-center space-x-2">
@@ -436,3 +453,5 @@ export default function AdminPage() {
         </div>
     );
 }
+
+    

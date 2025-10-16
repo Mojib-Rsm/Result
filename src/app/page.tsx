@@ -295,7 +295,17 @@ export default function Home() {
   const { addHistoryItem } = useHistory();
   const [captchaUrl, setCaptchaUrl] = useState('');
   const [captchaCookie, setCaptchaCookie] = useState('');
-  const [showSubscriptionForm, setShowSubscriptionForm] = useState(false);
+  
+  const [siteSettings, setSiteSettings] = useState({
+      showSubscriptionForm: true,
+      showNoticeBoard: true,
+      showAdmissionUpdate: true,
+      showEducationalResources: true,
+      showCareerHub: true,
+      showNewsSection: true,
+      showTools: true,
+      showCommunityForum: true,
+  });
   const [loadingSettings, setLoadingSettings] = useState(true);
 
   const db = getFirestore(app);
@@ -319,7 +329,6 @@ export default function Home() {
     if (selectedExam === 'hsc_bm') {
       form.setValue('board', 'tec');
     } else {
-      // Don't reset if it's already set by the user for other exams
       if (form.getValues('board') === 'tec') {
         form.setValue('board', '');
       }
@@ -348,17 +357,15 @@ export default function Home() {
     refreshCaptcha();
     
     const fetchSettings = async () => {
+        setLoadingSettings(true);
         try {
             const settingsRef = doc(db, 'settings', 'config');
             const settingsSnap = await getDoc(settingsRef);
             if (settingsSnap.exists()) {
-                setShowSubscriptionForm(settingsSnap.data().showSubscriptionForm);
-            } else {
-                setShowSubscriptionForm(true); // Default to true if not set
+                setSiteSettings(prev => ({...prev, ...settingsSnap.data()}));
             }
         } catch (error) {
             console.error("Error fetching site settings: ", error);
-            setShowSubscriptionForm(true); // Default to true on error
         } finally {
             setLoadingSettings(false);
         }
@@ -432,249 +439,266 @@ export default function Home() {
               />
           </div>
 
-          <Separator />
-          
-          <section>
-              <h2 className="text-3xl font-bold text-center mb-8">নোটিশ বোর্ড</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <Card className="hover:shadow-lg transition-shadow">
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-3">
-                            <Rss className="h-6 w-6 text-primary" /> বোর্ড ও মন্ত্রণালয়ের নোটিশ
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <CardDescription>শিক্ষা বোর্ড ও মন্ত্রণালয়ের সকল নোটিশ।</CardDescription>
-                    </CardContent>
-                    <CardFooter>
-                         <Button variant="link" asChild><Link href="/education-news">আরও দেখুন...</Link></Button>
-                    </CardFooter>
-                </Card>
-                <Card className="hover:shadow-lg transition-shadow">
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-3">
-                            <Rss className="h-6 w-6 text-primary" /> পরীক্ষা ও ফলাফল
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                       <CardDescription>পরীক্ষার তারিখ ও ফলাফল প্রকাশের ঘোষণা।</CardDescription>
-                    </CardContent>
-                     <CardFooter>
-                         <Button variant="link" asChild><Link href="/education-news">আরও দেখুন...</Link></Button>
-                      </CardFooter>
-                </Card>
+          {siteSettings.showNoticeBoard && (
+            <>
+              <Separator />
+              <section>
+                  <h2 className="text-3xl font-bold text-center mb-8">নোটিশ বোর্ড</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <Card className="hover:shadow-lg transition-shadow">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-3">
+                                <Rss className="h-6 w-6 text-primary" /> বোর্ড ও মন্ত্রণালয়ের নোটিশ
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <CardDescription>শিক্ষা বোর্ড ও মন্ত্রণালয়ের সকল নোটিশ।</CardDescription>
+                        </CardContent>
+                        <CardFooter>
+                             <Button variant="link" asChild><Link href="/education-news">আরও দেখুন...</Link></Button>
+                        </CardFooter>
+                    </Card>
+                    <Card className="hover:shadow-lg transition-shadow">
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-3">
+                                <Rss className="h-6 w-6 text-primary" /> পরীক্ষা ও ফলাফল
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                           <CardDescription>পরীক্ষার তারিখ ও ফলাফল প্রকাশের ঘোষণা।</CardDescription>
+                        </CardContent>
+                         <CardFooter>
+                             <Button variant="link" asChild><Link href="/education-news">আরও দেখুন...</Link></Button>
+                          </CardFooter>
+                    </Card>
+                    </div>
+                </section>
+            </>
+          )}
+
+          {siteSettings.showAdmissionUpdate && (
+            <>
+              <Separator />
+              <section>
+                  <h2 className="text-3xl font-bold text-center mb-8">ভর্তি ও পরীক্ষার আপডেট</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <Card className="hover:shadow-lg transition-shadow">
+                          <CardHeader>
+                              <CardTitle className="flex items-center gap-3">
+                                  <BookOpen className="h-6 w-6" /> ভর্তি তথ্য
+                              </CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                              <CardDescription>বিশ্ববিদ্যালয় ও কলেজ ভর্তি সংক্রান্ত সকল তথ্য।</CardDescription>
+                          </CardContent>
+                          <CardFooter>
+                             <Button variant="link" asChild><Link href="/suggestions">আরও দেখুন...</Link></Button>
+                          </CardFooter>
+                      </Card>
+                      <Card className="hover:shadow-lg transition-shadow">
+                          <CardHeader>
+                              <CardTitle className="flex items-center gap-3">
+                                  <Calendar className="h-6 w-6" /> পরীক্ষার সময়সূচী
+                              </CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                             <CardDescription>সকল পাবলিক পরীক্ষার সময়সূচী ও রুটিন।</CardDescription>
+                          </CardContent>
+                           <CardFooter>
+                             <Button variant="link" asChild><Link href="/education-news">আরও দেখুন...</Link></Button>
+                          </CardFooter>
+                      </Card>
+                  </div>
+              </section>
+            </>
+          )}
+
+          {siteSettings.showEducationalResources && (
+            <>
+              <Separator />
+              <section>
+                  <h2 className="text-3xl font-bold text-center mb-8">শিক্ষামূলক রিসোর্স</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <Card className="hover:shadow-lg transition-shadow">
+                          <CardHeader>
+                              <CardTitle className="flex items-center gap-3">
+                                  <FileText className="h-6 w-6" /> মডেল টেস্ট / সাজেশন
+                              </CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                              <CardDescription>পরীক্ষার প্রস্তুতির জন্য মডেল টেস্ট ও সাজেশন।</CardDescription>
+                          </CardContent>
+                          <CardFooter>
+                             <Button variant="link" asChild><Link href="/suggestions">আরও দেখুন...</Link></Button>
+                          </CardFooter>
+                      </Card>
+                      <Card className="hover:shadow-lg transition-shadow">
+                          <CardHeader>
+                              <CardTitle className="flex items-center gap-3">
+                                  <BookOpen className="h-6 w-6" /> স্টাডি গাইড
+                              </CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                             <CardDescription>SSC, HSC ও বিশ্ববিদ্যালয় ভর্তি গাইড।</CardDescription>
+                          </CardContent>
+                           <CardFooter>
+                             <Button variant="link" asChild><Link href="/suggestions">আরও দেখুন...</Link></Button>
+                          </CardFooter>
+                      </Card>
+                       <Card className="hover:shadow-lg transition-shadow">
+                          <CardHeader>
+                               <CardTitle className="flex items-center gap-3">
+                                   <Briefcase className="h-6 w-6" /> eBook / PDF নোটস
+                               </CardTitle>
+                          </CardHeader>
+                          <CardContent>
+                             <CardDescription>প্রয়োজনীয় বই ও নোটস ডাউনলোড করুন।</CardDescription>
+                          </CardContent>
+                           <CardFooter>
+                             <Button variant="link" asChild><Link href="/suggestions">আরও দেখুন...</Link></Button>
+                          </CardFooter>
+                      </Card>
+                  </div>
+              </section>
+            </>
+          )}
+
+          {siteSettings.showCareerHub && (
+            <>
+              <Separator />
+              <section>
+                  <h2 className="text-3xl font-bold text-center mb-8">ক্যারিয়ার হাব</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                      <Card className="hover:shadow-lg transition-shadow">
+                          <CardHeader>
+                              <CardTitle className="flex items-center gap-3">
+                                  <Briefcase className="h-6 w-6" /> শিক্ষা সংক্রান্ত চাকরি
+                              </CardTitle>
+                               <CardDescription>শিক্ষা ক্ষেত্রে সর্বশেষ চাকরির খবর ও বিজ্ঞপ্তি।</CardDescription>
+                          </CardHeader>
+                          <CardFooter>
+                             <Button variant="link" asChild><Link href="/education-news">আরও দেখুন...</Link></Button>
+                          </CardFooter>
+                      </Card>
+                      <Card className="hover:shadow-lg transition-shadow">
+                          <CardHeader>
+                              <CardTitle className="flex items-center gap-3">
+                                  <UserPlus className="h-6 w-6" /> শিক্ষক নিয়োগ
+                              </CardTitle>
+                               <CardDescription>সরকারি-বেসরকারি স্কুল, কলেজ ও বিশ্ববিদ্যালয়ে শিক্ষক নিয়োগের আপডেট।</CardDescription>
+                          </CardHeader>
+                           <CardFooter>
+                             <Button variant="link" asChild><Link href="/education-news">আরও দেখুন...</Link></Button>
+                          </CardFooter>
+                      </Card>
+                       <Card className="hover:shadow-lg transition-shadow">
+                          <CardHeader>
+                               <CardTitle className="flex items-center gap-3">
+                                   <Award className="h-6 w-6" /> স্কলারশিপ ও ইন্টার্নশিপ
+                               </CardTitle>
+                                <CardDescription>দেশ-বিদেশের বিভিন্ন স্কলারশিপ ও ইন্টার্নশিপের সুযোগ।</CardDescription>
+                          </CardHeader>
+                           <CardFooter>
+                             <Button variant="link" asChild><Link href="/education-news">আরও দেখুন...</Link></Button>
+                          </CardFooter>
+                      </Card>
+                      <Card className="hover:shadow-lg transition-shadow">
+                          <CardHeader>
+                               <CardTitle className="flex items-center gap-3">
+                                   <Sparkles className="h-6 w-6" /> ক্যারিয়ার গাইডলাইন
+                               </CardTitle>
+                                <CardDescription>সফল ক্যারিয়ার গড়ার জন্য সিভি তৈরি, ভাইভা প্রস্তুতি ও অন্যান্য টিপস।</CardDescription>
+                          </CardHeader>
+                           <CardFooter>
+                             <Button variant="link" asChild><Link href="/education-news">আরও দেখুন...</Link></Button>
+                          </CardFooter>
+                      </Card>
+                  </div>
+              </section>
+            </>
+          )}
+
+          {siteSettings.showNewsSection && (
+            <>
+              <Separator />
+              <NewsSection />
+            </>
+          )}
+
+          {siteSettings.showTools && (
+            <>
+              <Separator />
+              <section>
+                <h2 className="text-3xl font-bold text-center mb-8">টুলস ও ফিচার</h2>
+                <div className="space-y-4">
+                    <GpaCalculatorCard />
+                    <Card>
+                        <CardHeader>
+                            <CardTitle className="flex items-center gap-3">
+                                <Rss className="h-6 w-6" /> রেজাল্ট SMS ফরম্যাট
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="mb-4 text-muted-foreground">যেকোনো মোবাইল থেকে SMS-এর মাধ্যমে ফলাফল পেতে নিচের ফরম্যাট অনুসরণ করুন এবং 16222 নম্বরে পাঠান।</p>
+                            <div className="space-y-2">
+                                <p><strong>HSC:</strong> <code className="bg-muted px-2 py-1 rounded">HSC &lt;Space&gt; বোর্ডের নামের প্রথম ৩ অক্ষর &lt;Space&gt; রোল নম্বর &lt;Space&gt; বছর</code></p>
+                                <p><strong>SSC:</strong> <code className="bg-muted px-2 py-1 rounded">SSC &lt;Space&gt; বোর্ডের নামের প্রথম ৩ অক্ষর &lt;Space&gt; রোল নম্বর &lt;Space&gt; বছর</code></p>
+                                <p><strong>JSC:</strong> <code className="bg-muted px-2 py-1 rounded">JSC &lt;Space&gt; বোর্ডের নামের প্রথম ৩ অক্ষর &lt;Space&gt; রোল নম্বর &lt;Space&gt; বছর</code></p>
+                                 <p><strong>Dakhil:</strong> <code className="bg-muted px-2 py-1 rounded">DAKHIL &lt;Space&gt; MAD &lt;Space&gt; রোল নম্বর &lt;Space&gt; বছর</code></p>
+                            </div>
+                        </CardContent>
+                    </Card>
+                    <BoardShortCodesCard />
+                    <BoardHelplineCard />
                 </div>
             </section>
-          
-          <Separator />
+            </>
+          )}
 
-          {/* Admission & Exam Update Section */}
-          <section>
-              <h2 className="text-3xl font-bold text-center mb-8">ভর্তি ও পরীক্ষার আপডেট</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <Card className="hover:shadow-lg transition-shadow">
-                      <CardHeader>
-                          <CardTitle className="flex items-center gap-3">
-                              <BookOpen className="h-6 w-6" /> ভর্তি তথ্য
-                          </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                          <CardDescription>বিশ্ববিদ্যালয় ও কলেজ ভর্তি সংক্রান্ত সকল তথ্য।</CardDescription>
-                      </CardContent>
-                      <CardFooter>
-                         <Button variant="link" asChild><Link href="/suggestions">আরও দেখুন...</Link></Button>
-                      </CardFooter>
-                  </Card>
-                  <Card className="hover:shadow-lg transition-shadow">
-                      <CardHeader>
-                          <CardTitle className="flex items-center gap-3">
-                              <Calendar className="h-6 w-6" /> পরীক্ষার সময়সূচী
-                          </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                         <CardDescription>সকল পাবলিক পরীক্ষার সময়সূচী ও রুটিন।</CardDescription>
-                      </CardContent>
-                       <CardFooter>
-                         <Button variant="link" asChild><Link href="/education-news">আরও দেখুন...</Link></Button>
-                      </CardFooter>
-                  </Card>
-              </div>
-          </section>
-
-          <Separator />
-
-           {/* Educational Resources Section */}
-          <section>
-              <h2 className="text-3xl font-bold text-center mb-8">শিক্ষামূলক রিসোর্স</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <Card className="hover:shadow-lg transition-shadow">
-                      <CardHeader>
-                          <CardTitle className="flex items-center gap-3">
-                              <FileText className="h-6 w-6" /> মডেল টেস্ট / সাজেশন
-                          </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                          <CardDescription>পরীক্ষার প্রস্তুতির জন্য মডেল টেস্ট ও সাজেশন।</CardDescription>
-                      </CardContent>
-                      <CardFooter>
-                         <Button variant="link" asChild><Link href="/suggestions">আরও দেখুন...</Link></Button>
-                      </CardFooter>
-                  </Card>
-                  <Card className="hover:shadow-lg transition-shadow">
-                      <CardHeader>
-                          <CardTitle className="flex items-center gap-3">
-                              <BookOpen className="h-6 w-6" /> স্টাডি গাইড
-                          </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                         <CardDescription>SSC, HSC ও বিশ্ববিদ্যালয় ভর্তি গাইড।</CardDescription>
-                      </CardContent>
-                       <CardFooter>
-                         <Button variant="link" asChild><Link href="/suggestions">আরও দেখুন...</Link></Button>
-                      </CardFooter>
-                  </Card>
-                   <Card className="hover:shadow-lg transition-shadow">
-                      <CardHeader>
-                           <CardTitle className="flex items-center gap-3">
-                               <Briefcase className="h-6 w-6" /> eBook / PDF নোটস
-                           </CardTitle>
-                      </CardHeader>
-                      <CardContent>
-                         <CardDescription>প্রয়োজনীয় বই ও নোটস ডাউনলোড করুন।</CardDescription>
-                      </CardContent>
-                       <CardFooter>
-                         <Button variant="link" asChild><Link href="/suggestions">আরও দেখুন...</Link></Button>
-                      </CardFooter>
-                  </Card>
-              </div>
-          </section>
-
-          <Separator />
-
-          {/* Career Hub Section */}
-          <section>
-              <h2 className="text-3xl font-bold text-center mb-8">ক্যারিয়ার হাব</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  <Card className="hover:shadow-lg transition-shadow">
-                      <CardHeader>
-                          <CardTitle className="flex items-center gap-3">
-                              <Briefcase className="h-6 w-6" /> শিক্ষা সংক্রান্ত চাকরি
-                          </CardTitle>
-                           <CardDescription>শিক্ষা ক্ষেত্রে সর্বশেষ চাকরির খবর ও বিজ্ঞপ্তি।</CardDescription>
-                      </CardHeader>
-                      <CardFooter>
-                         <Button variant="link" asChild><Link href="/education-news">আরও দেখুন...</Link></Button>
-                      </CardFooter>
-                  </Card>
-                  <Card className="hover:shadow-lg transition-shadow">
-                      <CardHeader>
-                          <CardTitle className="flex items-center gap-3">
-                              <UserPlus className="h-6 w-6" /> শিক্ষক নিয়োগ
-                          </CardTitle>
-                           <CardDescription>সরকারি-বেসরকারি স্কুল, কলেজ ও বিশ্ববিদ্যালয়ে শিক্ষক নিয়োগের আপডেট।</CardDescription>
-                      </CardHeader>
-                       <CardFooter>
-                         <Button variant="link" asChild><Link href="/education-news">আরও দেখুন...</Link></Button>
-                      </CardFooter>
-                  </Card>
-                   <Card className="hover:shadow-lg transition-shadow">
-                      <CardHeader>
-                           <CardTitle className="flex items-center gap-3">
-                               <Award className="h-6 w-6" /> স্কলারশিপ ও ইন্টার্নশিপ
-                           </CardTitle>
-                            <CardDescription>দেশ-বিদেশের বিভিন্ন স্কলারশিপ ও ইন্টার্নশিপের সুযোগ।</CardDescription>
-                      </CardHeader>
-                       <CardFooter>
-                         <Button variant="link" asChild><Link href="/education-news">আরও দেখুন...</Link></Button>
-                      </CardFooter>
-                  </Card>
-                  <Card className="hover:shadow-lg transition-shadow">
-                      <CardHeader>
-                           <CardTitle className="flex items-center gap-3">
-                               <Sparkles className="h-6 w-6" /> ক্যারিয়ার গাইডলাইন
-                           </CardTitle>
-                            <CardDescription>সফল ক্যারিয়ার গড়ার জন্য সিভি তৈরি, ভাইভা প্রস্তুতি ও অন্যান্য টিপস।</CardDescription>
-                      </CardHeader>
-                       <CardFooter>
-                         <Button variant="link" asChild><Link href="/education-news">আরও দেখুন...</Link></Button>
-                      </CardFooter>
-                  </Card>
-              </div>
-          </section>
-          
-          <Separator />
-
-          <NewsSection />
-
-          <Separator />
-          
-           {/* Tools & Features Section */}
-          <section>
-            <h2 className="text-3xl font-bold text-center mb-8">টুলস ও ফিচার</h2>
-            <div className="space-y-4">
-                <GpaCalculatorCard />
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-3">
-                            <Rss className="h-6 w-6" /> রেজাল্ট SMS ফরম্যাট
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <p className="mb-4 text-muted-foreground">যেকোনো মোবাইল থেকে SMS-এর মাধ্যমে ফলাফল পেতে নিচের ফরম্যাট অনুসরণ করুন এবং 16222 নম্বরে পাঠান।</p>
-                        <div className="space-y-2">
-                            <p><strong>HSC:</strong> <code className="bg-muted px-2 py-1 rounded">HSC &lt;Space&gt; বোর্ডের নামের প্রথম ৩ অক্ষর &lt;Space&gt; রোল নম্বর &lt;Space&gt; বছর</code></p>
-                            <p><strong>SSC:</strong> <code className="bg-muted px-2 py-1 rounded">SSC &lt;Space&gt; বোর্ডের নামের প্রথম ৩ অক্ষর &lt;Space&gt; রোল নম্বর &lt;Space&gt; বছর</code></p>
-                            <p><strong>JSC:</strong> <code className="bg-muted px-2 py-1 rounded">JSC &lt;Space&gt; বোর্ডের নামের প্রথম ৩ অক্ষর &lt;Space&gt; রোল নম্বর &lt;Space&gt; বছর</code></p>
-                             <p><strong>Dakhil:</strong> <code className="bg-muted px-2 py-1 rounded">DAKHIL &lt;Space&gt; MAD &lt;Space&gt; রোল নম্বর &lt;Space&gt; বছর</code></p>
-                        </div>
-                    </CardContent>
-                </Card>
-                <BoardShortCodesCard />
-                <BoardHelplineCard />
-            </div>
-        </section>
-
-          <Separator />
-
-          <section>
-              <h2 className="text-3xl font-bold text-center mb-8">স্টুডেন্ট কমিউনিটি ফোরাম</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <Card>
-                      <CardHeader>
-                          <CardTitle className="flex items-center gap-3">
-                              <MessageCircleQuestion className="h-6 w-6" /> প্রশ্নোত্তর পর্ব (Q&A)
-                          </CardTitle>
-                          <CardDescription>
-                              আপনার প্রশ্নটি এখানে জমা দিন এবং কমিউনিটির কাছ থেকে উত্তর পান।
-                          </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                          <form className="space-y-4">
-                              <Textarea placeholder="আপনার প্রশ্নটি এখানে লিখুন..." />
-                              <Button className="w-full">প্রশ্ন জমা দিন</Button>
-                          </form>
-                      </CardContent>
-                      <CardFooter>
-                          <p className="text-xs text-muted-foreground">শীঘ্রই আসছে আরও ফিচার...</p>
-                      </CardFooter>
-                  </Card>
-                  <Card>
-                      <CardHeader>
-                          <CardTitle className="flex items-center gap-3">
-                              <MessagesSquare className="h-6 w-6" /> আলোচনা ও মন্তব্য
-                          </CardTitle>
-                          <CardDescription>
-                              শিক্ষার্থীরা এখানে বিভিন্ন বিষয় নিয়ে আলোচনা করতে পারেন।
-                          </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                          <div className="border-2 border-dashed rounded-lg p-8 text-center">
-                              <p className="text-muted-foreground">আলোচনা বোর্ড শীঘ্রই আসছে...</p>
-                          </div>
-                      </CardContent>
-                  </Card>
-              </div>
-          </section>
+          {siteSettings.showCommunityForum && (
+            <>
+              <Separator />
+              <section>
+                  <h2 className="text-3xl font-bold text-center mb-8">স্টুডেন্ট কমিউনিটি ফোরাম</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      <Card>
+                          <CardHeader>
+                              <CardTitle className="flex items-center gap-3">
+                                  <MessageCircleQuestion className="h-6 w-6" /> প্রশ্নোত্তর পর্ব (Q&A)
+                              </CardTitle>
+                              <CardDescription>
+                                  আপনার প্রশ্নটি এখানে জমা দিন এবং কমিউনিটির কাছ থেকে উত্তর পান।
+                              </CardDescription>
+                          </CardHeader>
+                          <CardContent>
+                              <form className="space-y-4">
+                                  <Textarea placeholder="আপনার প্রশ্নটি এখানে লিখুন..." />
+                                  <Button className="w-full">প্রশ্ন জমা দিন</Button>
+                              </form>
+                          </CardContent>
+                          <CardFooter>
+                              <p className="text-xs text-muted-foreground">শীঘ্রই আসছে আরও ফিচার...</p>
+                          </CardFooter>
+                      </Card>
+                      <Card>
+                          <CardHeader>
+                              <CardTitle className="flex items-center gap-3">
+                                  <MessagesSquare className="h-6 w-6" /> আলোচনা ও মন্তব্য
+                              </CardTitle>
+                              <CardDescription>
+                                  শিক্ষার্থীরা এখানে বিভিন্ন বিষয় নিয়ে আলোচনা করতে পারেন।
+                              </CardDescription>
+                          </CardHeader>
+                          <CardContent>
+                              <div className="border-2 border-dashed rounded-lg p-8 text-center">
+                                  <p className="text-muted-foreground">আলোচনা বোর্ড শীঘ্রই আসছে...</p>
+                              </div>
+                          </CardContent>
+                      </Card>
+                  </div>
+              </section>
+            </>
+           )}
 
            <Separator />
 
@@ -689,7 +713,7 @@ export default function Home() {
                       <Skeleton className="h-40 w-full" />
                   </CardContent>
               </Card>
-            ) : showSubscriptionForm && <ResultAlertForm />}
+            ) : siteSettings.showSubscriptionForm && <ResultAlertForm />}
         </div>
       ) : (
         <>
