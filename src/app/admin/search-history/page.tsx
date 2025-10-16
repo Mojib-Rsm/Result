@@ -8,9 +8,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Download, Search } from 'lucide-react';
+import { Download, Search, Eye } from 'lucide-react';
 import { format } from 'date-fns';
 import { Input } from '@/components/ui/input';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import ResultsDisplay from '@/components/results-display';
+import type { ExamResult } from '@/types';
+
 
 type SearchHistoryItem = {
     id: string;
@@ -20,18 +24,14 @@ type SearchHistoryItem = {
     board: string;
     exam: string;
     year: string;
-    result?: {
-        studentInfo?: {
-            name?: string;
-        };
-        gpa?: number;
-    };
+    result?: ExamResult;
 };
 
 export default function SearchHistoryPage() {
     const [history, setHistory] = useState<SearchHistoryItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
+    const [selectedResult, setSelectedResult] = useState<ExamResult | null>(null);
     const db = getFirestore(app);
 
     useEffect(() => {
@@ -129,48 +129,70 @@ export default function SearchHistoryPage() {
                             />
                         </div>
                     </div>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>সময়</TableHead>
-                                <TableHead>নাম</TableHead>
-                                <TableHead>রোল</TableHead>
-                                <TableHead>রেজি. নম্বর</TableHead>
-                                <TableHead>বোর্ড</TableHead>
-                                <TableHead>পরীক্ষা</TableHead>
-                                <TableHead>বছর</TableHead>
-                                <TableHead>GPA</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {loading ? (
-                                <TableSkeleton columns={8} />
-                            ) : filteredHistory.length > 0 ? (
-                                filteredHistory.map(item => (
-                                    <TableRow key={item.id}>
-                                        <TableCell className="text-xs">
-                                          {item.timestamp && typeof item.timestamp.seconds === 'number'
-                                              ? format(new Date(item.timestamp.seconds * 1000), 'dd/MM/yy hh:mm a')
-                                              : 'N/A'}
-                                        </TableCell>
-                                        <TableCell>{item.result?.studentInfo?.name || 'N/A'}</TableCell>
-                                        <TableCell>{item.roll}</TableCell>
-                                        <TableCell>{item.reg}</TableCell>
-                                        <TableCell className="capitalize">{item.board}</TableCell>
-                                        <TableCell className="uppercase">{item.exam}</TableCell>
-                                        <TableCell>{item.year}</TableCell>
-                                        <TableCell>{item.result?.gpa?.toFixed(2) || 'N/A'}</TableCell>
-                                    </TableRow>
-                                ))
-                            ) : (
+                    <Dialog>
+                        <Table>
+                            <TableHeader>
                                 <TableRow>
-                                    <TableCell colSpan={8} className="text-center h-24">
-                                        {history.length > 0 ? 'এই অনুসন্ধানের জন্য কোনো ফলাফল পাওয়া যায়নি।' : 'কোনো অনুসন্ধানের ইতিহাস পাওয়া যায়নি।'}
-                                    </TableCell>
+                                    <TableHead>সময়</TableHead>
+                                    <TableHead>নাম</TableHead>
+                                    <TableHead>রোল</TableHead>
+                                    <TableHead>রেজি. নম্বর</TableHead>
+                                    <TableHead>বোর্ড</TableHead>
+                                    <TableHead>পরীক্ষা</TableHead>
+                                    <TableHead>বছর</TableHead>
+                                    <TableHead>GPA</TableHead>
+                                    <TableHead className="text-right">কার্যকলাপ</TableHead>
                                 </TableRow>
-                            )}
-                        </TableBody>
-                    </Table>
+                            </TableHeader>
+                            <TableBody>
+                                {loading ? (
+                                    <TableSkeleton columns={9} />
+                                ) : filteredHistory.length > 0 ? (
+                                    filteredHistory.map(item => (
+                                        <TableRow key={item.id}>
+                                            <TableCell className="text-xs">
+                                            {item.timestamp && typeof item.timestamp.seconds === 'number'
+                                                ? format(new Date(item.timestamp.seconds * 1000), 'dd/MM/yy hh:mm a')
+                                                : 'N/A'}
+                                            </TableCell>
+                                            <TableCell>{item.result?.studentInfo?.name || 'N/A'}</TableCell>
+                                            <TableCell>{item.roll}</TableCell>
+                                            <TableCell>{item.reg}</TableCell>
+                                            <TableCell className="capitalize">{item.board}</TableCell>
+                                            <TableCell className="uppercase">{item.exam}</TableCell>
+                                            <TableCell>{item.year}</TableCell>
+                                            <TableCell>{item.result?.gpa?.toFixed(2) || 'N/A'}</TableCell>
+                                            <TableCell className="text-right">
+                                                {item.result && (
+                                                    <DialogTrigger asChild>
+                                                        <Button variant="ghost" size="icon" onClick={() => setSelectedResult(item.result!)}>
+                                                            <Eye className="h-4 w-4" />
+                                                        </Button>
+                                                    </DialogTrigger>
+                                                )}
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                ) : (
+                                    <TableRow>
+                                        <TableCell colSpan={9} className="text-center h-24">
+                                            {history.length > 0 ? 'এই অনুসন্ধানের জন্য কোনো ফলাফল পাওয়া যায়নি।' : 'কোনো অনুসন্ধানের ইতিহাস পাওয়া যায়নি।'}
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
+                         {selectedResult && (
+                            <DialogContent className="max-w-4xl h-[95vh] flex flex-col">
+                                <DialogHeader className="no-print">
+                                    <DialogTitle>ফলাফলের বিবরণ</DialogTitle>
+                                </DialogHeader>
+                                <div className="flex-grow overflow-y-auto">
+                                    <ResultsDisplay result={selectedResult} isDialog={true} />
+                                </div>
+                            </DialogContent>
+                        )}
+                    </Dialog>
                 </CardContent>
             </Card>
         </div>
