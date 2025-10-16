@@ -19,7 +19,7 @@ import { getFirestore, doc, getDoc, collection, query, orderBy, getDocs, limit }
 import { app } from '@/lib/firebase';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
-import { Bell, BookOpen, Briefcase, Calendar, FileText, Rss, ExternalLink, Calculator, Phone, Trash2, Plus, MessageCircleQuestion, MessagesSquare, UserPlus, Award, Sparkles, TableIcon } from 'lucide-react';
+import { Bell, BookOpen, Briefcase, Calendar, FileText, Rss, ExternalLink, Calculator, Phone, Trash2, Plus, MessageCircleQuestion, MessagesSquare, UserPlus, Award, Sparkles, TableIcon, Download } from 'lucide-react';
 import Image from 'next/image';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -279,9 +279,9 @@ export default function Home() {
         { title: 'পরীক্ষার সময়সূচী', description: 'সকল পাবলিক পরীক্ষার সময়সূচী ও রুটিন।', link: '/education-news' },
     ]},
     { name: 'showEducationalResources', title: 'রেজাল্ট গাইড', icon: FileText, link: '/suggestions', items: [
-        { title: 'মডেল টেস্ট / সাজেশন', description: 'পরীক্ষার প্রস্তুতির জন্য মডেল টেস্ট ও সাজেশন।', link: '/suggestions' },
-        { title: 'স্টাডি গাইড', description: 'SSC, HSC ও বিশ্ববিদ্যালয় ভর্তি গাইড।', link: '/suggestions' },
-        { title: 'eBook / PDF নোটস', description: 'প্রয়োজনীয় বই ও নোটস ডাউনলোড করুন।', link: '/suggestions' },
+        { icon: FileText, title: 'মডেল টেস্ট / সাজেশন', description: 'পরীক্ষার প্রস্তুতির জন্য মডেল টেস্ট ও সাজেশন।', link: '/suggestions' },
+        { icon: BookOpen, title: 'স্টাডি গাইড', description: 'SSC, HSC ও বিশ্ববিদ্যালয় ভর্তি গাইড।', link: '/suggestions' },
+        { icon: Download, title: 'eBook / PDF নোটস', description: 'প্রয়োজনীয় বই ও নোটস ডাউনলোড করুন।', link: '/suggestions' },
     ]},
     { name: 'showCareerHub', title: 'ক্যারিয়ার হাব', icon: Briefcase, link: '/career', items: [
         { title: 'শিক্ষা সংক্রান্ত চাকরি', icon: Briefcase, description: 'শিক্ষা ক্ষেত্রে সর্বশেষ চাকরির খবর ও বিজ্ঞপ্তি।', link: '/career/education-jobs'},
