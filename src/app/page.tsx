@@ -19,7 +19,7 @@ import { getFirestore, doc, getDoc, collection, query, orderBy, getDocs } from '
 import { app } from '@/lib/firebase';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
-import { Bell, BookOpen, Briefcase, Calendar, FileText, Rss, ExternalLink, Calculator, MessageSquare, ListChecks, Phone, Trash2, Plus, MessageCircleQuestion, MessagesSquare, UserPlus, Award } from 'lucide-react';
+import { Bell, BookOpen, Briefcase, Calendar, FileText, Rss, ExternalLink, Calculator, MessageSquare, ListChecks, Phone, Trash2, Plus, MessageCircleQuestion, MessagesSquare, UserPlus, Award, Sparkles } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Image from 'next/image';
 import { formatDistanceToNow } from 'date-fns';
@@ -395,9 +395,8 @@ export default function Home() {
           
           <NewsSection />
           
-
           <Separator />
-          
+
           <section>
               <h2 className="text-2xl font-bold text-center mb-6">ভর্তি ও পরীক্ষার আপডেট</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -512,17 +511,15 @@ export default function Home() {
 
           {/* Job & Career Corner Section */}
           <section>
-              <h2 className="text-2xl font-bold text-center mb-6">চাকরি ও ক্যারিয়ার কর্নার</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <h2 className="text-2xl font-bold text-center mb-6">ক্যারিয়ার হাব</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <Card className="hover:shadow-lg transition-shadow">
                       <CardHeader>
                           <CardTitle className="flex items-center gap-3">
-                              <Briefcase className="h-6 w-6" /> শিক্ষা সংক্রান্ত চাকরির খবর
+                              <Briefcase className="h-6 w-6" /> শিক্ষা সংক্রান্ত চাকরি
                           </CardTitle>
+                           <CardDescription>শিক্ষা ক্ষেত্রে সর্বশেষ চাকরির খবর ও বিজ্ঞপ্তি।</CardDescription>
                       </CardHeader>
-                      <CardContent>
-                          <CardDescription>শিক্ষা ক্ষেত্রে সর্বশেষ চাকরির বিজ্ঞপ্তি।</CardDescription>
-                      </CardContent>
                       <CardFooter>
                          <Button variant="link" asChild><Link href="#">আরও দেখুন...</Link></Button>
                       </CardFooter>
@@ -532,10 +529,8 @@ export default function Home() {
                           <CardTitle className="flex items-center gap-3">
                               <UserPlus className="h-6 w-6" /> শিক্ষক নিয়োগ
                           </CardTitle>
+                           <CardDescription>সরকারি-বেসরকারি স্কুল, কলেজ ও বিশ্ববিদ্যালয়ে শিক্ষক নিয়োগের আপডেট।</CardDescription>
                       </CardHeader>
-                      <CardContent>
-                         <CardDescription>শিক্ষক নিয়োগ সংক্রান্ত সর্বশেষ খবর ও আপডেট।</CardDescription>
-                      </CardContent>
                        <CardFooter>
                          <Button variant="link" asChild><Link href="#">আরও দেখুন...</Link></Button>
                       </CardFooter>
@@ -543,12 +538,21 @@ export default function Home() {
                    <Card className="hover:shadow-lg transition-shadow">
                       <CardHeader>
                            <CardTitle className="flex items-center gap-3">
-                               <Award className="h-6 w-6" /> বৃত্তি / ইন্টার্নশিপ আপডেট
+                               <Award className="h-6 w-6" /> স্কলারশিপ ও ইন্টার্নশিপ
                            </CardTitle>
+                            <CardDescription>দেশ-বিদেশের বিভিন্ন স্কলারশিপ ও ইন্টার্নশিপের সুযোগ।</CardDescription>
                       </CardHeader>
-                      <CardContent>
-                         <CardDescription>দেশ-বিদেশের বিভিন্ন স্কলারশিপ ও ইন্টার্নশিপের সুযোগ।</CardDescription>
-                      </CardContent>
+                       <CardFooter>
+                         <Button variant="link" asChild><Link href="#">আরও দেখুন...</Link></Button>
+                      </CardFooter>
+                  </Card>
+                  <Card className="hover:shadow-lg transition-shadow">
+                      <CardHeader>
+                           <CardTitle className="flex items-center gap-3">
+                               <Sparkles className="h-6 w-6" /> ক্যারিয়ার গাইডলাইন
+                           </CardTitle>
+                            <CardDescription>সফল ক্যারিয়ার গড়ার জন্য সিভি তৈরি, ভাইভা প্রস্তুতি ও অন্যান্য টিপস।</CardDescription>
+                      </CardHeader>
                        <CardFooter>
                          <Button variant="link" asChild><Link href="#">আরও দেখুন...</Link></Button>
                       </CardFooter>
