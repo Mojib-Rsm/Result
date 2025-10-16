@@ -339,7 +339,7 @@ export default function ResultsDisplay({ result, onReset, isDialog = false }: Re
                               className="h-16 w-16 mb-2"
                           />
                       </div>
-                       <CardTitle className="text-2xl text-primary">Result Marksheet</CardTitle>
+                       <CardTitle>Result Marksheet</CardTitle>
 
                       <div className="absolute top-0 right-0 text-right font-bold text-xl min-w-[120px]">
                           <p className={isPass ? 'text-green-600' : 'text-destructive'}>Status: {result.status}</p>
