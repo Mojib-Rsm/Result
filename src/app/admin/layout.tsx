@@ -4,7 +4,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import Loading from '../loading';
-import { SidebarProvider, Sidebar, SidebarTrigger, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarFooter } from '@/components/ui/sidebar';
+import { SidebarProvider, Sidebar, SidebarTrigger, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarFooter, SidebarInset } from '@/components/ui/sidebar';
 import { GraduationCap, MailCheck, History, Bookmark, Briefcase, BarChart, LogOut, Settings } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -86,13 +86,15 @@ export default function AdminLayout({
                         </SidebarMenu>
                     </SidebarFooter>
                 </SidebarContent>
-                <main className="flex-1 bg-muted/30">
+                <SidebarInset>
                     <header className="p-4 flex items-center gap-4 md:hidden border-b bg-background">
                         <SidebarTrigger />
                         <h1 className="text-lg font-semibold">অ্যাডমিন প্যানেল</h1>
                     </header>
-                    {children}
-                </main>
+                    <div className="flex-1 bg-muted/30">
+                      {children}
+                    </div>
+                </SidebarInset>
             </Sidebar>
         </SidebarProvider>
     );
