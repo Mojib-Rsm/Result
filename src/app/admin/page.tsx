@@ -173,7 +173,7 @@ export default function AdminPage() {
             setLoading(false);
             setLoadingSettings(false);
         }
-    }, [db, toast]);
+    }, [db]);
 
     useEffect(() => {
         fetchAllData();
