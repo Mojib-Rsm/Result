@@ -235,14 +235,16 @@ async function searchInstituteResult(values: { eiin: string; exam: string; year:
 
 export async function uploadImage(formData: FormData): Promise<{ url?: string; error?: string }> {
     try {
-        const response = await fetch("http://img.bdedu.me/upload", {
+        const response = await fetch("http://img.bdedu.me/?upload=1", {
             method: "POST",
             body: formData,
             headers: {
                 "Accept": "application/json",
+                "Accept-Language": "en-GB,en-US;q=0.9,en;q=0.8,ne;q=0.7,bn;q=0.6",
+                "Cache-Control": "no-cache",
                 "X-Requested-With": "XMLHttpRequest",
                 "Origin": "http://img.bdedu.me",
-                "Referer": "http://img.bdedu.me/en/user/gallery",
+                "Referer": "http://img.bdedu.me/?upload=1",
                 "x-csrf-token": "9oswLCk1qgrnmedhyL1O1ZEnkNYg6cDbdlud4PIH"
             }
         });
