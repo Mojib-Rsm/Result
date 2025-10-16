@@ -27,6 +27,7 @@ import { bn } from 'date-fns/locale';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import Link from 'next/link';
 
 interface NewsArticle {
     title: string;
@@ -94,7 +95,6 @@ const GpaCalculatorCard = () => {
             <CardTitle className="flex items-center gap-3">
                 <Calculator className="h-6 w-6" /> GPA ক্যালকুলেটর
             </CardTitle>
-            <CardDescription>আপনার বিষয়ভিত্তিক গ্রেড ব্যবহার করে GPA গণনা করুন।</CardDescription>
         </CardHeader>
       <CardContent>
         <div className="space-y-4 pt-2">
@@ -378,7 +378,7 @@ export default function Home() {
             </div>
         </CardHeader>
         <CardContent>
-            <Button variant="link" asChild><a href={href}>আরও দেখুন...</a></Button>
+            <Button variant="link" asChild><Link href={href}>আরও দেখুন...</Link></Button>
         </CardContent>
     </Card>
 );
@@ -415,18 +415,13 @@ export default function Home() {
 
           <Separator />
 
-          {/* Features Section */}
-          <section>
-                <h2 className="text-2xl font-bold text-center mb-6">অন্যান্য ফিচারসমূহ</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <FeatureCard icon={Calendar} title="ভর্তি ও পরীক্ষা আপডেট" description="বিশ্ববিদ্যালয় ও কলেজের ভর্তি বিজ্ঞপ্তি, পরীক্ষার রুটিন ইত্যাদি।" href="/education-news" />
-                    <FeatureCard icon={Briefcase} title="চাকরি ও ক্যারিয়ার কর্নার" description="শিক্ষকতা ও অন্যান্য চাকরির খবর এবং স্কলারশিপের তথ্য।" href="/education-news" />
-                    <FeatureCard icon={BookOpen} title="স্টাডি রিসোর্স" description="মডেল টেস্ট, সাজেশন এবং নোটস ডাউনলোড করুন।" href="/suggestions" />
-                    <FeatureCard icon={Rss} title="নোটিশ বোর্ড" description="শিক্ষা বোর্ড ও মন্ত্রণালয়ের সকল নোটিশ।" href="/education-news" />
+            <section>
+              <h2 className="text-2xl font-bold text-center mb-6">নোটিশ বোর্ড</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <FeatureCard icon={Rss} title="বোর্ড ও মন্ত্রণালয়ের নোটিশ" description="শিক্ষা বোর্ড ও মন্ত্রণালয়ের সকল নোটিশ।" href="/education-news" />
+                <FeatureCard icon={Rss} title="পরীক্ষা ও ফলাফল" description="পরীক্ষার তারিখ ও ফলাফল প্রকাশের ঘোষণা।" href="/education-news" />
                 </div>
-          </section>
-
-          <Separator />
+            </section>
           
            {/* Tools & Features Section */}
           <section>
@@ -534,3 +529,5 @@ export default function Home() {
     </div>
   );
 }
+
+    
