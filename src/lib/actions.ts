@@ -233,5 +233,35 @@ async function searchInstituteResult(values: { eiin: string; exam: string; year:
     return result as InstituteResult | { error: string };
 }
 
+export async function uploadImage(formData: FormData): Promise<{ url?: string; error?: string }> {
+    try {
+        const response = await fetch("http://img.bdedu.me/upload", {
+            method: "POST",
+            body: formData,
+            headers: {
+                "Accept": "application/json",
+                "X-Requested-With": "XMLHttpRequest",
+            }
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error("Image upload failed with status:", response.status, "Response:", errorText);
+            throw new Error(`সার্ভার থেকে ত্রুটি: ${response.statusText}`);
+        }
+
+        const result = await response.json();
+
+        if (result.status === "success" && result.url) {
+            return { url: result.url };
+        } else {
+            throw new Error(result.error?.message || "ছবি আপলোড করার পর সার্ভার থেকে কোনো URL পাওয়া যায়নি।");
+        }
+    } catch (error: any) {
+        console.error("Image upload action failed:", error);
+        return { error: error.message || "ছবি আপলোড করার সময় একটি অপ্রত্যাশিত সমস্যা হয়েছে।" };
+    }
+}
+
 
 export { searchResultLegacy, searchInstituteResult };

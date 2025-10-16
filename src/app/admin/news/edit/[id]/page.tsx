@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useForm } from 'react-hook-form';
@@ -11,10 +12,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { getFirestore, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { app } from '@/lib/firebase';
-import { useState, useEffect, useCallback } from 'react';
-import { Loader2 } from 'lucide-react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { Loader2, Upload } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Loading from '@/app/loading';
+import { uploadImage } from '@/lib/actions';
 
 const newsPostSchema = z.object({
   title: z.string().min(1, 'শিরোনাম আবশ্যক।'),
@@ -29,10 +31,12 @@ const newsPostSchema = z.object({
 export default function EditNewsPage({ params }: { params: { id: string } }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
   const db = getFirestore(app);
   const router = useRouter();
   const { id } = params;
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<z.infer<typeof newsPostSchema>>({
     resolver: zodResolver(newsPostSchema),
@@ -63,6 +67,32 @@ export default function EditNewsPage({ params }: { params: { id: string } }) {
   useEffect(() => {
     fetchNewsData();
   }, [fetchNewsData]);
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    const result = await uploadImage(formData);
+
+    if (result.error) {
+        toast({
+            title: 'ছবি আপলোড ব্যর্থ হয়েছে',
+            description: result.error,
+            variant: 'destructive',
+        });
+    } else if (result.url) {
+        form.setValue('imageUrl', result.url, { shouldValidate: true });
+        toast({
+            title: 'সফল',
+            description: 'ছবি সফলভাবে আপলোড করা হয়েছে।',
+        });
+    }
+    setIsUploading(false);
+  };
 
   const onSubmit = async (values: z.infer<typeof newsPostSchema>) => {
     setIsSubmitting(true);
@@ -158,9 +188,16 @@ export default function EditNewsPage({ params }: { params: { id: string } }) {
                     render={({ field }) => (
                     <FormItem>
                         <FormLabel>ছবির লিঙ্ক</FormLabel>
-                        <FormControl>
-                        <Input type="url" placeholder="https://example.com/image.jpg" {...field} />
-                        </FormControl>
+                        <div className="flex items-center gap-2">
+                            <FormControl>
+                                <Input type="url" placeholder="https://example.com/image.jpg" {...field} />
+                            </FormControl>
+                            <Button type="button" variant="outline" onClick={() => fileInputRef.current?.click()} disabled={isUploading}>
+                                {isUploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                                <span className="ml-2">আপলোড</span>
+                            </Button>
+                        </div>
+                        <input type="file" ref={fileInputRef} onChange={handleImageUpload} accept="image/*" className="hidden" />
                         <FormMessage />
                     </FormItem>
                     )}
