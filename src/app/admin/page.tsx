@@ -66,7 +66,7 @@ const adminFeatures = [
         title: 'সেটিংস ও SEO',
         description: 'সাইটের SEO, অ্যানালিটিক্স এবং অন্যান্য সেটিংস পরিচালনা করুন।',
         icon: Settings,
-        href: '#site-settings'
+        href: '/admin/settings'
     },
     {
         title: 'বিজ্ঞাপন ম্যানেজমেন্ট',
@@ -97,32 +97,16 @@ export default function AdminPage() {
     const [isSendingSms, setIsSendingSms] = useState(false);
     const [smsMessage, setSmsMessage] = useState('');
     
-    // Site settings state
-    const [siteSettings, setSiteSettings] = useState({
-        showSubscriptionForm: true,
-        showNoticeBoard: true,
-        showAdmissionUpdate: true,
-        showEducationalResources: true,
-        showCareerHub: true,
-        showNewsSection: true,
-        showTools: true,
-        showCommunityForum: true,
-        activeSmsApi: 'anbu',
-    });
-    const [loadingSettings, setLoadingSettings] = useState(true);
-
 
     const db = getFirestore(app);
     const { toast } = useToast();
     
     const fetchAllData = useCallback(async () => {
         setLoading(true);
-        setLoadingSettings(true);
         try {
             const searchesRef = collection(db, 'search-history');
             const usersRef = collection(db, 'users');
             const subscriptionsRef = collection(db, 'subscriptions');
-            const settingsRef = doc(db, 'settings', 'config');
             
             // Temporarily simplified query to avoid composite index requirement
             const [
@@ -130,13 +114,11 @@ export default function AdminPage() {
                 totalSearchesSnap,
                 totalSubscriptionsSnap,
                 allUsersSnap,
-                settingsSnap
             ] = await Promise.all([
                 getCountFromServer(query(usersRef)),
                 getCountFromServer(query(searchesRef)),
                 getCountFromServer(query(subscriptionsRef)),
                 getDocs(query(usersRef, orderBy('name'))),
-                getDoc(settingsRef)
             ]);
             
             const subsCount = totalSubscriptionsSnap.data().count;
@@ -153,10 +135,6 @@ export default function AdminPage() {
 
             setUsers(allUsersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
             
-            if (settingsSnap.exists()) {
-                const settingsData = settingsSnap.data();
-                setSiteSettings(prev => ({ ...prev, ...settingsData }));
-            }
         } catch (error) {
             console.error("Error fetching admin data: ", error);
             // toast({
@@ -166,33 +144,12 @@ export default function AdminPage() {
             // });
         } finally {
             setLoading(false);
-            setLoadingSettings(false);
         }
     }, [db]);
 
     useEffect(() => {
         fetchAllData();
     }, [fetchAllData]);
-    
-    const handleSettingsChange = async (key: string, value: any) => {
-        setSiteSettings(prev => ({ ...prev, [key]: value }));
-        try {
-            const settingsRef = doc(db, 'settings', 'config');
-            await setDoc(settingsRef, { [key]: value }, { merge: true });
-            toast({
-                title: 'সেটিং সংরক্ষিত হয়েছে',
-            });
-        } catch (error: any) {
-            toast({
-                title: 'ত্রুটি',
-                description: 'সেটিং সংরক্ষণ করা যায়নি।',
-                variant: 'destructive',
-            });
-             // Revert UI change on error
-             setSiteSettings(prev => ({ ...prev, [key]: !value }));
-        }
-    };
-    
 
     const handleBulkSendSms = async () => {
         if (!smsMessage.trim()) {
@@ -326,83 +283,6 @@ export default function AdminPage() {
                                 {isSendingSms ? 'পাঠানো হচ্ছে...' : `সকল ${subscriptionsCount} সাবস্ক্রাইবারকে SMS পাঠান`}
                             </Button>
                         </div>
-                    </CardContent>
-                </Card>
-                
-                 <Card id="site-settings">
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                            <Settings className="h-6 w-6" />
-                            সাইট সেটিংস
-                        </CardTitle>
-                        <CardDescription>
-                            সাইটের বিভিন্ন ফিচার ও কনফিগারেশন পরিচালনা করুন।
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-6">
-                        {loadingSettings ? (
-                           <div className="space-y-4">
-                               {[...Array(5)].map((_, i) => <Skeleton key={i} className="h-8 w-full" />)}
-                           </div>
-                        ) : (
-                            <>
-                                <div className="space-y-4">
-                                    <h4 className="font-medium">হোমপেজ সেকশন ম্যানেজমেন্ট</h4>
-                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                        <div className="flex items-center space-x-2">
-                                            <Switch id="notice-board-toggle" checked={siteSettings.showNoticeBoard} onCheckedChange={(c) => handleSettingsChange('showNoticeBoard', c)} />
-                                            <Label htmlFor="notice-board-toggle">নোটিশ বোর্ড</Label>
-                                        </div>
-                                        <div className="flex items-center space-x-2">
-                                            <Switch id="admission-update-toggle" checked={siteSettings.showAdmissionUpdate} onCheckedChange={(c) => handleSettingsChange('showAdmissionUpdate', c)} />
-                                            <Label htmlFor="admission-update-toggle">ভর্তি আপডেট</Label>
-                                        </div>
-                                        <div className="flex items-center space-x-2">
-                                            <Switch id="educational-resources-toggle" checked={siteSettings.showEducationalResources} onCheckedChange={(c) => handleSettingsChange('showEducationalResources', c)} />
-                                            <Label htmlFor="educational-resources-toggle">শিক্ষামূলক রিসোর্স</Label>
-                                        </div>
-                                        <div className="flex items-center space-x-2">
-                                            <Switch id="career-hub-toggle" checked={siteSettings.showCareerHub} onCheckedChange={(c) => handleSettingsChange('showCareerHub', c)} />
-                                            <Label htmlFor="career-hub-toggle">ক্যারিয়ার হাব</Label>
-                                        </div>
-                                        <div className="flex items-center space-x-2">
-                                            <Switch id="news-section-toggle" checked={siteSettings.showNewsSection} onCheckedChange={(c) => handleSettingsChange('showNewsSection', c)} />
-                                            <Label htmlFor="news-section-toggle">শিক্ষা সংবাদ</Label>
-                                        </div>
-                                        <div className="flex items-center space-x-2">
-                                            <Switch id="tools-toggle" checked={siteSettings.showTools} onCheckedChange={(c) => handleSettingsChange('showTools', c)} />
-                                            <Label htmlFor="tools-toggle">টুলস ও ফিচার</Label>
-                                        </div>
-                                        <div className="flex items-center space-x-2">
-                                            <Switch id="community-forum-toggle" checked={siteSettings.showCommunityForum} onCheckedChange={(c) => handleSettingsChange('showCommunityForum', c)} />
-                                            <Label htmlFor="community-forum-toggle">কমিউনিটি ফোরাম</Label>
-                                        </div>
-                                        <div className="flex items-center space-x-2">
-                                            <Switch id="subscription-form-toggle" checked={siteSettings.showSubscriptionForm} onCheckedChange={(c) => handleSettingsChange('showSubscriptionForm', c)} />
-                                            <Label htmlFor="subscription-form-toggle">ফলাফল অ্যালার্ট ফর্ম</Label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <Separator />
-                                <div>
-                                    <Label className="mb-2 block font-medium">সক্রিয় SMS গেটওয়ে</Label>
-                                    <RadioGroup
-                                        value={siteSettings.activeSmsApi}
-                                        onValueChange={(v) => handleSettingsChange('activeSmsApi', v)}
-                                        className="flex flex-col space-y-1"
-                                    >
-                                        <div className="flex items-center space-x-2">
-                                            <RadioGroupItem value="anbu" id="anbu" />
-                                            <Label htmlFor="anbu">ANBU SMS</Label>
-                                        </div>
-                                        <div className="flex items-center space-x-2">
-                                            <RadioGroupItem value="bulksmsbd" id="bulksmsbd" />
-                                            <Label htmlFor="bulksmsbd">BulkSMSBD</Label>
-                                        </div>
-                                    </RadioGroup>
-                                </div>
-                            </>
-                        )}
                     </CardContent>
                 </Card>
             </div>
