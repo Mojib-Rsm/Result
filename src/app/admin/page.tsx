@@ -391,10 +391,10 @@ export default function AdminPage() {
     };
 
 
-    const TableSkeleton = () => (
+    const TableSkeleton = ({ columns }: { columns: number }) => (
         [...Array(5)].map((_, i) => (
             <TableRow key={i}>
-                {[...Array(5)].map((_, j) => (
+                {[...Array(columns)].map((_, j) => (
                      <TableCell key={j}><Skeleton className="h-4 w-full" /></TableCell>
                 ))}
             </TableRow>
@@ -584,8 +584,10 @@ export default function AdminPage() {
                         <Table>
                             <TableHeader>
                                 <TableRow>
+                                    <TableHead>নাম</TableHead>
                                     <TableHead>রোল</TableHead>
                                     <TableHead>রেজি. নম্বর</TableHead>
+                                    <TableHead>বোর্ড</TableHead>
                                     <TableHead>পরীক্ষা</TableHead>
                                     <TableHead>বছর</TableHead>
                                     <TableHead>GPA</TableHead>
@@ -593,12 +595,14 @@ export default function AdminPage() {
                             </TableHeader>
                             <TableBody>
                                 {loading ? (
-                                    <TableSkeleton />
+                                    <TableSkeleton columns={7} />
                                 ) : recentSearches.length > 0 ? (
                                     recentSearches.map(result => (
                                         <TableRow key={result.id}>
+                                            <TableCell>{result.result?.studentInfo?.name || 'N/A'}</TableCell>
                                             <TableCell>{result.roll}</TableCell>
                                             <TableCell>{result.reg}</TableCell>
+                                            <TableCell className="capitalize">{result.board}</TableCell>
                                             <TableCell className="uppercase">{result.exam}</TableCell>
                                             <TableCell>{result.year}</TableCell>
                                             <TableCell>{result.result?.gpa?.toFixed(2) || 'N/A'}</TableCell>
@@ -606,7 +610,7 @@ export default function AdminPage() {
                                     ))
                                 ) : (
                                     <TableRow>
-                                        <TableCell colSpan={5} className="text-center">কোনো সাম্প্রতিক অনুসন্ধান নেই।</TableCell>
+                                        <TableCell colSpan={7} className="text-center">কোনো সাম্প্রতিক অনুসন্ধান নেই।</TableCell>
                                     </TableRow>
                                 )}
                             </TableBody>
@@ -639,7 +643,7 @@ export default function AdminPage() {
                                 </TableHeader>
                                 <TableBody>
                                     {loading ? (
-                                        <TableSkeleton />
+                                        <TableSkeleton columns={7} />
                                     ) : subscriptions.length > 0 ? (
                                         subscriptions.map(sub => (
                                         <TableRow key={sub.id}>
@@ -755,7 +759,5 @@ export default function AdminPage() {
         </div>
     );
 }
-
-    
 
     
