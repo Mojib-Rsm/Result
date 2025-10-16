@@ -19,14 +19,14 @@ import { getFirestore, doc, getDoc } from 'firebase/firestore';
 import { app } from '@/lib/firebase';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
-import { Bell, BookOpen, Briefcase, Calendar, FileText, Rss, ExternalLink, Calculator, MessageSquare, ListChecks, Phone, Trash2, Plus } from 'lucide-react';
+import { Bell, BookOpen, Briefcase, Calendar, FileText, Rss, ExternalLink, Calculator, MessageSquare, ListChecks, Phone, Trash2, Plus, MessageCircleQuestion, MessagesSquare } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Image from 'next/image';
 import { formatDistanceToNow } from 'date-fns';
 import { bn } from 'date-fns/locale';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 
 interface NewsArticle {
     title: string;
@@ -461,6 +461,48 @@ export default function Home() {
                       </CardHeader>
                       <CardContent>
                          <p className="text-muted-foreground">Coming soon...</p>
+                      </CardContent>
+                  </Card>
+              </div>
+          </section>
+
+          <Separator />
+
+          <section>
+              <h2 className="text-2xl font-bold text-center mb-6">স্টুডেন্ট কমিউনিটি ফোরাম</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <Card>
+                      <CardHeader>
+                          <CardTitle className="flex items-center gap-3">
+                              <MessageCircleQuestion className="h-6 w-6" /> প্রশ্নোত্তর পর্ব (Q&A)
+                          </CardTitle>
+                          <CardDescription>
+                              আপনার প্রশ্নটি এখানে জমা দিন এবং কমিউনিটির কাছ থেকে উত্তর পান।
+                          </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                          <form className="space-y-4">
+                              <Textarea placeholder="আপনার প্রশ্নটি এখানে লিখুন..." />
+                              <Button className="w-full">প্রশ্ন জমা দিন</Button>
+                          </form>
+                      </CardContent>
+                      <CardFooter>
+                          <p className="text-xs text-muted-foreground">শীঘ্রই আসছে আরও ফিচার...</p>
+                      </CardFooter>
+                  </Card>
+                  <Card>
+                      <CardHeader>
+                          <CardTitle className="flex items-center gap-3">
+                              <MessagesSquare className="h-6 w-6" /> আলোচনা ও মন্তব্য
+                          </CardTitle>
+                          <CardDescription>
+                              শিক্ষার্থীরা এখানে বিভিন্ন বিষয় নিয়ে আলোচনা করতে পারেন।
+                          </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                          <div className="border-2 border-dashed rounded-lg p-8 text-center">
+                              <p className="text-muted-foreground">আলোচনা বোর্ড শীঘ্রই আসছে...</p>
+                          </div>
                       </CardContent>
                   </Card>
               </div>
