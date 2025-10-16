@@ -397,6 +397,40 @@ export default function Home() {
           
 
           <Separator />
+          
+          <section>
+              <h2 className="text-2xl font-bold text-center mb-6">ভর্তি ও পরীক্ষার আপডেট</h2>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Card className="hover:shadow-lg transition-shadow">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-3">
+                            <BookOpen className="h-6 w-6 text-primary" /> ভর্তি তথ্য
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <CardDescription>বিশ্ববিদ্যালয় ও কলেজ ভর্তি সংক্রান্ত সকল তথ্য।</CardDescription>
+                    </CardContent>
+                    <CardFooter>
+                         <Button variant="link" asChild><Link href="/suggestions">আরও দেখুন...</Link></Button>
+                    </CardFooter>
+                </Card>
+                <Card className="hover:shadow-lg transition-shadow">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-3">
+                            <Calendar className="h-6 w-6 text-primary" /> পরীক্ষার সময়সূচী
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                       <CardDescription>সকল পাবলিক পরীক্ষার সময়সূচী ও রুটিন।</CardDescription>
+                    </CardContent>
+                     <CardFooter>
+                         <Button variant="link" asChild><Link href="#">আরও দেখুন...</Link></Button>
+                    </CardFooter>
+                </Card>
+                </div>
+            </section>
+
+          <Separator />
 
             <section>
               <h2 className="text-2xl font-bold text-center mb-6">নোটিশ বোর্ড</h2>
@@ -628,5 +662,7 @@ export default function Home() {
     </div>
   );
 }
+
+    
 
     
