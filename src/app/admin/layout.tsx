@@ -30,18 +30,22 @@ export default function AdminLayout({
     const pathname = usePathname();
 
     useEffect(() => {
-        if (!loading && !user) {
+        if (!loading && !user && pathname !== '/login') {
             router.push('/login');
         }
-    }, [user, loading, router]);
+    }, [user, loading, router, pathname]);
     
     const handleLogout = () => {
         logout();
         router.push('/login');
     }
 
-    if (loading || !user) {
+    if (loading) {
         return <Loading />;
+    }
+
+    if (!user && pathname !== '/login') {
+      return <Loading />;
     }
 
     return (
