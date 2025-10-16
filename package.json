@@ -1,8 +1,8 @@
 
 {
-  "name": "bd-edu-result",
+  "name": "bd-edu-hub",
   "version": "1.0.0",
-  "description": "A web application to check Bangladesh Education Board results.",
+  "description": "BD Edu - Education & Career Hub. Your one-stop platform for all educational needs in Bangladesh.",
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack",
