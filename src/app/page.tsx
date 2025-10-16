@@ -271,12 +271,12 @@ export default function Home() {
 
   const contentSections = [
     { name: 'showNoticeBoard', title: 'নোটিশ বোর্ড', icon: Rss, link: '/education-news', items: [
-        { title: 'বোর্ড ও মন্ত্রণালয়ের নোটিশ', description: 'শিক্ষা বোর্ড ও মন্ত্রণালয়ের সকল নোটিশ।', link: '/education-news' },
-        { title: 'পরীক্ষা ও ফলাফল', description: 'পরীক্ষার তারিখ ও ফলাফল প্রকাশের ঘোষণা।', link: '/education-news' },
+        { icon: Rss, title: 'বোর্ড ও মন্ত্রণালয়ের নোটিশ', description: 'শিক্ষা বোর্ড ও মন্ত্রণালয়ের সকল নোটিশ।', link: '/education-news/board-and-ministry' },
+        { icon: Calendar, title: 'পরীক্ষা ও ফলাফল', description: 'পরীক্ষার তারিখ ও ফলাফল প্রকাশের ঘোষণা।', link: '/education-news/exam-and-results' },
     ]},
     { name: 'showAdmissionUpdate', title: 'ভর্তি নির্দেশনা', icon: BookOpen, link: '/suggestions', items: [
-        { title: 'ভর্তি তথ্য', description: 'বিশ্ববিদ্যালয় ও কলেজ ভর্তি সংক্রান্ত সকল তথ্য।', link: '/suggestions' },
-        { title: 'পরীক্ষার সময়সূচী', description: 'সকল পাবলিক পরীক্ষার সময়সূচী ও রুটিন।', link: '/education-news' },
+        { icon: BookOpen, title: 'ভর্তি তথ্য', description: 'বিশ্ববিদ্যালয় ও কলেজ ভর্তি সংক্রান্ত সকল তথ্য।', link: '/suggestions' },
+        { icon: Calendar, title: 'পরীক্ষার সময়সূচী', description: 'সকল পাবলিক পরীক্ষার সময়সূচী ও রুটিন।', link: '/education-news' },
     ]},
     { name: 'showEducationalResources', title: 'রেজাল্ট গাইড', icon: FileText, link: '/suggestions', items: [
         { icon: FileText, title: 'মডেল টেস্ট / সাজেশন', description: 'পরীক্ষার প্রস্তুতির জন্য মডেল টেস্ট ও সাজেশন।', link: '/suggestions' },

@@ -7,6 +7,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const staticPages = [
     '/',
     '/education-news',
+    '/education-news/board-and-ministry',
+    '/education-news/exam-and-results',
     '/institute-result',
     '/suggestions',
     '/statistics',
