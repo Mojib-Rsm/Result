@@ -239,13 +239,13 @@ export async function uploadImage(formData: FormData): Promise<{ url?: string; e
             method: "POST",
             body: formData,
             headers: {
-                "Accept": "application/json",
+                "Accept": "application/json, text/plain, */*",
                 "Accept-Language": "en-GB,en-US;q=0.9,en;q=0.8,ne;q=0.7,bn;q=0.6",
                 "Cache-Control": "no-cache",
-                "X-Requested-With": "XMLHttpRequest",
+                "x-csrf-token": "9oswLCk1qgrnmedhyL1O1ZEnkNYg6cDbdlud4PIH",
+                "x-requested-with": "XMLHttpRequest",
                 "Origin": "http://img.bdedu.me",
                 "Referer": "http://img.bdedu.me/?upload=1",
-                "x-csrf-token": "9oswLCk1qgrnmedhyL1O1ZEnkNYg6cDbdlud4PIH"
             }
         });
 
@@ -255,13 +255,26 @@ export async function uploadImage(formData: FormData): Promise<{ url?: string; e
             throw new Error(`সার্ভার থেকে ত্রুটি: ${response.statusText}`);
         }
 
-        const result = await response.json();
-
-        if (result.status === "success" && result.url) {
-            return { url: result.url };
-        } else {
-            throw new Error(result.error?.message || "ছবি আপলোড করার পর সার্ভার থেকে কোনো URL পাওয়া যায়নি।");
+        const responseText = await response.text();
+        
+        try {
+            const result = JSON.parse(responseText);
+             if (result.status === "success" && result.url) {
+                return { url: result.url };
+            } else {
+                throw new Error(result.error?.message || "ছবি আপলোড করার পর সার্ভার থেকে কোনো URL পাওয়া যায়নি।");
+            }
+        } catch(e) {
+            // If response is not JSON, it might be HTML with the URL.
+            const dom = new JSDOM(responseText);
+            const urlInput = dom.window.document.querySelector('input[data-action="copy-to-clipboard"]');
+            if(urlInput){
+                const url = (urlInput as HTMLInputElement).value;
+                if(url) return { url };
+            }
+            throw new Error("সার্ভার থেকে একটি অপ্রত্যাশিত প্রতিক্রিয়া এসেছে।");
         }
+
     } catch (error: any) {
         console.error("Image upload action failed:", error);
         return { error: error.message || "ছবি আপলোড করার সময় একটি অপ্রত্যাশিত সমস্যা হয়েছে।" };
@@ -270,3 +283,4 @@ export async function uploadImage(formData: FormData): Promise<{ url?: string; e
 
 
 export { searchResultLegacy, searchInstituteResult };
+
