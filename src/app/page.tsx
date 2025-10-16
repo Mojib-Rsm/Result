@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -21,8 +22,6 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { Bell, BookOpen, Briefcase, Calendar, FileText, Rss, ExternalLink, Calculator, Phone, Trash2, Plus, MessageCircleQuestion, MessagesSquare, UserPlus, Award, Sparkles } from 'lucide-react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Image from 'next/image';
-import { formatDistanceToNow } from 'date-fns';
-import { bn } from 'date-fns/locale';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
@@ -245,7 +244,7 @@ export default function Home() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       exam: 'hsc',
-      year: '2025',
+      year: String(new Date().getFullYear()),
       board: '',
       roll: '',
       reg: '',
@@ -422,7 +421,7 @@ export default function Home() {
                           <CardDescription>বিশ্ববিদ্যালয় ও কলেজ ভর্তি সংক্রান্ত সকল তথ্য।</CardDescription>
                       </CardContent>
                       <CardFooter>
-                         <Button variant="link" asChild><Link href="#">আরও দেখুন...</Link></Button>
+                         <Button variant="link" asChild><Link href="/suggestions">আরও দেখুন...</Link></Button>
                       </CardFooter>
                   </Card>
                   <Card className="hover:shadow-lg transition-shadow">
@@ -435,7 +434,7 @@ export default function Home() {
                          <CardDescription>সকল পাবলিক পরীক্ষার সময়সূচী ও রুটিন।</CardDescription>
                       </CardContent>
                        <CardFooter>
-                         <Button variant="link" asChild><Link href="#">আরও দেখুন...</Link></Button>
+                         <Button variant="link" asChild><Link href="/education-news">আরও দেখুন...</Link></Button>
                       </CardFooter>
                   </Card>
               </div>
@@ -457,7 +456,7 @@ export default function Home() {
                           <CardDescription>পরীক্ষার প্রস্তুতির জন্য মডেল টেস্ট ও সাজেশন।</CardDescription>
                       </CardContent>
                       <CardFooter>
-                         <Button variant="link" asChild><Link href="#">আরও দেখুন...</Link></Button>
+                         <Button variant="link" asChild><Link href="/suggestions">আরও দেখুন...</Link></Button>
                       </CardFooter>
                   </Card>
                   <Card className="hover:shadow-lg transition-shadow">
@@ -470,7 +469,7 @@ export default function Home() {
                          <CardDescription>SSC, HSC ও বিশ্ববিদ্যালয় ভর্তি গাইড।</CardDescription>
                       </CardContent>
                        <CardFooter>
-                         <Button variant="link" asChild><Link href="#">আরও দেখুন...</Link></Button>
+                         <Button variant="link" asChild><Link href="/suggestions">আরও দেখুন...</Link></Button>
                       </CardFooter>
                   </Card>
                    <Card className="hover:shadow-lg transition-shadow">
@@ -483,7 +482,7 @@ export default function Home() {
                          <CardDescription>প্রয়োজনীয় বই ও নোটস ডাউনলোড করুন।</CardDescription>
                       </CardContent>
                        <CardFooter>
-                         <Button variant="link" asChild><Link href="#">আরও দেখুন...</Link></Button>
+                         <Button variant="link" asChild><Link href="/suggestions">আরও দেখুন...</Link></Button>
                       </CardFooter>
                   </Card>
               </div>
@@ -503,7 +502,7 @@ export default function Home() {
                            <CardDescription>শিক্ষা ক্ষেত্রে সর্বশেষ চাকরির খবর ও বিজ্ঞপ্তি।</CardDescription>
                       </CardHeader>
                       <CardFooter>
-                         <Button variant="link" asChild><Link href="#">আরও দেখুন...</Link></Button>
+                         <Button variant="link" asChild><Link href="/education-news">আরও দেখুন...</Link></Button>
                       </CardFooter>
                   </Card>
                   <Card className="hover:shadow-lg transition-shadow">
@@ -514,7 +513,7 @@ export default function Home() {
                            <CardDescription>সরকারি-বেসরকারি স্কুল, কলেজ ও বিশ্ববিদ্যালয়ে শিক্ষক নিয়োগের আপডেট।</CardDescription>
                       </CardHeader>
                        <CardFooter>
-                         <Button variant="link" asChild><Link href="#">আরও দেখুন...</Link></Button>
+                         <Button variant="link" asChild><Link href="/education-news">আরও দেখুন...</Link></Button>
                       </CardFooter>
                   </Card>
                    <Card className="hover:shadow-lg transition-shadow">
@@ -525,7 +524,7 @@ export default function Home() {
                             <CardDescription>দেশ-বিদেশের বিভিন্ন স্কলারশিপ ও ইন্টার্নশিপের সুযোগ।</CardDescription>
                       </CardHeader>
                        <CardFooter>
-                         <Button variant="link" asChild><Link href="#">আরও দেখুন...</Link></Button>
+                         <Button variant="link" asChild><Link href="/education-news">আরও দেখুন...</Link></Button>
                       </CardFooter>
                   </Card>
                   <Card className="hover:shadow-lg transition-shadow">
@@ -536,7 +535,7 @@ export default function Home() {
                             <CardDescription>সফল ক্যারিয়ার গড়ার জন্য সিভি তৈরি, ভাইভা প্রস্তুতি ও অন্যান্য টিপস।</CardDescription>
                       </CardHeader>
                        <CardFooter>
-                         <Button variant="link" asChild><Link href="#">আরও দেখুন...</Link></Button>
+                         <Button variant="link" asChild><Link href="/education-news">আরও দেখুন...</Link></Button>
                       </CardFooter>
                   </Card>
               </div>
@@ -654,3 +653,5 @@ export default function Home() {
     </div>
   );
 }
+
+    

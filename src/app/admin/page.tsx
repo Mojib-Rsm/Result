@@ -1,3 +1,4 @@
+
 'use client'
 
 import { useState, useEffect, useCallback } from 'react';
@@ -99,77 +100,77 @@ export default function AdminPage() {
     const db = getFirestore(app);
     const { toast } = useToast();
     
-    useEffect(() => {
-        const fetchAllData = async () => {
-            setLoading(true);
-            setLoadingSettings(true);
-            try {
-                const today = new Date();
-                const startOfToday = startOfDay(today);
-                const startOf7DaysAgo = startOfDay(subDays(today, 7));
-                const startOf30DaysAgo = startOfDay(subDays(today, 30));
+    const fetchAllData = useCallback(async () => {
+        setLoading(true);
+        setLoadingSettings(true);
+        try {
+            const today = new Date();
+            const startOfToday = startOfDay(today);
+            const startOf7DaysAgo = startOfDay(subDays(today, 7));
+            const startOf30DaysAgo = startOfDay(subDays(today, 30));
 
-                const searchesRef = collection(db, 'search-history');
-                const usersRef = collection(db, 'users');
-                const subscriptionsRef = collection(db, 'subscriptions');
-                const settingsRef = doc(db, 'settings', 'config');
-                
-                const [
-                    totalUsersSnap,
-                    totalSearchesSnap,
-                    todaysSearchesSnap,
-                    last7DaysSearchesSnap,
-                    last30DaysSearchesSnap,
-                    totalSubscriptionsSnap,
-                    allUsersSnap,
-                    settingsSnap
-                ] = await Promise.all([
-                    getCountFromServer(query(usersRef)),
-                    getCountFromServer(query(searchesRef)),
-                    getCountFromServer(query(searchesRef, where('timestamp', '>=', startOfToday))),
-                    getCountFromServer(query(searchesRef, where('timestamp', '>=', startOf7DaysAgo))),
-                    getCountFromServer(query(searchesRef, where('timestamp', '>=', startOf30DaysAgo))),
-                    getCountFromServer(query(subscriptionsRef)),
-                    getDocs(query(usersRef, orderBy('name'))),
-                    getDoc(settingsRef)
-                ]);
-                
-                const subsCount = totalSubscriptionsSnap.data().count;
-                setSubscriptionsCount(subsCount);
-                
-                setStats({
-                    totalUsers: totalUsersSnap.data().count,
-                    totalSearches: totalSearchesSnap.data().count,
-                    todaysSearches: todaysSearchesSnap.data().count,
-                    searchesLast7Days: last7DaysSearchesSnap.data().count,
-                    searchesLast30Days: last30DaysSearchesSnap.data().count,
-                    totalSubscriptions: subsCount,
-                });
+            const searchesRef = collection(db, 'search-history');
+            const usersRef = collection(db, 'users');
+            const subscriptionsRef = collection(db, 'subscriptions');
+            const settingsRef = doc(db, 'settings', 'config');
+            
+            const [
+                totalUsersSnap,
+                totalSearchesSnap,
+                todaysSearchesSnap,
+                last7DaysSearchesSnap,
+                last30DaysSearchesSnap,
+                totalSubscriptionsSnap,
+                allUsersSnap,
+                settingsSnap
+            ] = await Promise.all([
+                getCountFromServer(query(usersRef)),
+                getCountFromServer(query(searchesRef)),
+                getCountFromServer(query(searchesRef, where('timestamp', '>=', startOfToday))),
+                getCountFromServer(query(searchesRef, where('timestamp', '>=', startOf7DaysAgo))),
+                getCountFromServer(query(searchesRef, where('timestamp', '>=', startOf30DaysAgo))),
+                getCountFromServer(query(subscriptionsRef)),
+                getDocs(query(usersRef, orderBy('name'))),
+                getDoc(settingsRef)
+            ]);
+            
+            const subsCount = totalSubscriptionsSnap.data().count;
+            setSubscriptionsCount(subsCount);
+            
+            setStats({
+                totalUsers: totalUsersSnap.data().count,
+                totalSearches: totalSearchesSnap.data().count,
+                todaysSearches: todaysSearchesSnap.data().count,
+                searchesLast7Days: last7DaysSearchesSnap.data().count,
+                searchesLast30Days: last30DaysSearchesSnap.data().count,
+                totalSubscriptions: subsCount,
+            });
 
-                setUsers(allUsersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-                
-                if (settingsSnap.exists()) {
-                    const settingsData = settingsSnap.data();
-                    setShowSubscriptionForm(settingsData.showSubscriptionForm);
-                    setActiveSmsApi(settingsData.activeSmsApi || 'anbu');
-                }
-
-
-            } catch (error) {
-                console.error("Error fetching admin data: ", error);
-                toast({
-                    title: "ত্রুটি",
-                    description: "অ্যাডমিন ডেটা আনতে সমস্যা হয়েছে।",
-                    variant: "destructive",
-                });
-            } finally {
-                setLoading(false);
-                setLoadingSettings(false);
+            setUsers(allUsersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+            
+            if (settingsSnap.exists()) {
+                const settingsData = settingsSnap.data();
+                setShowSubscriptionForm(settingsData.showSubscriptionForm);
+                setActiveSmsApi(settingsData.activeSmsApi || 'anbu');
             }
-        };
 
-        fetchAllData();
+
+        } catch (error) {
+            console.error("Error fetching admin data: ", error);
+            toast({
+                title: "ত্রুটি",
+                description: "অ্যাডমিন ডেটা আনতে সমস্যা হয়েছে।",
+                variant: "destructive",
+            });
+        } finally {
+            setLoading(false);
+            setLoadingSettings(false);
+        }
     }, [db, toast]);
+
+    useEffect(() => {
+        fetchAllData();
+    }, [fetchAllData]);
     
     const handleSettingsChange = async (key: string, value: any) => {
         try {
@@ -429,3 +430,5 @@ export default function AdminPage() {
         </div>
     );
 }
+
+    
