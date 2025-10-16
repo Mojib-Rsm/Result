@@ -47,7 +47,7 @@ export default function EditJobPage({ params }: { params: { id: string } }) {
   const { toast } = useToast();
   const db = getFirestore(app);
   const router = useRouter();
-  const { id } = params;
+  const id = params.id;
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<z.infer<typeof jobPostSchema>>({
