@@ -26,7 +26,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/suggestions/polytechnic-institutes',
     '/career',
     '/career/post-job',
-    '/seeding'
+    '/seeding',
+    '/about-us',
+    '/contact-us',
+    '/privacy-policy',
+    '/disclaimer',
+    '/terms-and-conditions'
   ];
 
   const sitemapEntries: MetadataRoute.Sitemap = staticPages.map((path) => ({
