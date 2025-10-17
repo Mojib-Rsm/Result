@@ -276,7 +276,7 @@ export default function Home() {
     ]},
     { name: 'showAdmissionUpdate', title: 'ভর্তি নির্দেশনা', icon: BookOpen, link: '/suggestions', items: [
         { icon: BookOpen, title: 'ভর্তি তথ্য', description: 'বিশ্ববিদ্যালয় ও কলেজ ভর্তি সংক্রান্ত সকল তথ্য।', link: '/suggestions' },
-        { icon: Calendar, title: 'পরীক্ষার সময়সূচী', description: 'সকল পাবলিক পরীক্ষার সময়সূচী ও রুটিন।', link: '/education-news' },
+        { icon: Calendar, title: 'পরীক্ষার সময়সূচী', description: 'সকল পাবলিক পরীক্ষার সময়সূচী ও রুটিন।', link: '/education-news/exam-and-results' },
     ]},
     { name: 'showEducationalResources', title: 'রেজাল্ট গাইড', icon: FileText, link: '/suggestions', items: [
         { icon: FileText, title: 'মডেল টেস্ট / সাজেশন', description: 'পরীক্ষার প্রস্তুতির জন্য মডেল টেস্ট ও সাজেশন।', link: '/suggestions/model-test' },
