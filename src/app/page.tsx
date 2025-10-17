@@ -279,9 +279,9 @@ export default function Home() {
         { icon: Calendar, title: 'পরীক্ষার সময়সূচী', description: 'সকল পাবলিক পরীক্ষার সময়সূচী ও রুটিন।', link: '/education-news' },
     ]},
     { name: 'showEducationalResources', title: 'রেজাল্ট গাইড', icon: FileText, link: '/suggestions', items: [
-        { icon: FileText, title: 'মডেল টেস্ট / সাজেশন', description: 'পরীক্ষার প্রস্তুতির জন্য মডেল টেস্ট ও সাজেশন।', link: '/suggestions' },
-        { icon: BookOpen, title: 'স্টাডি গাইড', description: 'SSC, HSC ও বিশ্ববিদ্যালয় ভর্তি গাইড।', link: '/suggestions' },
-        { icon: Download, title: 'eBook / PDF নোটস', description: 'প্রয়োজনীয় বই ও নোটস ডাউনলোড করুন।', link: '/suggestions' },
+        { icon: FileText, title: 'মডেল টেস্ট / সাজেশন', description: 'পরীক্ষার প্রস্তুতির জন্য মডেল টেস্ট ও সাজেশন।', link: '/suggestions/model-test' },
+        { icon: BookOpen, title: 'স্টাডি গাইড', description: 'SSC, HSC ও বিশ্ববিদ্যালয় ভর্তি গাইড।', link: '/suggestions/study-guide' },
+        { icon: Download, title: 'eBook / PDF নোটস', description: 'প্রয়োজনীয় বই ও নোটস ডাউনলোড করুন।', link: '/suggestions/ebook-pdf-notes' },
     ]},
     { name: 'showCareerHub', title: 'ক্যারিয়ার হাব', icon: Briefcase, link: '/career', items: [
         { title: 'শিক্ষা সংক্রান্ত চাকরি', icon: Briefcase, description: 'শিক্ষা ক্ষেত্রে সর্বশেষ চাকরির খবর ও বিজ্ঞপ্তি।', link: '/career/education-jobs'},
