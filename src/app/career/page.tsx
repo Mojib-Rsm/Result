@@ -12,29 +12,9 @@ import Image from 'next/image';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter, DialogTrigger } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { ExternalLink, Briefcase, MapPin, Clock, Building, BadgeDollarSign } from 'lucide-react';
+import { ExternalLink, Briefcase, MapPin, Clock, Building } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { JobPost } from '@/types';
-
-const TakaIcon = (props: React.SVGProps<SVGSVGElement>) => (
-    <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        {...props}
-    >
-        <path d="M4 12h12" />
-        <path d="M10 4v14" />
-        <path d="M6 4h8a2 2 0 0 1 2 2v0a2 2 0 0 1-2 2h- период" />
-        <path d="M12 12v6" />
-        <path d="M10 18h4" />
-    </svg>
-);
-
 
 export default function CareerPage() {
     const [jobs, setJobs] = useState<JobPost[]>([]);
@@ -105,7 +85,7 @@ export default function CareerPage() {
             <ScrollArea className="max-h-[70vh] pr-4">
                  <div className="flex flex-wrap gap-x-6 gap-y-3 my-4 text-sm">
                     <div className="flex items-center gap-2"><Briefcase className="h-4 w-4 text-primary" /> {job.type}</div>
-                    {job.salary && <div className="flex items-center gap-2"><TakaIcon className="h-4 w-4 text-primary" />বেতন: {job.salary}</div>}
+                    {job.salary && <div className="flex items-center gap-2"><span className="text-primary font-bold text-lg">৳</span>বেতন: {job.salary}</div>}
                     <div className="flex items-center gap-2"><Clock className="h-4 w-4 text-primary" /> শেষ তারিখ: {new Date(job.deadline).toLocaleDateString('bn-BD')}</div>
                 </div>
 
