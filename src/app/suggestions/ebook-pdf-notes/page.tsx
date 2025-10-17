@@ -66,9 +66,6 @@ export default function EbookPdfNotesPage() {
                     </Table>
                 </CardContent>
             </Card>
-            <p className="text-muted-foreground text-sm mt-4 text-center">
-                (দ্রষ্টব্য: এটি একটি ডেমো তালিকা। ডাউনলোড লিঙ্কগুলো বর্তমানে নিষ্ক্রিয় রয়েছে।)
-            </p>
         </div>
     );
 }

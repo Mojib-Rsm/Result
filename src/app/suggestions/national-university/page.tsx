@@ -111,9 +111,6 @@ export default function NationalUniversityPage() {
                     </Table>
                 </CardContent>
             </Card>
-             <p className="text-muted-foreground text-sm mt-4 text-center">
-                (দ্রষ্টব্য: এটি একটি সংক্ষিপ্ত তালিকা। ভর্তির জন্য সংশ্লিষ্ট প্রতিষ্ঠানের অফিসিয়াল ওয়েবসাইট দেখুন।)
-            </p>
         </div>
     );
 }

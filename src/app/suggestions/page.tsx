@@ -60,7 +60,7 @@ export default function SuggestionsPage() {
                 </p>
                 {gpa && (
                     <p className="mt-4 text-xl font-semibold text-primary">
-                        আপনার প্রাপ্ত GPA: {gpa}
+                        আপনার প্রাপ্ত GPA: {gpa}. আপনার জন্য সেরা প্রতিষ্ঠানগুলোর একটি তালিকা নিচে দেওয়া হলো।
                     </p>
                 )}
             </div>
@@ -92,12 +92,6 @@ export default function SuggestionsPage() {
                         </CardFooter>
                     </Card>
                 ))}
-            </div>
-
-            <div className="mt-12 text-center">
-                 <p className="text-muted-foreground text-sm">
-                    (দ্রষ্টব্য: এটি একটি পরীক্ষামূলক ফিচার। প্রদত্ত তথ্য রেফারেন্স হিসেবে ব্যবহার করুন। ভর্তির জন্য সংশ্লিষ্ট প্রতিষ্ঠানের অফিসিয়াল ওয়েবসাইট দেখুন।)
-                </p>
             </div>
         </div>
     );
