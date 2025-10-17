@@ -17,6 +17,7 @@ import { Loader2, Upload } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
 import { uploadImage } from '@/lib/actions';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 
 const newsPostSchema = z.object({
@@ -27,6 +28,7 @@ const newsPostSchema = z.object({
   source: z.string().optional(),
   link: z.string().url('অনুগ্রহ করে একটি বৈধ খবরের লিঙ্ক দিন।').optional().or(z.literal('')),
   tags: z.string().optional(),
+  category: z.enum(['General', 'Notice', 'Board', 'Ministry', 'Exam', 'Result']).optional(),
 });
 
 export default function AddNewsPage() {
@@ -47,6 +49,7 @@ export default function AddNewsPage() {
       source: '',
       link: '',
       tags: '',
+      category: 'General',
     },
   });
 
@@ -79,10 +82,16 @@ export default function AddNewsPage() {
 
   const onSubmit = async (values: z.infer<typeof newsPostSchema>) => {
     setIsSubmitting(true);
+    
+    const tags = values.tags ? values.tags.split(',').map(tag => tag.trim()) : [];
+    if(values.category && !tags.includes(values.category.toLowerCase())){
+        tags.push(values.category.toLowerCase());
+    }
+
     try {
       await addDoc(collection(db, 'news'), {
         ...values,
-        tags: values.tags ? values.tags.split(',').map(tag => tag.trim()) : [],
+        tags,
         date: format(new Date(), 'MMMM dd, yyyy'),
         createdAt: serverTimestamp(),
       });
@@ -181,6 +190,46 @@ export default function AddNewsPage() {
                     </FormItem>
                     )}
                 />
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <FormField
+                        control={form.control}
+                        name="category"
+                        render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>ক্যাটাগরি</FormLabel>
+                            <Select onValueChange={field.onChange} value={field.value}>
+                                <FormControl>
+                                    <SelectTrigger><SelectValue placeholder="ক্যাটাগরি নির্বাচন করুন" /></SelectTrigger>
+                                </FormControl>
+                                <SelectContent>
+                                    <SelectItem value="General">General</SelectItem>
+                                    <SelectItem value="Notice">Notice</SelectItem>
+                                    <SelectItem value="Board">Board</SelectItem>
+                                    <SelectItem value="Ministry">Ministry</SelectItem>
+                                    <SelectItem value="Exam">Exam</SelectItem>
+                                    <SelectItem value="Result">Result</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="tags"
+                        render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>অতিরিক্ত ট্যাগ (ঐচ্ছিক)</FormLabel>
+                            <FormControl>
+                            <Input placeholder="যেমন: ssc, admission (কমা দিয়ে)" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                        </FormItem>
+                        )}
+                    />
+                </div>
+
                  <FormField
                     control={form.control}
                     name="source"
@@ -202,19 +251,6 @@ export default function AddNewsPage() {
                         <FormLabel>বহিরাগত লিঙ্ক (ঐচ্ছিক)</FormLabel>
                         <FormControl>
                         <Input type="url" placeholder="https://example.com/full-news" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                    </FormItem>
-                    )}
-                />
-                <FormField
-                    control={form.control}
-                    name="tags"
-                    render={({ field }) => (
-                    <FormItem>
-                        <FormLabel>ট্যাগ</FormLabel>
-                        <FormControl>
-                        <Input placeholder="যেমন: ssc, result, admission" {...field} />
                         </FormControl>
                         <FormMessage />
                     </FormItem>

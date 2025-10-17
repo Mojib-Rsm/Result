@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { GraduationCap, History, Calculator, MoreVertical, Sparkles, LogOut, User, Bookmark, BarChart, Building, Code, MailCheck, Briefcase, FileText, Phone, Wrench, ChevronDown, Rss } from 'lucide-react';
+import { GraduationCap, History, Calculator, MoreVertical, Sparkles, LogOut, User, Bookmark, BarChart, Building, Code, MailCheck, Briefcase, FileText, Phone, Wrench, ChevronDown, Rss, Calendar } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -13,6 +13,10 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
   DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuPortal,
 } from "@/components/ui/dropdown-menu"
 import { useAuth } from '@/hooks/use-auth';
 
@@ -24,11 +28,16 @@ export default function Header({ className }: { className?: string }) {
 
   const mainNavLinks = [
     { href: '/', label: 'হোম', icon: GraduationCap },
-    { href: '/education-news', label: 'শিক্ষা সংবাদ', icon: Rss },
     { href: '/career', label: 'ক্যারিয়ার হাব', icon: Briefcase },
     { href: '/suggestions', label: 'ভর্তি পরামর্শ', icon: Sparkles },
     { href: '/gpa-calculator', label: 'টুলস', icon: Wrench },
     { href: '/contact-us', label: 'যোগাযোগ', icon: Phone },
+  ];
+  
+  const newsSubMenu = [
+      { href: '/education-news', label: 'সকল সংবাদ', icon: Rss },
+      { href: '/education-news/board-and-ministry', label: 'বোর্ড ও মন্ত্রণালয়ের নোটিশ', icon: Building },
+      { href: '/education-news/exam-and-results', label: 'পরীক্ষা ও ফলাফল সংক্রান্ত নোটিশ', icon: Calendar },
   ];
 
   const moreNavLinks = [
@@ -111,6 +120,27 @@ export default function Header({ className }: { className?: string }) {
       <>
         <nav className="hidden flex-1 items-center gap-1 text-sm md:flex">
           {mainNavLinks.map((link) => <NavLink key={link.href} {...link} />)}
+          
+           <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="flex items-center gap-2 text-foreground/60">
+                        <Rss className="h-4 w-4" />
+                        শিক্ষা সংবাদ
+                        <ChevronDown className="h-4 w-4" />
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                    {newsSubMenu.map(link => (
+                        <DropdownMenuItem key={link.href} asChild>
+                            <Link href={link.href} className="flex items-center gap-2">
+                                <link.icon className="h-4 w-4" />
+                                {link.label}
+                            </Link>
+                        </DropdownMenuItem>
+                    ))}
+                </DropdownMenuContent>
+            </DropdownMenu>
+          
           <DropdownMenu>
               <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="flex items-center gap-2 text-foreground/60">
@@ -142,7 +172,35 @@ export default function Header({ className }: { className?: string }) {
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                    {[...mainNavLinks, ...moreNavLinks].map(link => (
+                     {mainNavLinks.map(link => (
+                          <DropdownMenuItem key={link.href} asChild>
+                              <Link href={link.href} className="flex items-center gap-2">
+                                <link.icon className="h-4 w-4" />
+                                <span>{link.label}</span>
+                              </Link>
+                          </DropdownMenuItem>
+                    ))}
+                    <DropdownMenuSeparator />
+                     <DropdownMenuSub>
+                        <DropdownMenuSubTrigger>
+                            <Rss className="mr-2 h-4 w-4" />
+                            <span>শিক্ষা সংবাদ</span>
+                        </DropdownMenuSubTrigger>
+                        <DropdownMenuPortal>
+                            <DropdownMenuSubContent>
+                                {newsSubMenu.map(link => (
+                                    <DropdownMenuItem key={link.href} asChild>
+                                        <Link href={link.href} className="flex items-center gap-2">
+                                            <link.icon className="h-4 w-4" />
+                                            {link.label}
+                                        </Link>
+                                    </DropdownMenuItem>
+                                ))}
+                            </DropdownMenuSubContent>
+                        </DropdownMenuPortal>
+                    </DropdownMenuSub>
+                    <DropdownMenuSeparator />
+                    {moreNavLinks.map(link => (
                           <DropdownMenuItem key={link.href} asChild>
                               <Link href={link.href} className="flex items-center gap-2">
                                 <link.icon className="h-4 w-4" />

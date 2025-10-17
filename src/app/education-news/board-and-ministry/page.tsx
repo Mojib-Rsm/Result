@@ -2,45 +2,52 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { getFirestore, collection, query, where, orderBy, getDocs } from 'firebase/firestore';
+import { app } from '@/lib/firebase';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { ArrowLeft, Rss, ExternalLink, Bookmark } from 'lucide-react';
+import { ArrowLeft, ExternalLink, Bookmark, Rss } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import Image from 'next/image';
-
-interface NewsArticle {
-    title: string;
-    url: string;
-    description: string;
-    urlToImage: string | null;
-    publishedAt: string;
-    source: { name: string };
-}
+import type { NewsPost } from '@/types';
+import { Badge } from '@/components/ui/badge';
 
 export default function BoardAndMinistryNoticesPage() {
-    const [articles, setArticles] = useState<NewsArticle[]>([]);
+    const [articles, setArticles] = useState<NewsPost[]>([]);
     const [loading, setLoading] = useState(true);
+    const db = getFirestore(app);
 
     useEffect(() => {
         const fetchNews = async () => {
             try {
-                const response = await fetch('/api/news?category=education');
-                if (!response.ok) {
-                    console.error('Failed to fetch news. Status:', response.status);
-                } else {
-                    const data = await response.json();
-                    setArticles(data);
-                }
+                const newsRef = collection(db, 'news');
+                const boardQuery = query(newsRef, where('tags', 'array-contains', 'board'), orderBy('createdAt', 'desc'));
+                const ministryQuery = query(newsRef, where('tags', 'array-contains', 'ministry'), orderBy('createdAt', 'desc'));
+
+                const [boardSnapshot, ministrySnapshot] = await Promise.all([
+                    getDocs(boardQuery),
+                    getDocs(ministryQuery)
+                ]);
+
+                const newsMap = new Map<string, NewsPost>();
+                boardSnapshot.docs.forEach(doc => newsMap.set(doc.id, { id: doc.id, ...doc.data() } as NewsPost));
+                ministrySnapshot.docs.forEach(doc => newsMap.set(doc.id, { id: doc.id, ...doc.data() } as NewsPost));
+
+                const combinedNews = Array.from(newsMap.values())
+                    .sort((a, b) => b.createdAt.seconds - a.createdAt.seconds);
+
+                setArticles(combinedNews);
+
             } catch (error) {
-                console.error('Error fetching news:', error);
+                console.error('Error fetching board/ministry news:', error);
             } finally {
                 setLoading(false);
             }
         };
 
         fetchNews();
-    }, []);
+    }, [db]);
 
     const NewsSkeleton = () => (
         [...Array(4)].map((_, i) => (
@@ -56,9 +63,11 @@ export default function BoardAndMinistryNoticesPage() {
                  <CardFooter className="flex flex-col items-start gap-4">
                      <div className="w-full flex justify-between">
                         <Skeleton className="h-4 w-1/4" />
-                        <Skeleton className="h-4 w-1/4" />
                      </div>
-                     <Skeleton className="h-5 w-24" />
+                     <div className="flex gap-2">
+                        <Skeleton className="h-6 w-16" />
+                      </div>
+                     <Skeleton className="h-9 w-24" />
                 </CardFooter>
             </Card>
         ))
@@ -86,42 +95,48 @@ export default function BoardAndMinistryNoticesPage() {
                 </div>
             ) : articles.length > 0 ? (
                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {articles.map((item, index) => (
-                        <Card key={index} className="flex flex-col overflow-hidden hover:shadow-lg transition-shadow">
-                            <a href={item.url} target="_blank" rel="noopener noreferrer" className="block">
+                    {articles.map((item) => (
+                        <Card key={item.id} className="flex flex-col overflow-hidden hover:shadow-lg transition-shadow">
+                             <Link href={`/education-news/${item.id}`} className="block">
                                 <CardHeader className="p-0">
                                     <div className="aspect-video relative">
                                         <Image
-                                            src={item.urlToImage || '/logo.png'}
+                                            src={item.imageUrl}
                                             alt={item.title}
                                             layout="fill"
                                             objectFit="cover"
                                             className="rounded-t-lg"
-                                            onError={(e) => { e.currentTarget.src = '/logo.png'; }}
                                         />
                                     </div>
                                 </CardHeader>
-                            </a>
+                            </Link>
 
                             <CardContent className="flex-grow p-4">
                                  <CardTitle className="text-lg leading-snug hover:text-primary transition-colors">
-                                    <a href={item.url} target="_blank" rel="noopener noreferrer">
+                                    <Link href={`/education-news/${item.id}`}>
                                         {item.title}
-                                    </a>
+                                    </Link>
                                 </CardTitle>
-                                <CardDescription className="mt-3 line-clamp-3">
+                                <CardDescription className="mt-3 line-clamp-3 text-sm">
                                     {item.description}
                                 </CardDescription>
                             </CardContent>
 
                             <CardFooter className="flex flex-col items-start gap-4 p-4">
                                  <div className="flex items-center justify-between w-full text-xs text-muted-foreground">
-                                    <span>{item.source.name}</span>
-                                    <span>{new Date(item.publishedAt).toLocaleDateString('bn-BD')}</span>
+                                    <span>{item.source || 'নিজস্ব'}</span>
+                                    <span>{item.date}</span>
                                 </div>
-                                <a href={item.url} target="_blank" rel="noopener noreferrer" className="text-sm font-semibold text-primary hover:underline flex items-center">
-                                    বিস্তারিত পড়ুন <ExternalLink className="ml-1 h-3 w-3" />
-                                </a>
+                                <div className="flex flex-wrap gap-2">
+                                    {item.tags?.map((tag: string) => (
+                                        <Badge key={tag} variant="secondary">{tag}</Badge>
+                                    ))}
+                                </div>
+                                <Button asChild variant="secondary" size="sm">
+                                    <Link href={`/education-news/${item.id}`}>
+                                        বিস্তারিত পড়ুন <ExternalLink className="ml-1 h-3 w-3" />
+                                    </Link>
+                                </Button>
                             </CardFooter>
                         </Card>
                     ))}
@@ -129,9 +144,9 @@ export default function BoardAndMinistryNoticesPage() {
             ) : (
                 <div className="text-center py-16 border-2 border-dashed rounded-lg">
                     <Bookmark className="mx-auto h-12 w-12 text-muted-foreground" />
-                    <h3 className="mt-4 text-lg font-medium">কোনো সংবাদ পাওয়া যায়নি</h3>
+                    <h3 className="mt-4 text-lg font-medium">কোনো নোটিশ পাওয়া যায়নি</h3>
                     <p className="mt-1 text-sm text-muted-foreground">
-                        এই মুহূর্তে কোনো নতুন নোটিশ নেই। অনুগ্রহ করে পরে আবার চেষ্টা করুন।
+                        এই মুহূর্তে বোর্ড বা মন্ত্রণালয় থেকে কোনো নতুন নোটিশ নেই।
                     </p>
                 </div>
             )}
