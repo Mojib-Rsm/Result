@@ -5,9 +5,10 @@ import { useAuth } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import Loading from '../loading';
-import Header from '@/components/header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, LayoutDashboard, Newspaper, Briefcase, Users, MailCheck, History, Settings, FileCog } from 'lucide-react';
+import { SidebarProvider, Sidebar, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarContent, SidebarTrigger, SidebarInset } from '@/components/ui/sidebar';
+import Link from 'next/link';
 
 export default function AdminLayout({
     children,
@@ -28,9 +29,7 @@ export default function AdminLayout({
     }
 
     if (!user) {
-      // This state should ideally not be reached due to the useEffect redirect,
-      // but it's a good failsafe.
-      return <Loading />;
+        return <Loading />;
     }
 
     if (user.role !== 'admin' && user.role !== 'editor') {
@@ -51,11 +50,52 @@ export default function AdminLayout({
     }
 
     return (
-        <>
-            <Header />
-            <main>
-                {children}
-            </main>
-        </>
+        <SidebarProvider>
+            <Sidebar>
+                <SidebarContent>
+                    <SidebarMenu>
+                        <SidebarMenuItem>
+                            <SidebarMenuButton asChild tooltip="ড্যাশবোর্ড"><Link href="/admin"><LayoutDashboard /><span>ড্যাশবোর্ড</span></Link></SidebarMenuButton>
+                        </SidebarMenuItem>
+                        <SidebarMenuItem>
+                            <SidebarMenuButton asChild tooltip="শিক্ষা সংবাদ"><Link href="/admin/news"><Newspaper /><span>শিক্ষা সংবাদ</span></Link></SidebarMenuButton>
+                        </SidebarMenuItem>
+                         <SidebarMenuItem>
+                            <SidebarMenuButton asChild tooltip="ক্যারিয়ার"><Link href="/admin/career"><Briefcase /><span>ক্যারিয়ার</span></Link></SidebarMenuButton>
+                        </SidebarMenuItem>
+                        {user.role === 'admin' && (
+                            <SidebarMenuItem>
+                                <SidebarMenuButton asChild tooltip="ব্যবহারকারীগণ"><Link href="/admin/users"><Users /><span>ব্যবহারকারীগণ</span></Link></SidebarMenuButton>
+                            </SidebarMenuItem>
+                        )}
+                        <SidebarMenuItem>
+                            <SidebarMenuButton asChild tooltip="সাবস্ক্রিপশন"><Link href="/admin/subscriptions"><MailCheck /><span>সাবস্ক্রিপশন</span></Link></SidebarMenuButton>
+                        </SidebarMenuItem>
+                        <SidebarMenuItem>
+                            <SidebarMenuButton asChild tooltip="অনুসন্ধানের ইতিহাস"><Link href="/admin/search-history"><History /><span>অনুসন্ধানের ইতিহাস</span></Link></SidebarMenuButton>
+                        </SidebarMenuItem>
+                        <SidebarMenuItem>
+                            <SidebarMenuButton asChild tooltip="API লগ"><Link href="/admin/api-logs"><History /><span>API লগ</span></Link></SidebarMenuButton>
+                        </SidebarMenuItem>
+                         <SidebarMenuItem>
+                            <SidebarMenuButton asChild tooltip="পেজ ম্যানেজমেন্ট"><Link href="/admin/pages"><FileCog /><span>পেজ ম্যানেজমেন্ট</span></Link></SidebarMenuButton>
+                        </SidebarMenuItem>
+                        <SidebarMenuItem>
+                            <SidebarMenuButton asChild tooltip="সেটিংস"><Link href="/admin/settings"><Settings /><span>সেটিংস</span></Link></SidebarMenuButton>
+                        </SidebarMenuItem>
+                    </SidebarMenu>
+                </SidebarContent>
+            </Sidebar>
+            <SidebarInset>
+                <header className="flex h-14 items-center justify-between border-b bg-background px-4">
+                    <SidebarTrigger />
+                    <h1 className="text-lg font-semibold">অ্যাডমিন প্যানেল</h1>
+                    <div />
+                </header>
+                <main className="p-4 md:p-6">
+                    {children}
+                </main>
+            </SidebarInset>
+        </SidebarProvider>
     );
 }

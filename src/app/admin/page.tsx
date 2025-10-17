@@ -6,7 +6,7 @@ import { getFirestore, collection, query, orderBy, getDocs, where, getCountFromS
 import { startOfDay, subDays } from 'date-fns';
 import { app } from '@/lib/firebase';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText, Users, MailCheck, DatabaseZap, Search, BellRing, MessageSquare, Bookmark, Trash2, RefreshCw, Settings, BadgeDollarSign, FileCog, History, Briefcase, Eye } from 'lucide-react';
+import { FileText, Users, MailCheck, DatabaseZap, Search, BellRing, MessageSquare, Bookmark, Trash2, RefreshCw, Settings, BadgeDollarSign, FileCog, History, Briefcase, Eye, Newspaper, LayoutDashboard } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import Link from 'next/link';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -24,13 +24,25 @@ const adminFeatures = [
         title: 'ব্যবহারকারী ব্যবস্থাপনা',
         description: 'অ্যাপ্লিকেশনের সমস্ত ব্যবহারকারীদের দেখুন এবং পরিচালনা করুন।',
         icon: Users,
-        href: '#users-table'
+        href: '/admin/users'
     },
     {
-        title: 'ফলাফল ডেটা',
-        description: 'সংরক্ষিত ফলাফল ডেটা দেখুন এবং বিশ্লেষণ করুন।',
-        icon: History,
-        href: '/admin/search-history'
+        title: 'শিক্ষা সংবাদ',
+        description: 'সাইটের সংবাদ এবং নোটিশ পরিচালনা করুন।',
+        icon: Newspaper,
+        href: '/admin/news'
+    },
+    {
+        title: 'ক্যারিয়ার ম্যানেজমেন্ট',
+        description: 'সাইটের সকল চাকরির পোস্ট পরিচালনা করুন।',
+        icon: Briefcase,
+        href: '/admin/career'
+    },
+    {
+        title: 'পেজ ম্যানেজমেন্ট',
+        description: 'About, Privacy Policy ইত্যাদি স্ট্যাটিক পেইজ এডিট করুন।',
+        icon: FileCog,
+        href: '/admin/pages'
     },
     {
         title: 'সাবস্ক্রিপশন',
@@ -45,16 +57,10 @@ const adminFeatures = [
         href: '#notification-system'
     },
     {
-        title: 'শিক্ষা সংবাদ',
-        description: 'সাইটের সংবাদ এবং নোটিশ পরিচালনা করুন।',
-        icon: Bookmark,
-        href: '/admin/news'
-    },
-    {
-        title: 'ক্যারিয়ার ম্যানেজমেন্ট',
-        description: 'সাইটের সকল চাকরির পোস্ট পরিচালনা করুন।',
-        icon: Briefcase,
-        href: '/admin/career'
+        title: 'অনুসন্ধানের ইতিহাস',
+        description: 'সংরক্ষিত ফলাফল ডেটা দেখুন এবং বিশ্লেষণ করুন।',
+        icon: History,
+        href: '/admin/search-history'
     },
     {
         title: 'API লগ',
@@ -68,16 +74,9 @@ const adminFeatures = [
         icon: Settings,
         href: '/admin/settings'
     },
-    {
-        title: 'পেইজ ম্যানেজমেন্ট',
-        description: 'About, Privacy Policy ইত্যাদি স্ট্যাটিক পেইজ এডিট করুন।',
-        icon: FileCog,
-        href: '#'
-    }
 ];
 
 export default function AdminPage() {
-    const [users, setUsers] = useState<any[]>([]);
     const [subscriptionsCount, setSubscriptionsCount] = useState(0);
     const [stats, setStats] = useState({
         totalUsers: 0,
@@ -102,17 +101,14 @@ export default function AdminPage() {
             const usersRef = collection(db, 'users');
             const subscriptionsRef = collection(db, 'subscriptions');
             
-            // Temporarily simplified query to avoid composite index requirement
             const [
                 totalUsersSnap,
                 totalSearchesSnap,
                 totalSubscriptionsSnap,
-                allUsersSnap,
             ] = await Promise.all([
                 getCountFromServer(query(usersRef)),
                 getCountFromServer(query(searchesRef)),
                 getCountFromServer(query(subscriptionsRef)),
-                getDocs(query(usersRef, orderBy('name'))),
             ]);
             
             const subsCount = totalSubscriptionsSnap.data().count;
@@ -126,16 +122,9 @@ export default function AdminPage() {
                 searchesLast30Days: 0,
                 totalSubscriptions: subsCount,
             });
-
-            setUsers(allUsersSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })));
             
         } catch (error) {
             console.error("Error fetching admin data: ", error);
-            // toast({
-            //     title: "ত্রুটি",
-            //     description: "অ্যাডমিন ডেটা আনতে সমস্যা হয়েছে।",
-            //     variant: "destructive",
-            // });
         } finally {
             setLoading(false);
         }
@@ -215,7 +204,7 @@ export default function AdminPage() {
 
 
     return (
-        <div className="container mx-auto max-w-7xl px-4 py-8 md:py-12">
+        <div className="space-y-10">
             <div className="mb-10">
                 <h1 className="text-4xl font-bold tracking-tight">অ্যাডমিন ড্যাশবোর্ড</h1>
                 <p className="mt-3 text-lg text-muted-foreground">
@@ -277,50 +266,6 @@ export default function AdminPage() {
                                 {isSendingSms ? 'পাঠানো হচ্ছে...' : `সকল ${subscriptionsCount} সাবস্ক্রাইবারকে SMS পাঠান`}
                             </Button>
                         </div>
-                    </CardContent>
-                </Card>
-            </div>
-
-            <div className="mt-12" id="users-table">
-                <Card>
-                    <CardHeader>
-                        <CardTitle>ব্যবহারকারীগণ</CardTitle>
-                        <CardDescription>
-                            আপনার অ্যাপ্লিকেশনের সকল নিবন্ধিত ব্যবহারকারীদের তালিকা।
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>নাম</TableHead>
-                                    <TableHead>ইমেইল</TableHead>
-                                    <TableHead>ভূমিকা</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {loading ? (
-                                    [...Array(2)].map((_, i) => (
-                                         <TableRow key={i}>
-                                            <TableCell><Skeleton className="h-4 w-2/4" /></TableCell>
-                                            <TableCell><Skeleton className="h-4 w-full" /></TableCell>
-                                            <TableCell><Skeleton className="h-4 w-1/4" /></TableCell>
-                                        </TableRow>
-                                    ))
-                                ) : users.length > 0 ? (
-                                    users.map(user => (
-                                    <TableRow key={user.id}>
-                                        <TableCell>{user.name}</TableCell>
-                                        <TableCell>{user.email}</TableCell>
-                                        <TableCell>{user.role}</TableCell>
-                                    </TableRow>
-                                ))) : (
-                                    <TableRow>
-                                        <TableCell colSpan={3} className="text-center">কোনো ব্যবহারকারী নেই।</TableCell>
-                                    </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
                     </CardContent>
                 </Card>
             </div>
