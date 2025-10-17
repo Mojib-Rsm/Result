@@ -27,10 +27,11 @@ export default function BoardAndMinistryNoticesPage() {
             try {
                 const response = await fetch('/api/news?category=education');
                 if (!response.ok) {
-                    throw new Error('Failed to fetch news');
+                    console.error('Failed to fetch news. Status:', response.status);
+                } else {
+                    const data = await response.json();
+                    setArticles(data);
                 }
-                const data = await response.json();
-                setArticles(data);
             } catch (error) {
                 console.error('Error fetching news:', error);
             } finally {
