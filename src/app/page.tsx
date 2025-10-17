@@ -237,7 +237,7 @@ export default function Home() {
         setCaptchaCookie(data.cookie);
     } catch(e) {
         console.error("Failed to refresh captcha", e);
-        toast({ title: "ত্রুটি", description: "ক্যাপচা লোড করা যায়নি।", variant: "destructive" });
+        toast({ title: "ত্রুটি", description: "ক্যাপচা লোড করা যায়নি। অনুগ্রহ করে পৃষ্ঠাটি রিফ্রেশ করুন।", variant: "destructive" });
     }
   }, [form, toast]);
 
