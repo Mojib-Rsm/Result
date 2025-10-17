@@ -32,7 +32,7 @@ export default function StatisticsPage() {
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                const statsRef = doc(db, 'statistics', 'hsc2023');
+                const statsRef = doc(db, 'statistics', 'hsc2025');
                 const docSnap = await getDoc(statsRef);
                 if (docSnap.exists()) {
                     setStats(docSnap.data());
@@ -168,7 +168,7 @@ export default function StatisticsPage() {
                                         axisLine={false}
                                         tick={{ fontSize: 12 }}
                                      />
-                                    <YAxis domain={[60, 100]} />
+                                    <YAxis domain={[40, 80]} />
                                     <ChartTooltip
                                         cursor={{ fill: 'hsl(var(--muted))' }}
                                         content={<ChartTooltipContent indicator="dot" />}

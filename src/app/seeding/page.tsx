@@ -105,26 +105,36 @@ const newsItems = [
     },
 ].map(news => ({ ...news, createdAt: serverTimestamp() }));
 
-const hsc2023Stats = {
-    totalExaminees: 1359342,
-    totalPassed: 1067852,
-    passRate: 78.64,
-    totalGpa5: 92595,
+const hsc2025Stats = {
+    totalExaminees: 1251111,
+    totalPassed: 726960,
+    passRate: 58.83,
+    totalGpa5: 69097,
     boardWiseGpa5: [
-        { board: 'ঢাকা', gpa5: 32801 }, { board: 'রাজশাহী', gpa5: 7853 },
-        { board: 'কুমিল্লা', gpa5: 6835 }, { board: 'যশোর', gpa5: 7800 },
-        { board: 'চট্টগ্রাম', gpa5: 6300 }, { board: 'বরিশাল', gpa5: 5800 },
-        { board: 'সিলেট', gpa5: 4200 }, { board: 'দিনাজপুর', gpa5: 6900 },
-        { board: 'ময়মনসিংহ', gpa5: 4500 }, { board: 'মাদ্রাসা', gpa5: 6125 },
-        { board: 'কারিগরি', gpa5: 6299 },
+        { board: 'ঢাকা', gpa5: 26063 },
+        { board: 'রাজশাহী', gpa5: 6259 },
+        { board: 'কুমিল্লা', gpa5: 1704 },
+        { board: 'যশোর', gpa5: 5498 },
+        { board: 'চট্টগ্রাম', gpa5: 6097 },
+        { board: 'বরিশাল', gpa5: 1674 },
+        { board: 'সিলেট', gpa5: 1602 },
+        { board: 'দিনাজপুর', gpa5: 6260 },
+        { board: 'ময়মনসিংহ', gpa5: 2706 },
+        { board: 'মাদ্রাসা', gpa5: 4268 },
+        { board: 'কারিগরি', gpa5: 4231 },
     ],
     boardWisePassRate: [
-        { board: 'ঢাকা', passRate: 79.44 }, { board: 'রাজশাহী', passRate: 78.46 },
-        { board: 'কুমিল্লা', passRate: 77.33 }, { board: 'যশোর', passRate: 83.95 },
-        { board: 'চট্টগ্রাম', passRate: 75.01 }, { board: 'বরিশাল', passRate: 85.01 },
-        { board: 'সিলেট', passRate: 71.02 }, { board: 'দিনাজপুর', passRate: 75.23 },
-        { board: 'ময়মনসিংহ', passRate: 74.00 }, { board: 'মাদ্রাসা', passRate: 91.80 },
-        { board: 'কারিগরি', passRate: 89.12 },
+        { board: 'ঢাকা', passRate: 64.62 },
+        { board: 'রাজশাহী', passRate: 59.40 },
+        { board: 'কুমিল্লা', passRate: 48.86 },
+        { board: 'যশোর', passRate: 50.20 },
+        { board: 'চট্টগ্রাম', passRate: 52.57 },
+        { board: 'বরিশাল', passRate: 62.57 },
+        { board: 'সিলেট', passRate: 51.86 },
+        { board: 'দিনাজপুর', passRate: 57.49 },
+        { board: 'ময়মনসিংহ', passRate: 51.54 },
+        { board: 'মাদ্রাসা', passRate: 75.61 },
+        { board: 'কারিগরি', passRate: 62.67 },
     ]
 };
 
@@ -165,8 +175,8 @@ export default function SeedingPage() {
             ]);
 
             // For single doc statistics
-            const statsRef = doc(db, 'statistics', 'hsc2023');
-            await setDoc(statsRef, hsc2023Stats);
+            const statsRef = doc(db, 'statistics', 'hsc2025');
+            await setDoc(statsRef, hsc2025Stats);
 
             // For site settings
             const settingsRef = doc(db, 'settings', 'config');
@@ -226,5 +236,3 @@ export default function SeedingPage() {
         </div>
     );
 }
-
-    
