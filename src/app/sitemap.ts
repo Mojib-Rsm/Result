@@ -15,6 +15,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/history',
     '/gpa-calculator',
     '/login',
+    '/register',
     '/admin',
     '/admin/api-logs',
     '/admin/subscriptions',
