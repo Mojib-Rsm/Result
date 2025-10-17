@@ -67,48 +67,76 @@ const jobsToSeed = [
 const newsItems = [
     {
         id: 'news1',
-        title: "Teachers, MPO-listed employees suspend long march till 4pm",
-        description: "MPO তালিকাভুক্ত শিক্ষক ও কর্মীরা তাদের তিনটি দাবি মেটানো না হলে সচিবালয়ের দিকে মিছিল করার ঘোষণা দিয়েছিলেন। সকালে মিছিল শুরু হলে দুপুর ৪টা পর্যন্ত তা স্থগিত রাখা হয়।",
-        content: "MPO-তালিকাভুক্ত বেসরকারি শিক্ষা প্রতিষ্ঠানের শিক্ষক ও কর্মচারীরা তাদের চাকরি জাতীয়করণের দাবিতে টানা তৃতীয় দিনের মতো অবস্থান কর্মসূচি পালন করছেন। এর অংশ হিসেবে তারা সচিবালয়ের দিকে পদযাত্রার ঘোষণা দিয়েছিলেন, যা পরে বিকাল ৪টা পর্যন্ত স্থগিত করা হয়েছে। দাবি আদায় না হলে তারা কঠোর কর্মসূচির হুঁশিয়ারি দিয়েছেন। এর আগে, এমপিওভুক্ত শিক্ষক-কর্মচারী জাতীয়করণ প্রত্যাশী মহাজোটের ব্যানারে তারা এই কর্মসূচি শুরু করেন। তাদের প্রধান দাবিগুলোর মধ্যে রয়েছে—ঈদুল আজহার আগে জাতীয়করণের সুস্পষ্ট ঘোষণা, সরকারি শিক্ষক-কর্মচারীদের মতো পূর্ণাঙ্গ উৎসব ভাতা, বাড়ি ভাড়া ও মেডিকেল ভাতা প্রদান।",
+        title: "শিক্ষকদের এমপিওভুক্তির দাবিতে পদযাত্রা স্থগিত",
+        description: "এমপিওভুক্ত শিক্ষক ও কর্মীরা তাদের দাবি আদায়ে সচিবালয়ের দিকে পদযাত্রার ঘোষণা দিলেও পরে তা স্থগিত করেন।",
+        content: "এমপিওভুক্ত বেসরকারি শিক্ষা প্রতিষ্ঠানের শিক্ষক ও কর্মচারীরা তাদের চাকরি জাতীয়করণের দাবিতে টানা তৃতীয় দিনের মতো অবস্থান কর্মসূচি পালন করছেন। এর অংশ হিসেবে তারা সচিবালয়ের দিকে পদযাত্রার ঘোষণা দিয়েছিলেন, যা পরে বিকাল ৪টা পর্যন্ত স্থগিত করা হয়েছে। দাবি আদায় না হলে তারা কঠোর কর্মসূচির হুঁশিয়ারি দিয়েছেন।",
         imageUrl: "https://www.tbsnews.net/sites/default/files/styles/media_gallery/public/media/images/2025/10/14/teachers_long_march.jpg",
         source: 'The Business Standard',
         date: format(new Date('2024-10-14'), 'MMMM dd, yyyy'),
         link: "https://www.tbsnews.net/bangladesh/teachers-continue-sit-3rd-day-announce-long-march-towards-secretariat-1260011",
-        tags: ['teachers', 'protest', 'MPO'],
+        category: 'Notice',
+        tags: ['teachers', 'protest', 'MPO', 'notice'],
     },
     {
         id: 'news2',
-        title: "‘March to Secretariat’: MPO teachers give govt deadline",
-        description: "MPO-সংবলিত শিক্ষক ও কর্মীরা সরকারকে নির্ধারিত সময়ের মধ্যে তাদের দাবি মেটাতে বলেন, নাহলে তারা সচিবালয় পর্যন্ত মিছিল করবেন।",
-        content: "এমপিওভুক্ত শিক্ষক-কর্মচারীরা তাদের চাকরি জাতীয়করণের দাবিতে সরকারকে একটি নির্দিষ্ট সময়সীমা বেঁধে দিয়েছেন। এই সময়ের মধ্যে দাবি পূরণ না হলে তারা সচিবালয়ের দিকে পদযাত্রার কর্মসূচি ঘোষণা করেছেন। শিক্ষকরা জানিয়েছেন, দীর্ঘদিন ধরে তারা তাদের ন্যায্য দাবিগুলো জানিয়ে আসছেন, কিন্তু কোনো সমাধান না হওয়ায় তারা কঠোর কর্মসূচিতে যেতে বাধ্য হচ্ছেন।",
-        imageUrl: "https://picsum.photos/seed/news2/600/400",
-        source: 'bdnews24.com',
-        date: format(new Date('2024-10-13'), 'MMMM dd, yyyy'),
-        link: "https://bdnews24.com/bangladesh/8e99209c1a04",
-        tags: ['teachers', 'protest', 'deadline'],
+        title: "শিক্ষামন্ত্রীর সাথে শিক্ষকদের বৈঠক, সমাধানের আশ্বাস",
+        description: "আন্দোলনরত শিক্ষকদের একটি প্রতিনিধি দল শিক্ষামন্ত্রীর সাথে বৈঠক করেছে। মন্ত্রী তাদের দাবিগুলো বিবেচনার আশ্বাস দিয়েছেন।",
+        content: "এমপিওভুক্ত শিক্ষক-কর্মচারীরা তাদের চাকরি জাতীয়করণের দাবিতে আন্দোলন চালিয়ে যাচ্ছেন। এর পরিপ্রেক্ষিতে, শিক্ষকদের একটি প্রতিনিধি দল শিক্ষামন্ত্রীর সাথে বৈঠক করেছেন। বৈঠকে শিক্ষামন্ত্রী তাদের দাবিগুলো মনোযোগ দিয়ে শোনেন এবং যত দ্রুত সম্ভব সমাধানের আশ্বাস দেন।",
+        imageUrl: "https://images.prothomalo.com/prothomalo-bangla%2F2023-07%2F98f49359-a51c-433f-b674-8b6b135c363e%2FIMG_5016.JPG",
+        source: 'প্রথম আলো',
+        date: format(new Date('2024-10-15'), 'MMMM dd, yyyy'),
+        link: "#",
+        category: 'Ministry',
+        tags: ['ministry', 'teachers', 'meeting'],
     },
     {
         id: 'news3',
-        title: "The broken ladder: Analysing the present and future of Bangladesh’s education system",
-        description: "যদিও প্রাথমিক বিদ্যালয়ে শিশুর সংখ্যা বেশ, শিক্ষার মান ও পাঠ্য বোঝাপড়ার অভাব বাংলাদেশের শিক্ষা ব্যবস্থাকে চ্যালেঞ্জ করেছে।",
+        title: "শিক্ষা ব্যবস্থার সংকট ও ভবিষ্যৎ করণীয়",
+        description: "প্রাথমিক স্তরে শিক্ষার মান এবং পাঠ্যক্রমের কার্যকারিতা নিয়ে একটি বিশ্লেষণধর্মী প্রতিবেদন।",
         content: "বাংলাদেশের শিক্ষা ব্যবস্থায় প্রাথমিক স্তরে তালিকাভুক্তির হার প্রায় শতভাগ হলেও, শিক্ষার মান নিয়ে गंभीर উদ্বেগ রয়েছে। অনেক শিক্ষার্থী প্রাথমিক শিক্ষা শেষ করেও সঠিকভাবে পড়তে বা লিখতে পারে না। এই সমস্যাটি 'শেখার সংকট' হিসেবে পরিচিত এবং এটি দেশের ভবিষ্যৎ মানবসম্পদ উন্নয়নের জন্য একটি বড় বাধা। নতুন পাঠ্যক্রম এবং শিক্ষাদান পদ্ধতির মাধ্যমে এই সংকট মোকাবিলার চেষ্টা করা হচ্ছে, তবে এর কার্যকারিতা এখনো পর্যালোচনার অধীনে।",
         imageUrl: "https://www.tbsnews.net/sites/default/files/styles/media_gallery/public/media/images/2025/08/07/broken_ladder.jpg",
         source: 'The Business Standard',
         date: format(new Date('2024-08-07'), 'MMMM dd, yyyy'),
         link: "https://www.tbsnews.net/features/big-picture/broken-ladder-analysing-present-and-future-bangladeshs-education-system-1207046",
-        tags: ['education system', 'analysis', 'exam'],
+        category: 'General',
+        tags: ['education system', 'analysis', 'general'],
     },
     {
         id: 'news4',
-        title: "Education left behind",
-        description: "শিক্ষা খাতে রাজনৈতিক হস্তক্ষেপ, শিক্ষক পদে অপসারণ, কাজ থেকে সরে যাওয়া ইত্যাদির কারণে অনেক শিক্ষা প্রতিষ্ঠান অনিশ্চিত অবস্থায় রয়েছে।",
-        content: "রাজনৈতিক অস্থিরতা এবং প্রশাসনিক জটিলতার কারণে বাংলাদেশের শিক্ষা খাত মারাত্মকভাবে ক্ষতিগ্রস্ত হয়েছে। অনেক শিক্ষককে রাজনৈতিক কারণে তাদের পদ থেকে সরিয়ে দেওয়া হয়েছে এবং নতুন নিয়োগ প্রক্রিয়াও স্থবির হয়ে আছে। এর ফলে, অনেক শিক্ষা প্রতিষ্ঠানে শিক্ষকের অভাব দেখা দিয়েছে এবং পাঠদান কার্যক্রম ব্যাহত হচ্ছে। এই অনিশ্চয়তা শিক্ষার্থীদের ভবিষ্যৎ এবং দেশের সামগ্রিক শিক্ষা ব্যবস্থার উপর নেতিবাচক প্রভাব ফেলছে।",
-        imageUrl: "https://www.thedailystar.net/sites/default/files/styles/media_main_image/public/media/images/2025/08/11/education_left_behind.jpg",
-        source: 'The Daily Star',
-        date: format(new Date('2024-08-11'), 'MMMM dd, yyyy'),
-        link: "https://www.thedailystar.net/news/bangladesh/news/education-left-behind-3959881",
-        tags: ['education', 'politics', 'result'],
+        title: "এইচএসসি পরীক্ষার ফলাফল প্রকাশের সম্ভাব্য তারিখ ঘোষণা",
+        description: "আগামী মাসের প্রথম সপ্তাহে এইচএসসি ও সমমান পরীক্ষার ফলাফল প্রকাশিত হতে পারে বলে জানিয়েছে শিক্ষা বোর্ড।",
+        content: "২০২৪ সালের এইচএসসি ও সমমান পরীক্ষার ফলাফল আগামী মাসের প্রথম সপ্তাহে প্রকাশিত হতে পারে। শিক্ষা বোর্ডগুলো জানিয়েছে, ফলাফল তৈরির কাজ প্রায় শেষ পর্যায়ে এবং প্রধানমন্ত্রীর সম্মতি পেলেই তারিখ চূড়ান্ত করা হবে। শিক্ষার্থীরা অধীর আগ্রহে ফলাফলের জন্য অপেক্ষা করছে।",
+        imageUrl: "https://images.somoynews.tv/medium/img_650x366_2023_11_26_16_17_26_65631c3ad94d2.jpg",
+        source: 'সময় নিউজ',
+        date: format(new Date('2024-10-16'), 'MMMM dd, yyyy'),
+        link: "#",
+        category: 'Result',
+        tags: ['hsc', 'result', 'education board'],
     },
+     {
+        id: 'news5',
+        title: "HSC পরীক্ষার নতুন মানবণ্টন প্রকাশ করলো ঢাকা বোর্ড",
+        description: "ঢাকা শিক্ষা বোর্ড ২০২৫ সালের এইচএসসি পরীক্ষার জন্য নতুন মানবণ্টন প্রকাশ করেছে। এতে সৃজনশীল ও বহুনির্বাচনী প্রশ্নের নম্বরে পরিবর্তন আনা হয়েছে।",
+        content: "২০২৫ সাল থেকে অনুষ্ঠেয় এইচএসসি পরীক্ষার জন্য নতুন মানবণ্টন প্রকাশ করেছে ঢাকা শিক্ষা বোর্ড। নতুন এই মানবণ্টনে সৃজনশীল এবং বহুনির্বাচনী অংশের নম্বরের অনুপাতে পরিবর্তন আনা হয়েছে। বোর্ড জানিয়েছে, শিক্ষার্থীদের মুখস্থনির্ভরতা কমিয়ে চিন্তাশীল ও সৃজনশীল করে তুলতেই এই উদ্যোগ নেওয়া হয়েছে।",
+        imageUrl: "https://www.jugantor.com/assets/news_photos/2022/11/06/image-327573-1667755376.jpg",
+        source: 'যুগান্তর',
+        date: format(new Date('2024-10-12'), 'MMMM dd, yyyy'),
+        link: "#",
+        category: 'Board',
+        tags: ['hsc', 'board', 'dhaka board', 'notice'],
+    },
+    {
+        id: 'news6',
+        title: "বিশ্ববিদ্যালয় ভর্তি পরীক্ষার সম্ভাব্য তারিখ ঘোষণা",
+        description: "পাবলিক বিশ্ববিদ্যালয়গুলোর সমন্বিত ভর্তি পরীক্ষার সম্ভাব্য তারিখ ঘোষণা করেছে কর্তৃপক্ষ। পরীক্ষা আগামী বছরের মার্চ মাসে শুরু হতে পারে।",
+        content: "দেশের পাবলিক বিশ্ববিদ্যালয়গুলোতে গুচ্ছ পদ্ধতিতে ভর্তি পরীক্ষার সম্ভাব্য তারিখ ঘোষণা করা হয়েছে। জানা গেছে, আগামী বছরের মার্চ মাস থেকে বিভিন্ন ইউনিটের পরীক্ষা শুরু হতে পারে। ভর্তিচ্ছু শিক্ষার্থীদের সে অনুযায়ী প্রস্তুতি নেওয়ার আহ্বান জানানো হয়েছে।",
+        imageUrl: "https://www.kalerkantho.com/images/2022/10/18/69595_Guccho-Vorti.jpg",
+        source: 'কালের কণ্ঠ',
+        date: format(new Date('2024-10-11'), 'MMMM dd, yyyy'),
+        link: "#",
+        category: 'Exam',
+        tags: ['admission', 'exam', 'university'],
+    }
 ].map(news => ({ ...news, createdAt: serverTimestamp() }));
 
 const hsc2025Stats = {
@@ -155,7 +183,7 @@ export default function SeedingPage() {
         data.forEach((item) => {
             const docId = item[idKey];
             if (!docId) {
-                console.warn(`Skipping item in ${collectionName} due to missing ID:`, item);
+                console.warn(`Skipping item in ${'${collectionName}'} due to missing ID:`, item);
                 return;
             }
             const docRef = doc(db, collectionName, docId);
