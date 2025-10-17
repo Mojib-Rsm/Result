@@ -12,7 +12,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { getFirestore, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { app } from '@/lib/firebase';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Loader2, Upload } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Loading from '@/app/loading';
@@ -30,14 +30,15 @@ const newsPostSchema = z.object({
   category: z.enum(['General', 'Notice', 'Board', 'Ministry', 'Exam', 'Result']).optional(),
 });
 
-export default function EditNewsPage({ params }: { params: { id: string } }) {
+export default function EditNewsPage({ params }: { params: { id: string } | Promise<{ id: string }> }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
   const { toast } = useToast();
   const db = getFirestore(app);
   const router = useRouter();
-  const id = params.id;
+  const resolvedParams = React.use(params);
+  const id = resolvedParams.id;
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const form = useForm<z.infer<typeof newsPostSchema>>({
@@ -290,3 +291,5 @@ export default function EditNewsPage({ params }: { params: { id: string } }) {
     </div>
   );
 }
+
+    

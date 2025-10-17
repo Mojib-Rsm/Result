@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import type { ExamResult } from '@/types';
@@ -10,16 +10,19 @@ import Loading from '@/app/loading';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { AlertTriangle } from 'lucide-react';
 
-export default function ResultPage({ params }: { params: { id: string } }) {
+export default function ResultPage({ params }: { params: { id: string } | Promise<{ id: string }> }) {
   const [result, setResult] = useState<ExamResult | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  const resolvedParams = React.use(params);
+  const id = resolvedParams.id;
 
   useEffect(() => {
-    if (params.id) {
+    if (id) {
       const fetchResult = async () => {
         try {
-          const resultDocRef = doc(db, 'results', params.id);
+          const resultDocRef = doc(db, 'results', id);
           const resultDocSnap = await getDoc(resultDocRef);
 
           if (resultDocSnap.exists()) {
@@ -38,7 +41,7 @@ export default function ResultPage({ params }: { params: { id: string } }) {
       };
       fetchResult();
     }
-  }, [params.id]);
+  }, [id]);
 
   if (loading) {
     return <Loading />;
@@ -71,3 +74,5 @@ export default function ResultPage({ params }: { params: { id: string } }) {
 
   return null;
 }
+
+    

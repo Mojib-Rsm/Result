@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import type { NewsPost } from '@/types';
@@ -11,16 +11,19 @@ import { AlertTriangle, Calendar, User } from 'lucide-react';
 import Image from 'next/image';
 import { Badge } from '@/components/ui/badge';
 
-export default function NewsArticlePage({ params }: { params: { id: string } }) {
+export default function NewsArticlePage({ params }: { params: { id: string } | Promise<{ id: string }> }) {
   const [article, setArticle] = useState<NewsPost | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const resolvedParams = React.use(params);
+  const id = resolvedParams.id;
+
   useEffect(() => {
-    if (params.id) {
+    if (id) {
       const fetchArticle = async () => {
         try {
-          const articleDocRef = doc(db, 'news', params.id);
+          const articleDocRef = doc(db, 'news', id);
           const articleDocSnap = await getDoc(articleDocRef);
 
           if (articleDocSnap.exists()) {
@@ -37,7 +40,7 @@ export default function NewsArticlePage({ params }: { params: { id: string } }) 
       };
       fetchArticle();
     }
-  }, [params.id]);
+  }, [id]);
 
   if (loading) {
     return <Loading />;
@@ -108,3 +111,5 @@ export default function NewsArticlePage({ params }: { params: { id: string } }) 
 
   return null;
 }
+
+    

@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useToast } from '@/hooks/use-toast';
 import { getFirestore, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { app } from '@/lib/firebase';
-import { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Loading from '@/app/loading';
@@ -27,13 +27,14 @@ const userSchema = z.object({
 });
 
 
-export default function EditUserPage({ params }: { params: { id: string } }) {
+export default function EditUserPage({ params }: { params: { id: string } | Promise<{ id: string }> }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
   const db = getFirestore(app);
   const router = useRouter();
-  const id = params.id;
+  const resolvedParams = React.use(params);
+  const id = resolvedParams.id;
 
   const form = useForm<z.infer<typeof userSchema>>({
     resolver: zodResolver(userSchema),
@@ -208,3 +209,5 @@ export default function EditUserPage({ params }: { params: { id: string } }) {
     </div>
   );
 }
+
+    
