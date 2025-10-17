@@ -13,7 +13,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/suggestions',
     '/statistics',
     '/history',
-    '/gpa-calculator',
+    '/tools',
+    '/tools/gpa-calculator',
+    '/tools/cgpa-calculator',
+    '/tools/age-calculator',
     '/login',
     '/register',
     '/admin',
@@ -60,3 +63,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return sitemapEntries;
 }
+
+    

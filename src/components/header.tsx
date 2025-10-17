@@ -31,7 +31,6 @@ export default function Header({ className }: { className?: string }) {
     { href: '/', label: 'হোম', icon: GraduationCap },
     { href: '/career', label: 'ক্যারিয়ার হাব', icon: Briefcase },
     { href: '/suggestions', label: 'ভর্তি পরামর্শ', icon: Sparkles },
-    { href: '/gpa-calculator', label: 'টুলস', icon: Wrench },
     { href: '/contact-us', label: 'যোগাযোগ', icon: Phone },
   ];
   
@@ -39,6 +38,13 @@ export default function Header({ className }: { className?: string }) {
       { href: '/education-news', label: 'সকল সংবাদ', icon: Rss },
       { href: '/education-news/board-and-ministry', label: 'বোর্ড ও মন্ত্রণালয়ের নোটিশ', icon: Building },
       { href: '/education-news/exam-and-results', label: 'পরীক্ষা ও ফলাফল সংক্রান্ত নোটিশ', icon: Calendar },
+  ];
+  
+  const toolsSubMenu = [
+      { href: '/tools', label: 'সকল টুলস', icon: Wrench },
+      { href: '/tools/gpa-calculator', label: 'GPA ক্যালকুলেটর', icon: Calculator },
+      { href: '/tools/cgpa-calculator', label: 'CGPA ক্যালকুলেটর', icon: Calculator },
+      { href: '/tools/age-calculator', label: 'বয়স ক্যালকুলেটর', icon: Calendar },
   ];
 
   const moreNavLinks = [
@@ -110,6 +116,26 @@ export default function Header({ className }: { className?: string }) {
                     ))}
                 </DropdownMenuContent>
             </DropdownMenu>
+            
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="flex items-center gap-2 text-foreground/60">
+                        <Wrench className="h-4 w-4" />
+                        টুলস
+                        <ChevronDown className="h-4 w-4" />
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                    {toolsSubMenu.map(link => (
+                        <DropdownMenuItem key={link.href} asChild>
+                            <Link href={link.href} className="flex items-center gap-2">
+                                <link.icon className="h-4 w-4" />
+                                {link.label}
+                            </Link>
+                        </DropdownMenuItem>
+                    ))}
+                </DropdownMenuContent>
+            </DropdownMenu>
           
           <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -169,6 +195,24 @@ export default function Header({ className }: { className?: string }) {
                             </DropdownMenuSubContent>
                         </DropdownMenuPortal>
                     </DropdownMenuSub>
+                     <DropdownMenuSub>
+                        <DropdownMenuSubTrigger>
+                            <Wrench className="mr-2 h-4 w-4" />
+                            <span>টুলস</span>
+                        </DropdownMenuSubTrigger>
+                        <DropdownMenuPortal>
+                            <DropdownMenuSubContent>
+                                {toolsSubMenu.map(link => (
+                                    <DropdownMenuItem key={link.href} asChild>
+                                        <Link href={link.href} className="flex items-center gap-2">
+                                            <link.icon className="h-4 w-4" />
+                                            {link.label}
+                                        </Link>
+                                    </DropdownMenuItem>
+                                ))}
+                            </DropdownMenuSubContent>
+                        </DropdownMenuPortal>
+                    </DropdownMenuSub>
                     <DropdownMenuSeparator />
                     {moreNavLinks.map(link => (
                           <DropdownMenuItem key={link.href} asChild>
@@ -215,3 +259,5 @@ export default function Header({ className }: { className?: string }) {
     </header>
   );
 }
+
+    
