@@ -96,7 +96,7 @@ const newsItems = [
         source: 'The Business Standard',
         date: format(new Date('2024-08-07'), 'MMMM dd, yyyy'),
         link: "https://www.tbsnews.net/features/big-picture/broken-ladder-analysing-present-and-future-bangladeshs-education-system-1207046",
-        tags: ['education system', 'analysis'],
+        tags: ['education system', 'analysis', 'exam'],
     },
     {
         id: 'news4',
@@ -107,7 +107,7 @@ const newsItems = [
         source: 'The Daily Star',
         date: format(new Date('2024-08-11'), 'MMMM dd, yyyy'),
         link: "https://www.thedailystar.net/news/bangladesh/news/education-left-behind-3959881",
-        tags: ['education', 'politics'],
+        tags: ['education', 'politics', 'result'],
     },
 ].map(news => ({ ...news, createdAt: serverTimestamp() }));
 
