@@ -20,7 +20,7 @@ const publicUniversities = [
     { name: 'National University', location: 'গাজীপুর', website: 'http://www.nu.edu.bd' },
     { name: 'Bangladesh Open University', location: 'গাজীপুর', website: 'http://www.bou.ac.bd' },
     { name: 'Bangabandhu Sheikh Mujib Medical University', location: 'ঢাকা', website: 'http://www.bsmmu.edu.bd' },
-    { name: 'Bangabandhu Sheikh Mujibur Rahman Agricultural University', location: 'গাজীপুর', website: 'https://gau.edu.bd/' },
+    { name: 'Bangabandhu Sheikh Mujibur Rahman Agricultural University', location: 'গাজীপুর', website: 'https://bsmrau.edu.bd/' },
     { name: 'Hajee Mohammad Danesh Science & Technology University', location: 'দিনাজপুর', website: 'http://www.hstu.ac.bd' },
     { name: 'Mawlana Bhashani Science & Technology University', location: 'টাঙ্গাইল', website: 'http://www.mbstu.ac.bd' },
     { name: 'Patuakhali Science And Technology University', location: 'পটুয়াখালী', website: 'http://www.pstu.ac.bd' },
@@ -52,18 +52,13 @@ const publicUniversities = [
     { name: 'Sheikh Hasina University', location: 'নেত্রকোনা', website: 'https://www.shu.edu.bd/' },
     { name: 'Khulna Agricultural University', location: 'খুলনা', website: 'http://www.kau.edu.bd' },
     { name: 'Bangamata Sheikh Fojilatunnesa Mujib Science and Technology University', location: 'জামালপুর', website: 'https://bsfmstu.ac.bd/' },
-    { name: 'Sylhet Medical University', location: 'সিলেট', website: 'http://www.bsfmmu.edu.bd' },
-    { name: 'Bangabandhu Sheikh Mujibur Rahman Aviation And Aerospace University', location: 'ঢাকা', website: 'http://www.aaub.edu.bd' },
+    { name: 'Pabna Science and Technology University', location: 'পাবনা', website: 'http://www.pust.ac.bd'},
+    { name: 'Bangabandhu Sheikh Mujibur Rahman University, Kishoreganj', location: 'কিশোরগঞ্জ', website: 'http://bsmru.ac.bd' },
     { name: 'Chandpur Science and Technology University', location: 'চাঁদপুর', website: 'http://www.cstu.ac.bd' },
-    { name: 'Bangabandhu Sheikh Mujibur Rahman University, Kishoreganj', location: 'কিশোরগঞ্জ', website: 'http://bsmru.ac.bd.' },
-    { name: 'Hobiganj Agricultural University', location: 'হবিগঞ্জ', website: 'http://www.hau.ac.bd' },
-    { name: 'Sheikh Hasina Medical University, Khulna', location: 'খুলনা', website: 'http://www.shmu.ac.bd' },
-    { name: 'Kurigram Agricultural University', location: 'কুড়িগ্রাম', website: 'http://www.kuriau.edu.bd' },
     { name: 'Sunamganj Science and Technology University', location: 'সুনামগঞ্জ', website: 'http://www.sstu.ac.bd' },
-    { name: 'Pirojpur Science & Technology University', location: 'পিরোজপুর', website: 'http://www.prstu.ac.bd' },
-    { name: 'Bangabandhu Sheikh Mujibur Rahman Science & Technology University, Pirojpur', location: 'পিরোজপুর', website: '' },
-    { name: 'Naogaon University', location: 'নওগাঁ', website: '' },
-    { name: 'Meherpur University', location: 'মেহেরপুর', website: '' },
+    { name: 'Hobiganj Agricultural University', location: 'হবিগঞ্জ', website: 'http://www.hau.ac.bd' },
+    { name: 'Kurigram Agricultural University', location: 'কুড়িগ্রাম', website: 'http://www.kuriau.edu.bd' },
+    { name: 'Sheikh Hasina Medical University, Khulna', location: 'খুলনা', website: 'http://www.shmu.ac.bd' },
 ];
 
 
@@ -107,7 +102,7 @@ export default function PublicUniversitiesPage() {
                                     <TableCell className="text-right">
                                         {uni.website ? (
                                             <Button asChild variant="ghost" size="sm">
-                                                <a href={`http://${uni.website.replace(/https?:\/\//, '')}`} target="_blank" rel="noopener noreferrer">
+                                                <a href={uni.website} target="_blank" rel="noopener noreferrer">
                                                     ভিজিট করুন
                                                     <ExternalLink className="ml-2 h-3 w-3" />
                                                 </a>

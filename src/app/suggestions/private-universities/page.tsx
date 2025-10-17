@@ -81,7 +81,7 @@ const privateUniversities = [
     { name: 'North Bengal International University', location: 'রাজশাহী', website: 'http://www.nbiu.edu.bd' },
     { name: 'Fareast International University', location: 'ঢাকা', website: 'http://www.fiu.edu.bd' },
     { name: 'Rajshahi Science & Technology University (RSTU), Natore', location: 'নাটোর', website: 'http://www.rstu.edu.bd' },
-    { name: 'Brahmaputra International University', location: 'ঢাকা', website: 'http://www.sfmu.ac.bd' },
+    { name: 'Sheikh Fazilatunnesa Mujib University', location: 'জামালপুর', website: 'http://www.sfmu.edu.bd' },
     { name: 'Cox\'s Bazar International University', location: 'কক্সবাজার', website: 'http://www.cbiu.ac.bd' },
     { name: 'R. P. Shaha University', location: 'টাঙ্গাইল', website: 'http://www.rpsu.ac.bd' },
     { name: 'German University Bangladesh', location: 'গাজীপুর', website: 'http://www.gub.edu.bd' },
@@ -94,7 +94,7 @@ const privateUniversities = [
     { name: 'Canadian University of Bangladesh', location: 'ঢাকা', website: 'http://www.cub.edu.bd' },
     { name: 'N.P.I University of Bangladesh', location: 'মানিকগঞ্জ', website: 'http://www.npiub.edu.bd' },
     { name: 'Northern University of Business & Technology, Khulna', location: 'খুলনা', website: 'http://www.nubtkhulna.ac.bd' },
-    { name: 'Rabindra Maitree University, Kushtia', location: 'কুষ্টিয়া', website: '' },
+    { name: 'Rabindra Maitree University, Kushtia', location: 'কুষ্টিয়া', website: 'http://www.rmu.ac.bd' },
     { name: 'University of Creative Technology, Chittagong', location: 'চট্টগ্রাম', website: 'http://www.uctc.edu.bd' },
     { name: 'Central University of Science and Technology', location: 'ঢাকা', website: 'http://www.cust.edu.bd' },
     { name: 'Tagore University of Creative Arts, Uttara, Dhaka, Bangladesh', location: 'ঢাকা', website: 'http://www.tuca.edu.bd' },
@@ -103,18 +103,15 @@ const privateUniversities = [
     { name: 'ZNRF University of Management Sciences', location: 'ঢাকা', website: 'http://www.zums.edu.bd' },
     { name: 'Ahsania Mission University of Science and Technology', location: 'রাজশাহী', website: 'http://www.amust.ac.bd' },
     { name: 'Khulna Khan Bahadur Ahsanullah University', location: 'খুলনা', website: 'http://www.kkbau.ac.bd' },
-    { name: 'Bandarban University', location: 'বান্দরবান', website: 'http://www.bubban.edu.bd' },
+    { name: 'Bandarban University', location: 'বান্দরবান', website: 'http://www.bu.edu.bd' },
     { name: 'Trust University, Barishal', location: 'বরিশাল', website: 'http://www.trustuniversity.ac.bd' },
     { name: 'International Standard University', location: 'ঢাকা', website: 'http://www.isu.ac.bd' },
     { name: 'University of Brahmanbaria', location: 'ব্রাহ্মণবাড়িয়া', website: 'http://www.uob.edu.bd' },
     { name: 'University of Skill Enrichment and Technology', location: 'ঢাকা', website: 'http://www.uset.ac.bd' },
     { name: 'R.T.M Al-Kabir Technical University', location: 'সিলেট', website: 'http://www.rtm-aktu.edu.bd' },
-    { name: 'Dr. Momtaz Begum University of Science and Technology (MUST)', location: 'মানিকগঞ্জ', website: 'http://www.must.ac.bd' },
+    { name: 'Sheikh Hasina University of Science and Technology', location: 'কিশোরগঞ্জ', website: 'http://shust.ac.bd' },
     { name: 'Chattogram BGMEA University of Fashion and Technology', location: 'চট্টগ্রাম', website: 'http://www.cbuft.edu.bd' },
-    { name: 'Bangladesh Army University of Science and Technology, Khulna', location: 'খুলনা', website: 'http://www.baustkhulna.ac.bd' },
-    { name: 'Teesta University, Rangpur', location: 'রংপুর', website: 'http://www.teestauniversity.ac.bd' },
-    { name: 'International Islami University of Science and Technology', location: 'ঢাকা', website: 'http://www.iiustb.ac.bd' },
-    { name: 'Lalon University of Science and Arts', location: 'কুষ্টিয়া', website: 'https://lusa.ac.bd' },
+    { name: 'IBAIS University', location: 'ঢাকা', website: 'http://www.ibais.edu.bd'},
 ];
 
 export default function PrivateUniversitiesPage() {
@@ -178,5 +175,3 @@ export default function PrivateUniversitiesPage() {
         </div>
     );
 }
-
-    
