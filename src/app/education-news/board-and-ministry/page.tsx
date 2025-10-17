@@ -35,7 +35,8 @@ export default function BoardAndMinistryNoticesPage() {
                 ministrySnapshot.docs.forEach(doc => newsMap.set(doc.id, { id: doc.id, ...doc.data() } as NewsPost));
 
                 const combinedNews = Array.from(newsMap.values())
-                    .sort((a, b) => b.createdAt.seconds - a.createdAt.seconds);
+                    .sort((a, b) => (b.createdAt?.seconds ?? 0) - (a.createdAt?.seconds ?? 0));
+
 
                 setArticles(combinedNews);
 
@@ -52,15 +53,15 @@ export default function BoardAndMinistryNoticesPage() {
     const NewsSkeleton = () => (
         [...Array(4)].map((_, i) => (
              <Card key={i} className="flex flex-col overflow-hidden">
-                <CardHeader>
+                <CardHeader className="p-0">
                     <Skeleton className="aspect-video w-full" />
                 </CardHeader>
-                <CardContent className="flex-grow">
+                <CardContent className="flex-grow p-4">
                      <Skeleton className="h-6 w-3/4 mb-4" />
                      <Skeleton className="h-4 w-full" />
                      <Skeleton className="h-4 w-full mt-2" />
                 </CardContent>
-                 <CardFooter className="flex flex-col items-start gap-4">
+                 <CardFooter className="flex flex-col items-start gap-4 p-4">
                      <div className="w-full flex justify-between">
                         <Skeleton className="h-4 w-1/4" />
                      </div>
