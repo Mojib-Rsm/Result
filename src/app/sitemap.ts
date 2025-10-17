@@ -43,7 +43,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/privacy-policy',
     '/disclaimer',
     '/terms-and-conditions',
-    '/image-hosting'
+    '/image-hosting',
+    '/dashboard',
   ];
 
   const sitemapEntries: MetadataRoute.Sitemap = staticPages.map((path) => ({

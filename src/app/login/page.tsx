@@ -66,7 +66,13 @@ export default function LoginPage() {
         title: 'সফল',
         description: 'আপনি সফলভাবে লগইন করেছেন।',
       });
-      router.push('/admin');
+      
+      if (user.role === 'admin' || user.role === 'editor') {
+        router.push('/admin');
+      } else {
+        router.push('/dashboard');
+      }
+
     } catch (error: any) {
       toast({
         title: 'লগইন ব্যর্থ হয়েছে',
@@ -82,7 +88,7 @@ export default function LoginPage() {
     <div className="container mx-auto flex min-h-[calc(100vh-8rem)] max-w-sm items-center justify-center py-12">
       <Card className="w-full">
         <CardHeader>
-          <CardTitle>অ্যাডমিন লগইন</CardTitle>
+          <CardTitle>অ্যাকাউন্ট লগইন</CardTitle>
           <CardDescription>আপনার ড্যাশবোর্ডে প্রবেশ করতে লগইন করুন।</CardDescription>
         </CardHeader>
         <CardContent>

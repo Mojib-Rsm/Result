@@ -82,7 +82,7 @@ export default function Header({ className }: { className?: string }) {
                   <DropdownMenuTrigger asChild>
                      <Button variant="ghost">
                         <User className="mr-2 h-4 w-4" />
-                        Admin
+                        {user.name}
                         <ChevronDown className="ml-2 h-4 w-4" />
                       </Button>
                   </DropdownMenuTrigger>
@@ -153,12 +153,35 @@ export default function Header({ className }: { className?: string }) {
                 </DropdownMenuContent>
             </DropdownMenu>
           </div>
-          <Button variant="ghost" size="icon" asChild>
-              <Link href="/admin">
-                <User className="h-5 w-5" />
-                  <span className="sr-only">Admin Login</span>
-              </Link>
-          </Button>
+           {user ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                     <Button variant="ghost">
+                        <User className="mr-2 h-4 w-4" />
+                        {user.name}
+                        <ChevronDown className="ml-2 h-4 w-4" />
+                      </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                        <DropdownMenuItem asChild>
+                           <Link href="/dashboard">
+                                <GraduationCap className="mr-2 h-4 w-4" />
+                                ড্যাশবোর্ড
+                            </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={handleLogout}>
+                            <LogOut className="mr-2 h-4 w-4" />
+                            লগআউট
+                        </DropdownMenuItem>
+                  </DropdownMenuContent>
+              </DropdownMenu>
+           ) : (
+             <Button asChild size="sm">
+                <Link href="/login">
+                    লগইন / নিবন্ধন
+                </Link>
+            </Button>
+           )}
         </div>
       </>
     )
