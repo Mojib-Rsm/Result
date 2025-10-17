@@ -25,7 +25,7 @@ export default function Header({ className }: { className?: string }) {
   const router = useRouter();
   const { user, logout } = useAuth();
   
-  const isSpecialPage = pathname.startsWith('/admin') || pathname.startsWith('/dashboard');
+  const isAdminPage = pathname.startsWith('/admin');
 
   const mainNavLinks = [
     { href: '/', label: 'হোম', icon: GraduationCap },
@@ -71,7 +71,7 @@ export default function Header({ className }: { className?: string }) {
     </Button>
   );
 
-  if (isSpecialPage) {
+  if (isAdminPage) {
     return null;
   }
 
