@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { GraduationCap, History, Calculator, MoreVertical, Sparkles, LogOut, User, Bookmark, BarChart, Building, Code, MailCheck, Briefcase, FileText, Phone, Wrench, ChevronDown, Rss, Calendar } from 'lucide-react';
+import { GraduationCap, History, Calculator, MoreVertical, Sparkles, LogOut, User, Bookmark, BarChart, Building, Code, MailCheck, Briefcase, FileText, Phone, Wrench, ChevronDown, Rss, Calendar, ImageIcon } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -25,7 +25,6 @@ export default function Header({ className }: { className?: string }) {
   const router = useRouter();
   const { user, logout } = useAuth();
   
-  // Do not render header for admin and dashboard pages, as they have their own sidebar navigation
   const isSpecialPage = pathname.startsWith('/admin') || pathname.startsWith('/dashboard');
 
   const mainNavLinks = [
@@ -46,6 +45,7 @@ export default function Header({ className }: { className?: string }) {
     { href: '/institute-result', label: 'প্রতিষ্ঠানের ফলাফল', icon: Building },
     { href: '/statistics', label: 'পরিসংখ্যান', icon: BarChart },
     { href: '/history', label: 'ইতিহাস', icon: History },
+    { href: '/image-hosting', label: 'ইমেজ হোস্টিং', icon: ImageIcon },
     { href: '/career/post-job', label: 'জব পোস্ট করুন', icon: Briefcase },
     { href: '/developer', label: 'ডেভেলপার', icon: Code },
   ];

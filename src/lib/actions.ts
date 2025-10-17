@@ -1,3 +1,4 @@
+
 'use server';
 
 import type { ExamResult, GradeInfo, InstituteResult, StudentResult } from '@/types';
@@ -234,48 +235,24 @@ async function searchInstituteResult(values: { eiin: string; exam: string; year:
 
 export async function uploadImage(formData: FormData): Promise<{ url?: string; error?: string }> {
     try {
-        const response = await fetch("http://img.bdedu.me/?upload=1", {
+        const response = await fetch("https://img.bdedu.me/?upload=1", {
             method: "POST",
             body: formData,
-            headers: {
-                "Accept": "application/json, text/plain, */*",
-                "Accept-Language": "en-GB,en-US;q=0.9,en;q=0.8,ne;q=0.7,bn;q=0.6",
-                "Cache-Control": "no-cache",
-                "x-csrf-token": "9oswLCk1qgrnmedhyL1O1ZEnkNYg6cDbdlud4PIH",
-                "x-requested-with": "XMLHttpRequest",
-                "Origin": "http://img.bdedu.me",
-                "Referer": "http://img.bdedu.me/?upload=1",
-            }
+             headers: {
+                "Accept": "application/json",
+            },
         });
 
         if (!response.ok) {
-            const errorText = await response.text();
-            console.error("Image upload failed with status:", response.status, "Response:", errorText);
             throw new Error(`সার্ভার থেকে ত্রুটি: ${response.statusText}`);
         }
 
-        const responseText = await response.text();
+        const result = await response.json();
         
-        try {
-            const result = JSON.parse(responseText);
-             if (result.status === "success" && result.url) {
-                return { url: result.url };
-            } else {
-                throw new Error(result.error?.message || "ছবি আপলোড করার পর সার্ভার থেকে কোনো URL পাওয়া যায়নি।");
-            }
-        } catch(e) {
-            try {
-                const dom = new JSDOM(responseText);
-                const urlInput = dom.window.document.querySelector('input[data-action="copy-to-clipboard"]');
-                if(urlInput){
-                    const url = (urlInput as HTMLInputElement).value;
-                    if(url) return { url };
-                }
-                 throw new Error("HTML response parsing failed to find the URL.");
-            } catch (htmlError) {
-                 console.error("Could not parse response as JSON or HTML:", responseText);
-                 throw new Error("সার্ভার থেকে একটি অপ্রত্যাশিত প্রতিক্রিয়া এসেছে।");
-            }
+        if (result.status === "success" && result.image?.url) {
+            return { url: result.image.url };
+        } else {
+            throw new Error(result.error?.message || "ছবি আপলোড করার পর সার্ভার থেকে কোনো URL পাওয়া যায়নি।");
         }
 
     } catch (error: any) {
@@ -286,6 +263,3 @@ export async function uploadImage(formData: FormData): Promise<{ url?: string; e
 
 
 export { searchResultLegacy, searchInstituteResult };
-
-
-
