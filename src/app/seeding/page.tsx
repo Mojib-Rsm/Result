@@ -172,6 +172,74 @@ const hsc2025Stats = {
     ]
 };
 
+const pagesToSeed = [
+    {
+        slug: 'about-us',
+        title: 'আমাদের সম্পর্কে',
+        content: `BD Edu Hub হলো বাংলাদেশের শিক্ষার্থীদের জন্য একটি ওয়ান-স্টপ সমাধান। আমাদের লক্ষ্য হলো পরীক্ষার ফলাফল, ভর্তি তথ্য, ক্যারিয়ার গাইডলাইন এবং শিক্ষামূলক রিসোর্সগুলোকে সবার জন্য সহজলভ্য করে তোলা। আমরা বিশ্বাস করি, সঠিক তথ্য এবং দিকনির্দেশনা শিক্ষার্থীদের তাদের স্বপ্নের পথে এগিয়ে যেতে সাহায্য করে।\n\nএই প্ল্যাটফর্মটি Oftern দ্বারা পরিচালিত। Oftern একটি প্রযুক্তি-ভিত্তিক প্রতিষ্ঠান, যা ডিজিটাল সমাধান তৈরির মাধ্যমে মানুষের জীবনকে সহজ করতে প্রতিশ্রুতিবদ্ধ। আমাদের ডেভেলপার এবং ডিজাইনারদের টিম শিক্ষার্থীদের জন্য একটি সুন্দর এবং কার্যকরী অভিজ্ঞতা নিশ্চিত করতে অক্লান্ত পরিশ্রম করে যাচ্ছে।`
+    },
+    {
+        slug: 'privacy-policy',
+        title: 'গোপনীয়তা নীতি',
+        content: `BD Edu Hub আপনার ব্যক্তিগত তথ্যের গোপনীয়তা রক্ষা করতে প্রতিশ্রুতিবদ্ধ। এই নীতিটি ব্যাখ্যা করে যে আমরা কীভাবে আপনার তথ্য সংগ্রহ, ব্যবহার এবং সুরক্ষিত রাখি।\n\n**যে তথ্য আমরা সংগ্রহ করি:**\n- ফলাফল অনুসন্ধানের তথ্য (রোল, বোর্ড, ইত্যাদি)\n- সাবস্ক্রিপশন তথ্য (ফোন নম্বর)\n- যোগাযোগের তথ্য (নাম, ইমেইল)\n\n**তথ্যের ব্যবহার:**\nআপনার তথ্য শুধুমাত্র ফলাফল প্রদর্শন, SMS অ্যালার্ট পাঠানো এবং আমাদের পরিষেবা উন্নত করার জন্য ব্যবহৃত হয়। আমরা আপনার তথ্য কোনো তৃতীয় পক্ষের কাছে বিক্রয় করি না।`
+    },
+    {
+        slug: 'disclaimer',
+        title: 'দাবিত্যাগ',
+        content: `BD Edu Hub ওয়েবসাইটের সমস্ত তথ্য শুধুমাত্র সাধারণ তথ্যের উদ্দেশ্যে সরবরাহ করা হয়েছে। আমরা এই তথ্যের সম্পূর্ণতা বা নির্ভুলতার বিষয়ে কোনো গ্যারান্টি প্রদান করি না। এই সাইটের তথ্যের উপর ভিত্তি করে কোনো সিদ্ধান্ত গ্রহণের সম্পূর্ণ ঝুঁকি আপনার নিজের। চূড়ান্ত ফলাফলের জন্য নিজ নিজ শিক্ষা বোর্ডের অফিসিয়াল ডকুমেন্ট ব্যবহার করুন।`
+    },
+    {
+        slug: 'terms-and-conditions',
+        title: 'শর্তাবলী',
+        content: `এই ওয়েবসাইটটি ব্যবহার করার মাধ্যমে, আপনি আমাদের শর্তাবলীতে সম্মত হচ্ছেন।\n\n- এই সাইটটি শুধুমাত্র শিক্ষামূলক উদ্দেশ্যে ব্যবহৃত হবে।\n- ফলাফলের নির্ভুলতার জন্য আমরা দায়ী নই। চূড়ান্ত ফলাফলের জন্য বোর্ডের অফিসিয়াল ডকুমেন্ট দেখুন।\n- আমরা কোনো পূর্ব বিজ্ঞপ্তি ছাড়াই পরিষেবা পরিবর্তন করার অধিকার রাখি।`
+    }
+];
+
+const questionsToSeed = [
+  {
+    id: 'q1',
+    title: 'HSC পরীক্ষার পর কোন বিষয়ে পড়লে ভালো হবে?',
+    content: 'আমি এইবার এইচএসসি পরীক্ষা দিয়েছি। এখন কোন বিষয়ে অনার্স করলে ভবিষ্যতে চাকরির বাজারে ভালো সুযোগ পাওয়া যাবে, এ বিষয়ে পরামর্শ প্রয়োজন। আমার গ্রুপ ছিল বিজ্ঞান।',
+    author: 'সাকিব আল হাসান',
+    authorId: 'user1',
+    tags: ['hsc', 'admission', 'career'],
+    createdAt: serverTimestamp(),
+    answers: [],
+  },
+  {
+    id: 'q2',
+    title: 'ঢাকা বিশ্ববিদ্যালয়ে "ক" ইউনিটে ভর্তির জন্য কীভাবে প্রস্তুতি নেব?',
+    content: 'আমি একজন এইচএসসি পরীক্ষার্থী এবং আমার স্বপ্ন ঢাকা বিশ্ববিদ্যালয়ে পড়া। "ক" ইউনিটে ভর্তির জন্য সেরা প্রস্তুতির কৌশল কী হতে পারে? কোন কোন বই পড়া উচিত?',
+    author: 'আফিফা খাতুন',
+    authorId: 'user2',
+    tags: ['admission', 'dhaka-university', 'preparation'],
+    createdAt: serverTimestamp(),
+    answers: [],
+  }
+];
+
+const forumPostsToSeed = [
+  {
+    id: 'fp1',
+    title: 'নতুন শিক্ষাক্রম নিয়ে আলোচনা',
+    content: 'সরকারের নতুন শিক্ষাক্রম সম্পর্কে আপনাদের মতামত কী? এটি কি সত্যিই শিক্ষার্থীদের জন্য উপকারী হবে? আমার মনে হয়, এর কিছু ভালো দিক থাকলেও প্রায়োগিক ক্ষেত্রে অনেক চ্যালেঞ্জ রয়েছে।',
+    author: 'একজন অভিভাবক',
+    authorId: 'user3',
+    tags: ['curriculum', 'education-system'],
+    createdAt: serverTimestamp(),
+    comments: [],
+  },
+  {
+    id: 'fp2',
+    title: 'পাবলিক ভার্সেস প্রাইভেট বিশ্ববিদ্যালয়: কোনটি ভালো?',
+    content: 'আমি দ্বিধায় আছি, পাবলিক বিশ্ববিদ্যালয়ে পড়ব নাকি প্রাইভেট বিশ্ববিদ্যালয়ে? খরচের পাশাপাশি শিক্ষার মান, চাকরির সুযোগ এবং অন্যান্য বিষয়গুলো নিয়ে আলোচনা করতে চাই।',
+    author: 'রিফাত আহমেদ',
+    authorId: 'user4',
+    tags: ['university', 'admission', 'public-vs-private'],
+    createdAt: serverTimestamp(),
+    comments: [],
+  }
+];
 
 export default function SeedingPage() {
     const [isSeeding, setIsSeeding] = useState(false);
@@ -200,6 +268,9 @@ export default function SeedingPage() {
                 seedCollection('users', usersToSeed),
                 seedCollection('news', newsItems),
                 seedCollection('jobs', jobsToSeed),
+                seedCollection('pages', pagesToSeed, 'slug'),
+                seedCollection('questions', questionsToSeed),
+                seedCollection('forum_posts', forumPostsToSeed),
             ]);
 
             // For single doc statistics
@@ -253,7 +324,7 @@ export default function SeedingPage() {
                 </CardHeader>
                 <CardContent>
                     <p className="mb-4 text-sm text-muted-foreground">
-                        এই প্রক্রিয়াটি নিম্নলিখিত কালেকশনগুলো তৈরি বা আপডেট করবে: <code className="bg-muted px-1 py-0.5 rounded">users</code>, <code className="bg-muted px-1 py-0.5 rounded">news</code>, <code className="bg-muted px-1 py-0.5 rounded">jobs</code>, <code className="bg-muted px-1 py-0.5 rounded">statistics</code>, এবং <code className="bg-muted px-1 py-0.5 rounded">settings</code>। এটি নিরাপদে একাধিকবার চালানো যেতে পারে।
+                        এই প্রক্রিয়াটি নিম্নলিখিত কালেকশনগুলো তৈরি বা আপডেট করবে: <code className="bg-muted px-1 py-0.5 rounded">users</code>, <code className="bg-muted px-1 py-0.5 rounded">news</code>, <code className="bg-muted px-1 py-0.5 rounded">jobs</code>, <code className="bg-muted px-1 py-0.5 rounded">pages</code>, <code className="bg-muted px-1 py-0.5 rounded">questions</code>, <code className="bg-muted px-1 py-0.5 rounded">forum_posts</code>, <code className="bg-muted px-1 py-0.5 rounded">statistics</code>, এবং <code className="bg-muted px-1 py-0.5 rounded">settings</code>। এটি নিরাপদে একাধিকবার চালানো যেতে পারে।
                     </p>
                     <Button onClick={handleSeed} disabled={isSeeding} className="w-full">
                         {isSeeding && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

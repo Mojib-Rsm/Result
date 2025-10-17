@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import Loading from '../loading';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { AlertTriangle, LayoutDashboard, Newspaper, Briefcase, Users, MailCheck, History, Settings, FileCog } from 'lucide-react';
+import { AlertTriangle, LayoutDashboard, Newspaper, Briefcase, Users, MailCheck, History, Settings, FileCog, MessageSquare, MessagesSquare } from 'lucide-react';
 import { SidebarProvider, Sidebar, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarContent, SidebarTrigger, SidebarInset } from '@/components/ui/sidebar';
 import Link from 'next/link';
 
@@ -64,9 +64,17 @@ export default function AdminLayout({
                             <SidebarMenuButton asChild tooltip="ক্যারিয়ার"><Link href="/admin/career"><Briefcase /><span>ক্যারিয়ার</span></Link></SidebarMenuButton>
                         </SidebarMenuItem>
                         {user.role === 'admin' && (
-                            <SidebarMenuItem>
-                                <SidebarMenuButton asChild tooltip="ব্যবহারকারীগণ"><Link href="/admin/users"><Users /><span>ব্যবহারকারীগণ</span></Link></SidebarMenuButton>
-                            </SidebarMenuItem>
+                            <>
+                                <SidebarMenuItem>
+                                    <SidebarMenuButton asChild tooltip="ব্যবহারকারীগণ"><Link href="/admin/users"><Users /><span>ব্যবহারকারীগণ</span></Link></SidebarMenuButton>
+                                </SidebarMenuItem>
+                                <SidebarMenuItem>
+                                    <SidebarMenuButton asChild tooltip="প্রশ্নোত্তর"><Link href="/admin/community/qna"><MessageSquare /><span>প্রশ্নোত্তর</span></Link></SidebarMenuButton>
+                                </SidebarMenuItem>
+                                <SidebarMenuItem>
+                                    <SidebarMenuButton asChild tooltip="ফোরাম"><Link href="/admin/community/forum"><MessagesSquare /><span>ফোরাম</span></Link></SidebarMenuButton>
+                                </SidebarMenuItem>
+                            </>
                         )}
                         <SidebarMenuItem>
                             <SidebarMenuButton asChild tooltip="সাবস্ক্রিপশন"><Link href="/admin/subscriptions"><MailCheck /><span>সাবস্ক্রিপশন</span></Link></SidebarMenuButton>

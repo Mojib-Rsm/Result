@@ -295,7 +295,7 @@ export default function Home() {
     <div className="container mx-auto max-w-5xl px-4 py-8 md:py-12" id="main-content">
        <div className="flex flex-col items-center text-center mb-12 no-print">
         <h1 className="text-4xl md:text-5xl font-bold tracking-tight bg-gradient-to-br from-primary to-accent bg-clip-text text-transparent animate-fade-in-up">
-          BD Edu: Your Education & Career Hub
+          BD Edu: Your Education &amp; Career Hub
         </h1>
         <p className="mt-4 max-w-2xl text-lg text-muted-foreground animate-fade-in-up animation-delay-200">
            রেজাল্ট, ভর্তি, শিক্ষা সংবাদ ও গাইড — সব BD Edu তে।
@@ -359,8 +359,28 @@ export default function Home() {
              <section className="pt-12">
                 <h2 className="text-3xl font-bold text-center mb-8">স্টুডেন্ট কমিউনিটি ফোরাম</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <Card><CardHeader><CardTitle className="flex items-center gap-3"><MessageCircleQuestion className="h-6 w-6" /> প্রশ্নোত্তর পর্ব (Q&A)</CardTitle><CardDescription>আপনার প্রশ্নটি এখানে জমা দিন এবং কমিউনিটির কাছ থেকে উত্তর পান।</CardDescription></CardHeader><CardContent><p className="text-center text-muted-foreground py-8">এই ফিচারটি শীঘ্রই আসছে...</p></CardContent></Card>
-                    <Card><CardHeader><CardTitle className="flex items-center gap-3"><MessagesSquare className="h-6 w-6" /> আলোচনা ও মন্তব্য</CardTitle><CardDescription>শিক্ষার্থীরা এখানে বিভিন্ন বিষয় নিয়ে আলোচনা করতে পারেন।</CardDescription></CardHeader><CardContent><p className="text-center text-muted-foreground py-8">আলোচনা বোর্ড শীঘ্রই আসছে...</p></CardContent></Card>
+                  <Card className="hover:shadow-lg transition-shadow">
+                      <CardHeader>
+                          <CardTitle className="flex items-center gap-3"><MessageCircleQuestion className="h-6 w-6" /> প্রশ্নোত্তর পর্ব (Q&amp;A)</CardTitle>
+                          <CardDescription>আপনার প্রশ্নটি এখানে জমা দিন এবং কমিউনিটির কাছ থেকে উত্তর পান।</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                          <Button asChild className="w-full">
+                              <Link href="/community/qna">প্রশ্ন করতে ক্লিক করুন</Link>
+                          </Button>
+                      </CardContent>
+                  </Card>
+                  <Card className="hover:shadow-lg transition-shadow">
+                      <CardHeader>
+                          <CardTitle className="flex items-center gap-3"><MessagesSquare className="h-6 w-6" /> আলোচনা ও মন্তব্য</CardTitle>
+                          <CardDescription>শিক্ষার্থীরা এখানে বিভিন্ন বিষয় নিয়ে আলোচনা করতে পারেন।</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                           <Button asChild className="w-full">
+                              <Link href="/community/forum">আলোচনা শুরু করুন</Link>
+                          </Button>
+                      </CardContent>
+                  </Card>
                 </div>
             </section></>
            )}
