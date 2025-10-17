@@ -16,47 +16,53 @@ const usersToSeed = [
     { id: 'editor-user', email: 'mojibrsm@gmail.com', name: 'Mojib Rsm', role: 'editor', password: 'password123' },
 ];
 
-const resultsToSeed = [
-    { roll: '123456', exam: 'HSC', year: '2023', gpa: '5.00' },
-    { roll: '654321', exam: 'SSC', year: '2023', gpa: '4.89' },
-    { roll: '101010', exam: 'JSC', year: '2023', gpa: 'Pass' },
-    { roll: '112233', exam: 'HSC', year: '2022', gpa: '4.50' },
-    { roll: '445566', exam: 'DAKHIL', year: '2023', gpa: '4.95' },
-];
+const jobsToSeed = [
+    {
+        id: 'job1',
+        title: 'Senior Software Engineer (React)',
+        companyName: 'Oftern IT',
+        companyLogoUrl: 'https://www.oftern.com/images/logo-light.png',
+        location: 'ঢাকা, বাংলাদেশ',
+        type: 'Full-time',
+        category: 'IT',
+        experienceLevel: 'Senior',
+        salary: 'আলোচনা সাপেক্ষে',
+        description: 'আমরা একজন অভিজ্ঞ সিনিয়র সফটওয়্যার ইঞ্জিনিয়ার খুঁজছি যিনি আমাদের ওয়েব অ্যাপ্লিকেশন ডেভেলপমেন্ট টিমে নেতৃত্ব দেবেন। প্রার্থীকে অবশ্যই React এবং আধুনিক ওয়েব প্রযুক্তিতে দক্ষ হতে হবে।',
+        requirements: 'কম্পিউটার সায়েন্সে স্নাতক ডিগ্রি। React এবং Node.js-এ কমপক্ষে ৪ বছরের অভিজ্ঞতা। ক্লাউড টেকনোলজি (AWS/GCP) সম্পর্কে ভালো ধারণা।',
+        applyLink: 'https://www.oftern.com/career',
+        deadline: '2025-12-31',
+    },
+    {
+        id: 'job2',
+        title: 'Lecturer in English',
+        companyName: 'Dhaka City College',
+        companyLogoUrl: 'https://upload.wikimedia.org/wikipedia/commons/4/42/Dhaka_City_College_Logo.png',
+        location: 'ঢাকা',
+        type: 'Full-time',
+        category: 'Teaching',
+        experienceLevel: 'Mid',
+        salary: 'কলেজের বেতন কাঠামো অনুযায়ী',
+        description: 'ইংরেজি বিভাগে লেকচারার পদে নিয়োগের জন্য আবেদনপত্র আহ্বান করা হচ্ছে। প্রার্থীকে অবশ্যই ইউজিসি-এর নিয়ম অনুযায়ী যোগ্যতা সম্পন্ন হতে হবে।',
+        requirements: 'ইংরেজি সাহিত্যে স্নাতক ও স্নাতকোত্তর ডিগ্রি। উভয় পরীক্ষায় প্রথম শ্রেণি থাকতে হবে। পূর্ববর্তী শিক্ষকতার অভিজ্ঞতা অগ্রাধিকার পাবে।',
+        applyLink: '#',
+        deadline: '2025-11-30',
+    },
+    {
+        id: 'job3',
+        title: 'Digital Marketing Manager',
+        companyName: 'BartaNow',
+        companyLogoUrl: 'https://www.mojib.me/img/work/bartanow.png',
+        location: 'Remote',
+        type: 'Remote',
+        category: 'Marketing',
+        experienceLevel: 'Mid',
+        description: 'আমাদের ডিজিটাল মার্কেটিং টিমের জন্য একজন দক্ষ ম্যানেজার প্রয়োজন। প্রার্থীকে SEO, SMM এবং কন্টেন্ট মার্কেটিং-এ অভিজ্ঞ হতে হবে।',
+        requirements: 'মার্কেটিং বা সংশ্লিষ্ট বিষয়ে স্নাতক। ডিজিটাল মার্কেটিং-এ কমপক্ষে ৩ বছরের অভিজ্ঞতা। চমৎকার যোগাযোগ দক্ষতা।',
+        applyLink: '#',
+        deadline: '2025-11-20',
+    }
+].map(job => ({ ...job, postedAt: serverTimestamp() }));
 
-const engineeringColleges = [
-    { id: 'buet', name: 'Bangladesh University of Engineering and Technology (BUET)', location: 'ঢাকা', website: 'https://www.buet.ac.bd' },
-    { id: 'kuet', name: 'Khulna University of Engineering & Technology (KUET)', location: 'খুলনা', website: 'https://www.kuet.ac.bd' },
-    { id: 'ruet', name: 'Rajshahi University of Engineering & Technology (RUET)', location: 'রাজশাহী', website: 'https://www.ruet.ac.bd' },
-    { id: 'cuet', name: 'Chittagong University of Engineering & Technology (CUET)', location: 'চট্টগ্রাম', website: 'https://www.cuet.ac.bd' },
-    { id: 'duet', name: 'Dhaka University of Engineering & Technology (DUET)', location: 'গাজীপুর', website: 'http://www.duet.ac.bd' },
-];
-
-const medicalColleges = [
-    { id: 'dmc', name: 'ঢাকা মেডিকেল কলেজ', location: 'ঢাকা' },
-    { id: 'ssmc', name: 'স্যার সলিমুল্লাহ মেডিকেল কলেজ', location: 'ঢাকা' },
-    { id: 'shsmc', name: 'শহীদ সোহরাওয়ার্দী মেডিকেল কলেজ', location: 'ঢাকা' },
-];
-
-const publicUniversities = [
-    { id: 'du', name: 'University of Dhaka', location: 'ঢাকা', website: 'http://www.du.ac.bd' },
-    { id: 'ru', name: 'University of Rajshahi', location: 'রাজশাহী', website: 'http://www.ru.ac.bd' },
-];
-
-const privateUniversities = [
-    { id: 'nsu', name: 'North South University', location: 'ঢাকা', website: 'http://www.northsouth.edu' },
-    { id: 'iub', name: 'Independent University, Bangladesh', location: 'ঢাকা', website: 'http://www.iub.edu.bd' },
-];
-
-const nationalColleges = [
-    { id: 'dhaka-college', name: 'ঢাকা কলেজ', location: 'ঢাকা', website: 'https://www.dhakacollege.edu.bd' },
-    { id: 'eden-college', name: 'ইডেন মহিলা কলেজ', location: 'ঢাকা', website: 'https://www.emc.edu.bd' },
-];
-
-const polytechnicInstitutes = [
-    { id: 'dhaka-poly', name: 'Dhaka Polytechnic Institute', departments: [ { name: 'Civil Technology', seats: 200 }, { name: 'Electrical Technology', seats: 150 } ] },
-    { id: 'mymensingh-poly', name: 'Mymensingh Polytechnic Institute', departments: [ { name: 'Civil Technology', seats: 150 }, { name: 'Electrical Technology', seats: 150 } ] },
-];
 
 const newsItems = [
     {
@@ -164,14 +170,8 @@ export default function SeedingPage() {
         try {
             await Promise.all([
                 seedCollection('users', usersToSeed),
-                seedCollection('results', resultsToSeed, 'roll'),
-                seedCollection('engineering-colleges', engineeringColleges),
-                seedCollection('medical-colleges', medicalColleges),
-                seedCollection('public-universities', publicUniversities),
-                seedCollection('private-universities', privateUniversities),
-                seedCollection('national-colleges', nationalColleges),
-                seedCollection('polytechnic-institutes', polytechnicInstitutes),
                 seedCollection('news', newsItems),
+                seedCollection('jobs', jobsToSeed),
             ]);
 
             // For single doc statistics
@@ -225,7 +225,7 @@ export default function SeedingPage() {
                 </CardHeader>
                 <CardContent>
                     <p className="mb-4 text-sm text-muted-foreground">
-                        এই প্রক্রিয়াটি নিম্নলিখিত কালেকশনগুলো তৈরি বা আপডেট করবে: <code className="bg-muted px-1 py-0.5 rounded">users</code>, <code className="bg-muted px-1 py-0.5 rounded">results</code>, <code className="bg-muted px-1 py-0.5 rounded">engineering-colleges</code>, <code className="bg-muted px-1 py-0.5 rounded">medical-colleges</code>, <code className="bg-muted px-1 py-0.5 rounded">public-universities</code>, <code className="bg-muted px-1 py-0.5 rounded">private-universities</code>, <code className="bg-muted px-1 py-0.5 rounded">national-colleges</code>, <code className="bg-muted px-1 py-0.5 rounded">polytechnic-institutes</code>, <code className="bg-muted px-1 py-0.5 rounded">news</code>, <code className="bg-muted px-1 py-0.5 rounded">statistics</code>, এবং <code className="bg-muted px-1 py-0.5 rounded">settings</code>। এটি নিরাপদে একাধিকবার চালানো যেতে পারে।
+                        এই প্রক্রিয়াটি নিম্নলিখিত কালেকশনগুলো তৈরি বা আপডেট করবে: <code className="bg-muted px-1 py-0.5 rounded">users</code>, <code className="bg-muted px-1 py-0.5 rounded">news</code>, <code className="bg-muted px-1 py-0.5 rounded">jobs</code>, <code className="bg-muted px-1 py-0.5 rounded">statistics</code>, এবং <code className="bg-muted px-1 py-0.5 rounded">settings</code>। এটি নিরাপদে একাধিকবার চালানো যেতে পারে।
                     </p>
                     <Button onClick={handleSeed} disabled={isSeeding} className="w-full">
                         {isSeeding && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

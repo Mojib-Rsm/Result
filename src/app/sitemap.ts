@@ -49,7 +49,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: `${baseUrl}${path}`,
     lastModified: new Date(),
     changeFrequency: 'weekly',
-    priority: path === '/' ? 1 : 0.8,
+    priority: path === '/' ? 1 : (path === '/career/post-job' ? 0.5 : 0.8),
   }));
   
   // We can't dynamically generate result pages here easily without

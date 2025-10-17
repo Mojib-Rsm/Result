@@ -35,6 +35,7 @@ export default function Header({ className }: { className?: string }) {
     { href: '/institute-result', label: 'প্রতিষ্ঠানের ফলাফল', icon: Building },
     { href: '/statistics', label: 'পরিসংখ্যান', icon: BarChart },
     { href: '/history', label: 'ইতিহাস', icon: History },
+    { href: '/admin/career/add', label: 'জব পোস্ট করুন', icon: Briefcase },
     { href: '/developer', label: 'ডেভেলপার', icon: Code },
   ];
   
