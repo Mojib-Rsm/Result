@@ -25,9 +25,10 @@ export default function DashboardPage() {
                     </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                    <div className="p-4 bg-muted rounded-lg">
+                    <div className="p-4 bg-muted rounded-lg space-y-1">
                         <p><strong>নাম:</strong> {user.name}</p>
                         <p><strong>ইমেইল:</strong> {user.email}</p>
+                        {user.registration && <p><strong>রেজিস্ট্রেশন নম্বর:</strong> {user.registration}</p>}
                         <p><strong>ভূমিকা:</strong> <span className="capitalize">{user.role}</span></p>
                     </div>
 

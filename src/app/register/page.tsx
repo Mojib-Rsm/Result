@@ -21,6 +21,7 @@ const registerSchema = z.object({
   name: z.string().min(3, 'নাম কমপক্ষে ৩ অক্ষরের হতে হবে।'),
   email: z.string().email('অনুগ্রহ করে একটি বৈধ ইমেইল দিন।'),
   password: z.string().min(6, 'পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে।'),
+  registration: z.string().optional(),
 });
 
 export default function RegisterPage() {
@@ -35,6 +36,7 @@ export default function RegisterPage() {
       name: '',
       email: '',
       password: '',
+      registration: '',
     },
   });
 
@@ -58,6 +60,7 @@ export default function RegisterPage() {
           name: values.name,
           email: values.email,
           password: values.password, // NOT SECURE
+          registration: values.registration || '',
           role: 'user', // Default role
           createdAt: new Date(),
       });
@@ -124,6 +127,19 @@ export default function RegisterPage() {
                     <FormLabel>পাসওয়ার্ড</FormLabel>
                     <FormControl>
                       <Input type="password" placeholder="••••••••" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+               <FormField
+                control={form.control}
+                name="registration"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>রেজিস্ট্রেশন নম্বর (ঐচ্ছিক)</FormLabel>
+                    <FormControl>
+                      <Input placeholder="আপনার পরীক্ষার রেজিস্ট্রেশন নম্বর" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

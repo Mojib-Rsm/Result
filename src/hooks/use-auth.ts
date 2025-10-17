@@ -7,6 +7,7 @@ export interface AuthUser {
   email: string;
   name?: string;
   role?: string;
+  registration?: string;
   [key: string]: any;
 }
 
