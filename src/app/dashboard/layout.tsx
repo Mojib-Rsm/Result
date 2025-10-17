@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import Loading from '../loading';
 import { Sidebar, SidebarContent, SidebarInset, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
-import { LayoutDashboard, User } from 'lucide-react';
+import { LayoutDashboard, User, History } from 'lucide-react';
 import Link from 'next/link';
 
 export default function DashboardLayout({
@@ -34,6 +34,9 @@ export default function DashboardLayout({
                     <SidebarMenu>
                         <SidebarMenuItem>
                             <SidebarMenuButton asChild tooltip="ড্যাশবোর্ড"><Link href="/dashboard"><LayoutDashboard /><span>ড্যাশবোর্ড</span></Link></SidebarMenuButton>
+                        </SidebarMenuItem>
+                         <SidebarMenuItem>
+                            <SidebarMenuButton asChild tooltip="অনুসন্ধানের ইতিহাস"><Link href="/dashboard/history"><History /><span>অনুসন্ধানের ইতিহাস</span></Link></SidebarMenuButton>
                         </SidebarMenuItem>
                         {user.role === 'admin' &&
                             <SidebarMenuItem>
