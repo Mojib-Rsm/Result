@@ -4,7 +4,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { ArrowLeft, Briefcase, UserShield } from 'lucide-react';
+import { ArrowLeft, Briefcase, ShieldAlert } from 'lucide-react';
 
 export default function PostJobPage() {
     return (
@@ -25,7 +25,7 @@ export default function PostJobPage() {
                     <CardDescription className="text-lg">আপনার প্রতিষ্ঠানের জন্য চাকরির বিজ্ঞপ্তি দিন।</CardDescription>
                 </CardHeader>
                 <CardContent className="p-6 md:p-8 text-center">
-                    <UserShield className="h-10 w-10 mx-auto text-muted-foreground mb-4" />
+                    <ShieldAlert className="h-10 w-10 mx-auto text-muted-foreground mb-4" />
                     <h3 className="text-xl font-semibold mb-4">এই ফিচারটি শুধুমাত্র অ্যাডমিনদের জন্য।</h3>
                     <p className="text-muted-foreground">
                         আমাদের প্ল্যাটফর্মে চাকরির বিজ্ঞপ্তির মান বজায় রাখার জন্য, বর্তমানে শুধুমাত্র অ্যাডমিনরা চাকরির বিজ্ঞপ্তি পোস্ট করতে পারেন। আপনি যদি আপনার প্রতিষ্ঠানের জন্য কোনো বিজ্ঞপ্তি পোস্ট করতে চান, অনুগ্রহ করে আমাদের সাথে যোগাযোগ করুন।
