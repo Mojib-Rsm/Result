@@ -1,3 +1,4 @@
+
 'use client'
 
 import { useState, useEffect, useCallback } from 'react';
@@ -158,10 +159,9 @@ export default function SubscriptionsPage() {
             
             let message = '';
             if (result.status === 'Pass') {
-                const resultUrl = result.pdfId ? `www.bdedu.me/results/${result.pdfId}` : 'www.bdedu.me';
-                message = `অভিনন্দন! আপনার ${result.exam.toUpperCase()} পরীক্ষার ফলাফল প্রকাশিত হয়েছে। আপনার GPA: ${result.gpa.toFixed(2)}. বিস্তারিত দেখুন: ${resultUrl}`;
+                message = `অভিনন্দন! আপনার ${result.exam.toUpperCase()} পরীক্ষার ফলাফল প্রকাশিত হয়েছে। আপনার GPA: ${result.gpa.toFixed(2)}. - bdedu.me`;
             } else {
-                message = `আপনার ${selectedSub.exam.toUpperCase()} পরীক্ষার ফলাফল প্রকাশিত হয়েছে। স্ট্যাটাস: Fail. বিস্তারিত দেখুন: www.bdedu.me`;
+                message = `আপনার ${selectedSub.exam.toUpperCase()} পরীক্ষার ফলাফল প্রকাশিত হয়েছে। স্ট্যাটাস: Fail. - bdedu.me`;
             }
             setSingleSmsMessage(message);
 

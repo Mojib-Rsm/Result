@@ -139,7 +139,7 @@ export default function ResultAlertForm() {
       });
       
       // Send confirmation SMS to user
-      const userMessage = `BD Edu Result-এ স্বাগতম! আপনার পরীক্ষার ফলাফল প্রকাশিত হলে আপনাকে SMS-এর মাধ্যমে জানানো হবে। ধন্যবাদ। - www.bdedu.me`;
+      const userMessage = `BD Edu Result-এ স্বাগতম! আপনার পরীক্ষার ফলাফল প্রকাশিত হলে আপনাকে SMS-এর মাধ্যমে জানানো হবে। ধন্যবাদ। - bdedu.me`;
       const userSmsResult = await sendNotification({ message: userMessage, type: 'sms', recipient: submissionValues.phone });
 
       if (!userSmsResult.success) {
@@ -150,7 +150,7 @@ export default function ResultAlertForm() {
       const adminMessage = `New Subscription on BD Edu Result:\nRoll: ${submissionValues.roll}\nExam: ${submissionValues.exam.toUpperCase()}\nYear: ${submissionValues.year}\nBoard: ${submissionValues.board}\nPhone: ${submissionValues.phone}`;
       
       // Send notification SMS to admin
-      await sendNotification({ message: `${adminMessage} - www.bdedu.me`, type: 'sms' });
+      await sendNotification({ message: `${adminMessage} - bdedu.me`, type: 'sms' });
       
       // Send Telegram notification
       await sendNotification({ message: adminMessage, type: 'telegram' });

@@ -1,7 +1,7 @@
 
 
 import { NextResponse } from 'next/server';
-import { getFirestore, collection, getDocs, doc, deleteDoc } from 'firebase/firestore';
+import { getFirestore, collection, getDocs, doc, deleteDoc, getDoc } from 'firebase/firestore';
 import { app } from '@/lib/firebase';
 import { searchResultLegacy } from '@/lib/actions';
 import { sendAnbuSms, sendBulkSmsBd } from '@/lib/sms';
@@ -81,10 +81,9 @@ export async function GET(request: Request) {
                     const examResult = result as ExamResult;
                     resultFound = true;
                      if (examResult.status === 'Pass') {
-                        const resultUrl = examResult.pdfId ? `www.bdedu.me/results/${examResult.pdfId}` : 'www.bdedu.me';
-                        message = `অভিনন্দন! আপনার ${examResult.exam.toUpperCase()} পরীক্ষার ফলাফল প্রকাশিত হয়েছে। আপনার GPA: ${examResult.gpa.toFixed(2)}. বিস্তারিত দেখুন: ${resultUrl}`;
+                        message = `অভিনন্দন! আপনার ${examResult.exam.toUpperCase()} পরীক্ষার ফলাফল প্রকাশিত হয়েছে। আপনার GPA: ${examResult.gpa.toFixed(2)}. - bdedu.me`;
                     } else {
-                        message = `আপনার ${sub.exam.toUpperCase()} পরীক্ষার ফলাফল প্রকাশিত হয়েছে। স্ট্যাটাস: Fail. বিস্তারিত দেখুন: www.bdedu.me`;
+                        message = `আপনার ${sub.exam.toUpperCase()} পরীক্ষার ফলাফল প্রকাশিত হয়েছে। স্ট্যাটাস: Fail. - bdedu.me`;
                     }
                     console.log(`Result for Roll ${sub.roll}: SUCCESS. SMS: "${message}"`);
                 }
