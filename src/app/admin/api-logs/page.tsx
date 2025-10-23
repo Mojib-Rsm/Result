@@ -1,3 +1,4 @@
+
 'use client'
 
 import { useState, useEffect } from 'react';
@@ -94,7 +95,7 @@ export default function ApiLogsPage() {
                                                 {item.status}
                                             </Badge>
                                         </TableCell>
-                                        <TableCell className="text-xs max-w-xs truncate">{item.response}</TableCell>
+                                        <TableCell className="text-xs whitespace-pre-wrap">{item.response}</TableCell>
                                     </TableRow>
                                 ))
                             ) : (
