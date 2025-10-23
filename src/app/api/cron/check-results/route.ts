@@ -81,9 +81,9 @@ export async function GET(request: Request) {
                     const examResult = result as ExamResult;
                     resultFound = true;
                      if (examResult.status === 'Pass') {
-                        message = `অভিনন্দন! আপনার ${examResult.exam.toUpperCase()} পরীক্ষার ফলাফল প্রকাশিত হয়েছে। আপনার GPA: ${examResult.gpa.toFixed(2)}. - bdedu.me`;
+                        message = `অভিনন্দন! আপনার ${examResult.exam.toUpperCase()} পরীক্ষার ফলাফল প্রকাশিত হয়েছে। আপনার GPA: ${examResult.gpa.toFixed(2)}. বিস্তারিত দেখুন: bdedu.me`;
                     } else {
-                        message = `আপনার ${sub.exam.toUpperCase()} পরীক্ষার ফলাফল প্রকাশিত হয়েছে। স্ট্যাটাস: Fail. - bdedu.me`;
+                        message = `আপনার ${sub.exam.toUpperCase()} পরীক্ষার ফলাফল প্রকাশিত হয়েছে। স্ট্যাটাস: Fail. বিস্তারিত দেখুন: bdedu.me`;
                     }
                     console.log(`Result for Roll ${sub.roll}: SUCCESS. SMS: "${message}"`);
                 }
