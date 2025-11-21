@@ -18,6 +18,10 @@ const Adsense = () => {
         }
     }, []);
 
+    if (!process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID) {
+        return null;
+    }
+
     return (
         <ins
             className="adsbygoogle"
