@@ -2,6 +2,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 
 declare global {
     interface Window {
@@ -10,13 +11,15 @@ declare global {
 }
 
 const Adsense = () => {
+    const pathname = usePathname();
+
     useEffect(() => {
         try {
             (window.adsbygoogle = window.adsbygoogle || []).push({});
         } catch (err) {
             console.error(err);
         }
-    }, []);
+    }, [pathname]);
 
     if (!process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID) {
         return null;
@@ -24,6 +27,7 @@ const Adsense = () => {
 
     return (
         <ins
+            key={pathname}
             className="adsbygoogle"
             style={{ display: 'block' }}
             data-ad-client={process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}
