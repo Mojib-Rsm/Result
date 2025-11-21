@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect } from 'react';
@@ -19,7 +18,7 @@ const Adsense = () => {
         } catch (err) {
             console.error(err);
         }
-    }, [pathname]);
+    }, []); // Empty dependency array ensures this runs only once on mount
 
     if (!process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID) {
         return null;
@@ -27,7 +26,6 @@ const Adsense = () => {
 
     return (
         <ins
-            key={pathname}
             className="adsbygoogle"
             style={{ display: 'block' }}
             data-ad-client={process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}
