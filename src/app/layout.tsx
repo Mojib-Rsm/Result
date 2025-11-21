@@ -3,6 +3,7 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { Poppins } from 'next/font/google';
 import AppProvider from '@/components/app-provider';
+import Script from 'next/script';
 
 const poppins = Poppins({ 
   subsets: ['latin'], 
@@ -92,6 +93,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+       <head>
+        <Script
+          async
+          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID}`}
+          crossOrigin="anonymous"
+          strategy="lazyOnload"
+        />
+      </head>
       <body className={poppins.variable} suppressHydrationWarning>
         <AppProvider>{children}</AppProvider>
       </body>

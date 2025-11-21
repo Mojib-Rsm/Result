@@ -25,6 +25,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import Link from 'next/link';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import Adsense from '@/components/adsense';
 
 
 const GpaCalculatorCard = () => {
@@ -306,6 +307,10 @@ export default function Home() {
         <div className="space-y-16">
           <div className="rounded-xl border bg-card text-card-foreground shadow p-4 md:p-8">
               <ExamForm form={form} onSubmit={onSubmit} isSubmitting={isSubmitting} captchaUrl={captchaUrl} onCaptchaRefresh={refreshCaptcha} selectedExam={selectedExam} />
+          </div>
+          
+          <div className="my-8">
+            <Adsense />
           </div>
 
           {contentSections.map(section => (
